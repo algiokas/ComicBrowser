@@ -4,14 +4,10 @@ import PageSelect from "./pageSelect";
 
 class BookGallery extends Component {
     constructor(props) {
-        super(props)
-
-        console.log(this.props)
-
-        console.log('new gallery with ' + props.allBooks.length + ' books')
-        
+        super(props)  
         this.allBooks = props.allBooks
-        this.setCurrentBook = props.setCurrentBook.bind(this)
+        this.viewBook = props.viewBook.bind(this)
+        this.addBookToSlideshow = props.addBookToSlideshow.bind(this)
         this.pageSize = props.pageSize
         this.totalPages = Math.floor(props.allBooks.length / this.pageSize)
 
@@ -51,7 +47,7 @@ class BookGallery extends Component {
                 </div>
                 <div className="container-inner">
                     {this.getCurrentPage().map((object, i) => {
-                        return <GalleryItem book={object} setCurrentBook={this.setCurrentBook}></GalleryItem>
+                        return <GalleryItem book={object} viewBook={this.viewBook} addBookToSlideshow={this.addBookToSlideshow}></GalleryItem>
                     })
                     }
                 </div>

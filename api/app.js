@@ -22,7 +22,6 @@ app.use(cookieParser());
 app.use('/data', express.static(path.join(__dirname, 'data')));
 
 var imageDirectory = path.join(__dirname, '../../Images')
-console.log(imageDirectory)
 app.use('/img', express.static(imageDirectory));
 app.use(cors())
 

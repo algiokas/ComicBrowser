@@ -130,6 +130,10 @@ h2 {
   align-items: center;
 }
 
+.nav-item {
+  margin-right: 15px;
+}
+
 .gallery-controls {
   display: flex;
   justify-content: center;
@@ -148,7 +152,6 @@ h2 {
 
 .stepper-arrow img {
   height: 25px;
-  filter: invert(100%) sepia(79%) saturate(30%) hue-rotate(32deg) brightness(93%) contrast(83%);
 }
 
 
@@ -161,7 +164,7 @@ h2 {
 }
 
 .slideshow-sidebar {
-  height: calc(96% - 50px);
+  height: calc(93% - 50px);
   width: 200px;
   position: absolute;
   left: 0;
@@ -192,7 +195,6 @@ h2 {
 
 .sidebar-toggle img {
   height: 30px;
-  filter: invert(100%) sepia(79%) saturate(30%) hue-rotate(32deg) brightness(93%) contrast(83%);
 }
 
 .sidebar-stack {
@@ -232,4 +234,27 @@ h2 {
   background-color: #3a3a3a;
   color: #d9d9d9;
   font-family: 'Noto Sans', sans-serif;
+}
+
+.add-button {
+  z-index: 3;
+  border: 2px solid #353535;
+  border-radius: 3px;
+  margin: 0;
+  padding: 2px;
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #404040;
+}
+
+.add-button img {
+  width: 20px;
+  height: 20px;
+}
+
+.svg-icon {
+  filter: invert(100%) sepia(79%) saturate(30%) hue-rotate(32deg) brightness(93%) contrast(83%);
 }

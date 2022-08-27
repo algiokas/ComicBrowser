@@ -1,16 +1,20 @@
 import React, { Component } from "react";
-import { GetPagePath, GetPagePathMulti } from "../helpers";
+import { GetPagePathMulti } from "../helpers";
 
 class SlideShow extends Component {
     constructor(props) {
         super(props)
 
-        //console.log("New Slideshow with " + props.book.pageCount + " pages")
+        console.log(props.slideShow)
 
         this.setSlideshowInterval = props.setSlideshowInterval.bind(this)
         this.onImgLoad = this.onImgLoad.bind(this);
 
+        console.log('new slideshow')
+        console.log(props.slideShow)
+
         this.state = {
+            currentBook: {},
             currentPage: 0,
             showSidebar: false,
             playing: false,
@@ -20,7 +24,6 @@ class SlideShow extends Component {
     }
 
     onImgLoad = ({target:img}) => {
-        console.log(`Image Dimensions: ${img.naturalWidth}x${img.naturalHeight}`)
         this.setState({imageDimensions :
             { width:img.naturalWidth, height:img.naturalHeight }
         });
@@ -48,7 +51,7 @@ class SlideShow extends Component {
     }
 
     nextPage = () => {
-        if (this.state.currentPage < this.props.book.pageCount - 1) {
+        if (this.state.currentPage < this.props.slideShow.pageCount - 1) {
             this.setState((state) => {
                 return { currentPage: state.currentPage + 1 };
             });
@@ -92,9 +95,9 @@ class SlideShow extends Component {
             <div className={`slideshow-container ${this.state.showSidebar ? "show-sidebar" : ""}`}>
                 <div className="slideshow">
                     <img className={`slideshow-image ${this.isWideImage() ? "wide" : ""}` }
-                        src={GetPagePath(this.props.book, this.state.currentPage)}
+                        src={GetPagePathMulti(this.props.slideShow.books, this.state.currentPage)}
                         style={{ left: this.state.showSidebar ? '300px' : '0' }}
-                        alt={this.props.book.title + " page " + this.currentPage + 1}
+                        alt={" page " + this.currentPage + 1}
                         onLoad={this.onImgLoad}>
                     </img>
                     <div className="slideshow-overlay">
@@ -103,18 +106,18 @@ class SlideShow extends Component {
                     </div>
                 </div>
                 <div className="sidebar-toggle stepper-arrow" onClick={this.toggleSidebar}>
-                    <img src="http://localhost:9000/data/images/chevron-right.svg" className={this.state.showSidebar ? 'mirror' : ''} alt="stepper left"></img>
+                    <img src="http://localhost:9000/data/images/chevron-right.svg" className={`svg-icon ${this.state.showSidebar ? 'mirror' : ''}`} alt="stepper left"></img>
                 </div>
                 <div className="slideshow-sidebar">
                     <div className="sidebar-stack slideshow-controls">
                         <div className="stepper-arrow mirror" onClick={this.previousPage}>
-                            <img src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper left"></img>
+                            <img className="svg-icon" src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper left"></img>
                         </div>
                         <div className="page-number">
-                            {this.state.currentPage + 1}/{this.props.book.pageCount}
+                            {this.state.currentPage + 1}/{this.props.slideShow.pageCount}
                         </div>
                         <div className="stepper-arrow" onClick={this.nextPage}>
-                            <img src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper right"></img>
+                            <img className="svg-icon" src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper right"></img>
                         </div>
                     </div>
                     <div className="sidebar-stack slideshow-controls">
@@ -126,8 +129,8 @@ class SlideShow extends Component {
                         </div>
                     </div>
                     <div className="sidebar-stack slideshow-controls">
-                        <button class="media-button play" onClick={this.playPause}>{this.state.playing ? "Pause" : "Play"}</button>
-                        <button class="media-button reset" onClick={this.resetPage}>Reset</button>
+                        <button className="media-button play" onClick={this.playPause}>{this.state.playing ? "Pause" : "Play"}</button>
+                        <button className="media-button reset" onClick={this.resetPage}>Reset</button>
                     </div>
                 </div>
             </div>

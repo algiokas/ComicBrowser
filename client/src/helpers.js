@@ -19,15 +19,14 @@ export function GetPagePathMulti(books, pageNum) {
     if (books.length < 2) {
         return GetPagePath(books[0], pageNum)
     }
-
     let pageNumInternal = pageNum
-    books.forEach((book) => {
-        if (pageNumInternal < book.pageCount){
-            return GetPagePath(book, pageNumInternal)
+    for (let i =0; i < books.length; i++) {
+        if (pageNumInternal < books[i].pageCount){
+            return GetPagePath(books[i], pageNumInternal)
         }
         else {
-            pageNumInternal = pageNumInternal - book.pageCount
+            pageNumInternal = pageNumInternal - books[i].pageCount
         }
-    })
+    }
     console.log(`GetPagePathMulti - page ${pageNum} not found in books`)
 }

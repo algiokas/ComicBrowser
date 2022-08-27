@@ -40,13 +40,13 @@ class PageSelect extends Component {
         return (
             <div className="gallery-controls">
                 <div className="stepper-arrow mirror" onClick={this.previousPage}>
-                    <img src="http://localhost:9000/data/images/chevron-right.svg"></img>
+                    <img className="svg-icon" src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper left"></img>
                 </div>
                 <div className="page-number">
                     {this.state.currentPage + 1}/{this.totalPages}
                 </div>
                 <div className="stepper-arrow" onClick={this.nextPage}>
-                    <img src="http://localhost:9000/data/images/chevron-right.svg"></img>
+                    <img className="svg-icon" src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper right"></img>
                 </div>
             </div>
         )
