@@ -12,11 +12,6 @@ class PageSelect extends Component {
         this.state = { currentPage: props.currentPage }
     }
 
-    test = () => {
-        
-    }
-
-
     previousPage = () => {
         if (this.state.currentPage > 0) {
             this.previousPageHandler();
