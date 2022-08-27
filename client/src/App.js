@@ -1,26 +1,25 @@
 import React, { Component } from "react";
-import SlideShow from "./components/slideShow";
-import BookGallery from "./components/bookGallery";
-import logo from './logo.svg';
+import Navigation from "./components/navigation";
+import MainBody from "./components/mainBody";
 import './App.css';
 
 const apiBaseUrl = "http://localhost:9000/api/";
 
-const ViewMode = Object.freeze({
-	Summer: Symbol("summer"),
-	Autumn: Symbol("autumn"),
-	Winter: Symbol("winter"),
-	Spring: Symbol("spring")
+export const ViewMode = Object.freeze({
+	Listing: Symbol("Listing"),
+	SingleBook: Symbol("SingleBook"),
+	Slideshow: Symbol("SlideShow"),
 })
 
 class App extends Component {
   constructor(props) {
     super(props);
 
-    this.galleryPageSize = 12
     this.state = {
+      galleryPageSize: 12,
       allBooks: [],
-      showSlideshow: false,
+      viewMode: ViewMode.Listing,
+      currentBook: {},
       currentSlideshow: {
         pageCount: 0,
         books: []
@@ -40,8 +39,9 @@ class App extends Component {
   }
 
   resetSlideShow = () => {
+    console.log('reset slideshow')
     this.setState({
-      showSlideshow: false,
+      viewMode: ViewMode.Listing,
       currentSlideshow: {
         pageCount: 0,
         books: []
@@ -52,25 +52,31 @@ class App extends Component {
   viewBook = (book) => {
     console.log('view book')
     this.setState({
-      showSlideshow: true,
-      currentSlideshow: {
-        pageCount: book.pageCount,
-        books: [book]
-      }
+      viewMode: ViewMode.SingleBook,
+      currentBook: book,
     })
+  }
+
+  viewCurrentBook = () => {
+    console.log('view current book')
+    if (this.state.currentBook.title) {
+      this.setState({
+        viewMode: ViewMode.SingleBook
+      })
+    }
   }
 
   viewSlideshow = () => {
     if (this.state.currentSlideshow.pageCount > 0) {
       this.setState({
-        showSlideshow: true
+        viewMode: ViewMode.Slideshow
       })
     } 
   }
 
   viewListing = () => {
     this.setState({
-      showSlideshow: false
+      viewMode: ViewMode.Listing
     })
   }
 
@@ -84,7 +90,7 @@ class App extends Component {
         }
       }
     })
-    console.log(this.state.currentSlideshow)
+
   }
 
   setSlideshowInterval = (interval) => {
@@ -96,24 +102,23 @@ class App extends Component {
   }
 
   render() {
+    const handlers = {
+      resetSlideShow: this.resetSlideShow,
+      viewBook: this.viewBook,
+      viewSlideshow: this.viewSlideshow,
+      viewListing: this.viewListing,
+      viewCurrentBook: this.viewCurrentBook,
+      addBookToSlideshow: this.addBookToSlideshow,
+      setSlideshowInterval: this.setSlideshowInterval,
+    }
+    console.log("Render App")
     return (
       <div className="App">
-        <nav role="navigation">
-          <div className="logo">
-            <img src={logo} alt="Logo" onClick={this.viewListing} />
-          </div>
-          <div className="nav-items">
-            <div className="nav-item" onClick={this.viewListing}>Listing</div>
-            <div className="nav-item" onClick={this.viewSlideshow}>
-              Slideshow <span className="slideshow-count">{this.state.currentSlideshow.books.length}</span> 
-            </div>
-          </div>
-        </nav>
-        {
-          this.state.showSlideshow ?
-            <SlideShow slideShow={this.state.currentSlideshow} interval={this.state.slideshowInterval} setSlideshowInterval={this.setSlideshowInterval}></SlideShow> :
-            <BookGallery allBooks={this.state.allBooks} pageSize={this.galleryPageSize} viewBook={this.viewBook} addBookToSlideshow={this.addBookToSlideshow}></BookGallery>
-        }
+        <Navigation 
+          handlers={handlers}
+          slideshowCount={this.state.currentSlideshow.books.length}>
+        </Navigation>
+        <MainBody {...this.state} {...handlers}></MainBody>
       </div>
     )
   }

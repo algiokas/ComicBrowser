@@ -5,18 +5,14 @@ class SlideShow extends Component {
     constructor(props) {
         super(props)
 
-        console.log(props.slideShow)
-
         this.setSlideshowInterval = props.setSlideshowInterval.bind(this)
         this.onImgLoad = this.onImgLoad.bind(this);
 
         console.log('new slideshow')
-        console.log(props.slideShow)
 
         this.state = {
-            currentBook: {},
             currentPage: 0,
-            showSidebar: false,
+            showSidebar: true,
             playing: false,
             intervalId: 0,
             imageDimensions: {}
@@ -105,32 +101,34 @@ class SlideShow extends Component {
                         <div className="overlay-right" onClick={this.nextPage}></div>
                     </div>
                 </div>
-                <div className="sidebar-toggle stepper-arrow" onClick={this.toggleSidebar}>
-                    <img src="http://localhost:9000/data/images/chevron-right.svg" className={`svg-icon ${this.state.showSidebar ? 'mirror' : ''}`} alt="stepper left"></img>
-                </div>
-                <div className="slideshow-sidebar">
-                    <div className="sidebar-stack slideshow-controls">
-                        <div className="stepper-arrow mirror" onClick={this.previousPage}>
-                            <img className="svg-icon" src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper left"></img>
-                        </div>
-                        <div className="page-number">
-                            {this.state.currentPage + 1}/{this.props.slideShow.pageCount}
-                        </div>
-                        <div className="stepper-arrow" onClick={this.nextPage}>
-                            <img className="svg-icon" src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper right"></img>
-                        </div>
+                <div className="sidebar-container">
+                    <div className="sidebar-toggle stepper-arrow" onClick={this.toggleSidebar}>
+                        <img src="http://localhost:9000/data/images/chevron-right.svg" className={`svg-icon ${this.state.showSidebar ? 'mirror' : ''}`} alt="stepper left"></img>
                     </div>
-                    <div className="sidebar-stack slideshow-controls">
-                        <span className="control-label">Interval</span>
-                        <div className="interval-input">
-                            <input type="number"
-                                value={this.props.interval}
-                                onChange={this.handleIntervalChange}></input>
+                    <div className="slideshow-sidebar">
+                        <div className="sidebar-stack slideshow-controls">
+                            <div className="stepper-arrow mirror" onClick={this.previousPage}>
+                                <img className="svg-icon" src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper left"></img>
+                            </div>
+                            <div className="page-number">
+                                {this.state.currentPage + 1}/{this.props.slideShow.pageCount}
+                            </div>
+                            <div className="stepper-arrow" onClick={this.nextPage}>
+                                <img className="svg-icon" src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper right"></img>
+                            </div>
                         </div>
-                    </div>
-                    <div className="sidebar-stack slideshow-controls">
-                        <button className="media-button play" onClick={this.playPause}>{this.state.playing ? "Pause" : "Play"}</button>
-                        <button className="media-button reset" onClick={this.resetPage}>Reset</button>
+                        <div className="sidebar-stack slideshow-controls">
+                            <span className="control-label">Interval</span>
+                            <div className="interval-input">
+                                <input type="number"
+                                    value={this.props.interval}
+                                    onChange={this.handleIntervalChange}></input>
+                            </div>
+                        </div>
+                        <div className="sidebar-stack slideshow-controls">
+                            <button className="media-button play" onClick={this.playPause}>{this.state.playing ? "Pause" : "Play"}</button>
+                            <button className="media-button reset" onClick={this.resetPage}>Reset</button>
+                        </div>
                     </div>
                 </div>
             </div>

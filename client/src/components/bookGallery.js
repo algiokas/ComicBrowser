@@ -4,7 +4,8 @@ import PageSelect from "./pageSelect";
 
 class BookGallery extends Component {
     constructor(props) {
-        super(props)  
+        super(props)
+        
         this.allBooks = props.allBooks
         this.viewBook = props.viewBook.bind(this)
         this.addBookToSlideshow = props.addBookToSlideshow.bind(this)

@@ -25,6 +25,7 @@ nav .logo {
   height: 50px;
   padding: 10px;
   margin-left: -76px;
+  cursor: pointer;
 }
 
 nav .logo img {
@@ -32,8 +33,16 @@ nav .logo img {
   height: 30px;
 }
 
+.logo-pink {
+  filter: invert(39%) sepia(81%) saturate(2985%) hue-rotate(319deg) brightness(102%) contrast(101%);
+}
+
 a {
   color: #00B7FF;
+}
+
+button {
+  cursor: pointer;
 }
 
 .container {
@@ -65,6 +74,7 @@ h2 {
   position: relative;
   margin: 3px;
   margin-bottom: 3em;
+  cursor: pointer;
 }
 
 
@@ -131,6 +141,7 @@ h2 {
 }
 
 .nav-item {
+  cursor: pointer;
   margin-right: 15px;
 }
 
@@ -147,6 +158,7 @@ h2 {
 }
 
 .stepper-arrow {
+  cursor: pointer;
   height: 100%;
 }
 
@@ -162,6 +174,7 @@ h2 {
   -ms-transform: scale(-1, 1);
   transform: scale(-1, 1);
 }
+
 
 .slideshow-sidebar {
   height: calc(93% - 50px);
