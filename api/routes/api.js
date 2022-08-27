@@ -28,6 +28,7 @@ router.get('/allbooks', function(req, res, next) {
         }
       }
     })
+    console.log(`returned ${books.length} books`)
     res.json(books);
   }) 
 });
