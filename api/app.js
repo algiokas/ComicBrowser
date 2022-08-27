@@ -19,7 +19,11 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static('data'));
+app.use('/data', express.static(path.join(__dirname, 'data')));
+
+var imageDirectory = path.join(__dirname, '../../Images')
+console.log(imageDirectory)
+app.use('/img', express.static(imageDirectory));
 app.use(cors())
 
 app.use('/', indexRouter);
