@@ -6,12 +6,12 @@ class BookGallery extends Component {
     constructor(props) {
         super(props)
         
-        this.allBooks = props.allBooks
+        this.allBooks = props.allBooks  
         this.viewBook = props.viewBook.bind(this)
         this.addBookToSlideshow = props.addBookToSlideshow.bind(this)
         this.pageSize = props.pageSize
         this.totalPages = Math.floor(props.allBooks.length / this.pageSize)
-
+            
         this.state = { galleryPage: 0 }
     }
 
@@ -23,7 +23,6 @@ class BookGallery extends Component {
     }
 
     previousPage = () => {
-        console.log('prev page')
         if (this.state.galleryPage > 0) {
             this.setState((state) => {
                 return {galleryPage: state.galleryPage - 1};
@@ -32,7 +31,6 @@ class BookGallery extends Component {
     }
 
     nextPage = () => {
-        console.log('next page')
         if (this.state.galleryPage < this.totalPages-1) {
             this.setState((state) => {
                 return {galleryPage: state.galleryPage + 1};
@@ -48,7 +46,7 @@ class BookGallery extends Component {
                 </div>
                 <div className="container-inner">
                     {this.getCurrentPage().map((object, i) => {
-                        return <GalleryItem book={object} viewBook={this.viewBook} addBookToSlideshow={this.addBookToSlideshow}></GalleryItem>
+                        return <GalleryItem book={object} bodyClickHandler={this.viewBook} addButtonHandler={this.addBookToSlideshow} ></GalleryItem>
                     })
                     }
                 </div>

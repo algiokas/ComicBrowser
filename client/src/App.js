@@ -6,9 +6,9 @@ import './App.css';
 const apiBaseUrl = "http://localhost:9000/api/";
 
 export const ViewMode = Object.freeze({
-	Listing: Symbol("Listing"),
-	SingleBook: Symbol("SingleBook"),
-	Slideshow: Symbol("SlideShow"),
+  Listing: Symbol("Listing"),
+  SingleBook: Symbol("SingleBook"),
+  Slideshow: Symbol("Slideshow"),
 })
 
 class App extends Component {
@@ -19,27 +19,25 @@ class App extends Component {
       galleryPageSize: 12,
       allBooks: [],
       viewMode: ViewMode.Listing,
-      currentBook: {},
+      singleBookPage: 0,
+      slideshowPage: 0,
       currentSlideshow: {
         pageCount: 0,
-        books: []
+        books: [],
       },
       slideshowInterval: 5
     }
   }
 
   getAllBooks() {
-    console.log('getting books')
     fetch(apiBaseUrl + "allBooks")
       .then(res => res.json())
       .then(data => {
-        console.log(`got ${data.length} books`)
         this.setState({ allBooks: data })
       });
   }
 
-  resetSlideShow = () => {
-    console.log('reset slideshow')
+  resetSlideshow = () => {
     this.setState({
       viewMode: ViewMode.Listing,
       currentSlideshow: {
@@ -49,17 +47,20 @@ class App extends Component {
     })
   }
 
+  saveCurrentSlideshow = () => {
+    console.log('save slideshow')
+  }
+
   viewBook = (book) => {
-    console.log('view book')
     this.setState({
       viewMode: ViewMode.SingleBook,
       currentBook: book,
+      singleBookPage: 0
     })
   }
 
   viewCurrentBook = () => {
-    console.log('view current book')
-    if (this.state.currentBook.title) {
+    if (this.state.currentBook && this.state.currentBook.title) {
       this.setState({
         viewMode: ViewMode.SingleBook
       })
@@ -71,7 +72,7 @@ class App extends Component {
       this.setState({
         viewMode: ViewMode.Slideshow
       })
-    } 
+    }
   }
 
   viewListing = () => {
@@ -81,7 +82,6 @@ class App extends Component {
   }
 
   addBookToSlideshow = (book) => {
-    console.log('add to slideshow')
     this.setState((state) => {
       return {
         currentSlideshow: {
@@ -90,11 +90,48 @@ class App extends Component {
         }
       }
     })
+  }
 
+  removeBookFromSlideshow = (index) => {
+    this.setState((state) => {
+      let matchingBook = state.currentSlideshow.books[index]
+      let remainingBooks = state.currentSlideshow.books.filter((_, i) => i !== index)
+      if (matchingBook) {
+        if (remainingBooks.length > 0) {
+          return {
+            currentSlideshow: {
+              pageCount: state.currentSlideshow.pageCount - matchingBook.pageCount,
+              books: remainingBooks
+            }
+          }
+        }
+        return {
+          viewMode: ViewMode.Listing,
+          currentSlideshow: {
+            pageCount: state.currentSlideshow.pageCount - matchingBook.pageCount,
+            books: remainingBooks
+          }
+        }
+
+      }
+    })
   }
 
   setSlideshowInterval = (interval) => {
     this.setState({ slideshowInterval: interval })
+  }
+
+  setSlideshowPage = (n) => {
+    if (this.state.viewMode === ViewMode.SingleBook) {
+      this.setState({
+        singleBookPage: n
+      })
+    }
+    else if (this.state.viewMode === ViewMode.Slideshow) {
+      this.setState({
+        slideshowPage: n
+      })
+    }
   }
 
   componentDidMount() {
@@ -103,18 +140,20 @@ class App extends Component {
 
   render() {
     const handlers = {
-      resetSlideShow: this.resetSlideShow,
       viewBook: this.viewBook,
       viewSlideshow: this.viewSlideshow,
       viewListing: this.viewListing,
       viewCurrentBook: this.viewCurrentBook,
       addBookToSlideshow: this.addBookToSlideshow,
+      removeBookFromSlideshow: this.removeBookFromSlideshow,
       setSlideshowInterval: this.setSlideshowInterval,
+      setSlideshowPage: this.setSlideshowPage,
+      resetSlideshow: this.resetSlideshow,
+      saveCurrentSlideshow: this.saveCurrentSlideshow
     }
-    console.log("Render App")
     return (
       <div className="App">
-        <Navigation 
+        <Navigation
           handlers={handlers}
           slideshowCount={this.state.currentSlideshow.books.length}>
         </Navigation>

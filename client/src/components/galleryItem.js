@@ -5,14 +5,34 @@ class GalleryItem extends Component {
     constructor(props) {
       super(props)
       this.state = { coverUrl: GetCoverPath(props.book) }
-      this.viewBook = props.viewBook.bind(this)
-      this.addBookToSlideshow = props.addBookToSlideshow.bind(this)
+
+      if (props.viewBook) {
+        this.viewBook = props.viewBook.bind(this)
+      }
+      if (props.addButtonHandler) {
+        this.addButtonHandler = props.addButtonHandler.bind(this)
+      }
+      if (props.removeButtonHandler) {
+        this.removeButtonHandler = props.removeButtonHandler.bind(this)
+      }
+      if (props.bodyClickHandler) {
+        this.bodyClickHandler = props.bodyClickHandler.bind(this)
+      }
+    }
+
+    bodyClick = (e) => {
+      console.log(`body click ${this.props.book.title}`)
+      this.bodyClickHandler(this.props.book, this.props.index)
     }
 
     addButtonClick = (e) => {
-      console.log('add to slideshow')
       e.stopPropagation()
-      this.addBookToSlideshow(this.props.book)
+      this.addButtonHandler(this.props.book)
+    }
+
+    removeButtonClick = (e) => {
+      e.stopPropagation()
+      this.removeButtonHandler(this.props.index)
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -23,12 +43,23 @@ class GalleryItem extends Component {
 
     render() {
         return (
-          <div className="gallery" key={this.props.book.title} onClick={() => this.viewBook(this.props.book)}>
+          <div className="gallery" key={this.props.book.title} onClick={this.props.bodyClickHandler ? this.bodyClick : undefined}>
             <img className="gallery-image" src={this.state.coverUrl} alt={`${this.props.book.title} cover`}></img>
             <div className="caption">{this.props.book.title}</div>
-            <button className="add-button" onClick={this.addButtonClick}>
-              <img className="svg-icon" src="http://localhost:9000/data/images/plus-symbol.svg" alt="add to slideshow"></img>
-            </button>
+            {
+              this.props.addButtonHandler ? (
+                <button className="add-button" onClick={this.addButtonClick}>
+                  <img className="svg-icon" src="http://localhost:9000/data/images/plus-symbol.svg" alt="add to slideshow"></img>
+                </button>
+              ) : null
+            }
+            {
+              this.props.removeButtonHandler ? (
+                <button className="add-button" onClick={this.removeButtonClick}>
+                  <img className="svg-icon" src="http://localhost:9000/data/images/minus-symbol.svg" alt="remove from slideshow"></img>
+                </button>
+              ) : null
+            }
           </div>
         )
       }

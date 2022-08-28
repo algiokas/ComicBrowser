@@ -38,7 +38,7 @@ class PageSelect extends Component {
 
     render() {
         return (
-            <div className="gallery-controls">
+            <div className="page-select">
                 <div className="stepper-arrow mirror" onClick={this.previousPage}>
                     <img className="svg-icon" src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper left"></img>
                 </div>

@@ -1,16 +1,9 @@
 import React, { Component } from "react";
 import BookGallery from "./bookGallery";
-import SlideShow from "./slideshow";
+import Slideshow from "./slideshow";
 import { ViewMode } from "../App";
 
 class MainBody extends Component {
-    constructor(props) {
-        super(props)
-
-        console.log("Construct Main Body")
-        console.log(props)
-    }
-
     render() {
         switch(this.props.viewMode) {
             case ViewMode.Listing:
@@ -25,22 +18,32 @@ class MainBody extends Component {
             case ViewMode.SingleBook:
                 let singleBook = {
                     pageCount: this.props.currentBook.pageCount,
-                    books: [ this.props.currentBook ]
+                    books: [ this.props.currentBook ],
                 }
                 return(
-                    <SlideShow 
-                    slideShow={singleBook}
-                    interval={this.props.slideshowInterval}
-                    setSlideshowInterval={this.props.setSlideshowInterval}
-                    ></SlideShow>
+                    <Slideshow
+                        slideshow={singleBook}
+                        currentPage={this.props.singleBookPage}
+                        viewMode={this.props.viewMode}
+                        interval={this.props.slideshowInterval}
+                        setSlideshowInterval={this.props.setSlideshowInterval}
+                        setCurrentPage={this.props.setSlideshowPage}
+                        addButtonHandler={this.props.addBookToSlideshow}
+                    ></Slideshow>
                 )
             case ViewMode.Slideshow:
                 return (
-                    <SlideShow 
-                    slideShow={this.props.currentSlideshow}
-                    interval={this.props.slideshowInterval}
-                    setSlideshowInterval={this.props.setSlideshowInterval}
-                    ></SlideShow>
+                    <Slideshow
+                        slideshow={this.props.currentSlideshow}
+                        currentPage={this.props.slideshowPage}
+                        viewMode={this.props.viewMode}
+                        interval={this.props.slideshowInterval}
+                        setSlideshowInterval={this.props.setSlideshowInterval}
+                        setCurrentPage={this.props.setSlideshowPage}
+                        removeButtonHandler={this.props.removeBookFromSlideshow}
+                        emptySlideShow={this.props.resetSlideshow}
+                        saveCurrentSlideshow={this.props.saveCurrentSlideshow}
+                    ></Slideshow>
                 )
             default:
                 console.log("INVALID VIEWMODE")
