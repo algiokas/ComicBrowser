@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Navigation from "./components/navigation";
 import MainBody from "./components/mainBody";
+import { slideshowToJSON } from "./helpers";
 import './App.css';
 
 const apiBaseUrl = "http://localhost:9000/api/";
@@ -49,6 +50,15 @@ class App extends Component {
 
   saveCurrentSlideshow = () => {
     console.log('save slideshow')
+    fetch(apiBaseUrl + 'saveslideshow', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(slideshowToJSON(this.state.currentSlideshow))
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log(data)
+    });
   }
 
   viewBook = (book) => {

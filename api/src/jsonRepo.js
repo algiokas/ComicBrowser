@@ -1,9 +1,12 @@
 const languages = ["Japanese", "English", "Chinese", "Translated"]
 
-exports.folderToJSON = function(folderName, contents) {
+exports.folderToJSON = function(folderName, contents, id) {
     let output = {}
     if (!folderName || !contents || contents.length < 1) {
         return 
+    }
+    if (id > 0) {
+        output.id = id
     }
     output.folderName = folderName
     if (folderName[0] == '(')

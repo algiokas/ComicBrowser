@@ -67,7 +67,7 @@ class Sidebar extends Component {
                         this.props.viewMode === ViewMode.Slideshow ?
                             <div className="sidebar-stack slideshow-controls">
                                 <button className="media-button play" onClick={this.props.emptySlideShow}>Clear</button>
-                                <button className="media-button reset" onClick={this.props.resetPage}>Save</button>
+                                <button className="media-button reset" onClick={this.props.saveCurrentSlideshow}>Save</button>
                             </div>
                             : null
                     }

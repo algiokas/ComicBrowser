@@ -30,3 +30,19 @@ export function GetPagePathMulti(books, pageNum) {
     }
     console.log(`GetPagePathMulti - page ${pageNum} not found in books`)
 }
+
+export function slideshowToJSON(slideshow) {
+    let output = {}
+    if (!slideshow || !slideshow.books) {
+        return output
+    }
+    
+    output.ids = slideshow.books.map((book) => {
+        return book.id
+    })
+  
+    output.titles = slideshow.books.map((book) => {
+        return book.title
+    })
+    return output
+}

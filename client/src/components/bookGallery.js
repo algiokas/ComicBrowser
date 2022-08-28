@@ -2,17 +2,25 @@ import React, { Component } from "react";
 import GalleryItem from "./galleryItem";
 import PageSelect from "./pageSelect";
 
+export const SortOrder = Object.freeze({
+    Random: Symbol("Random"),
+    Title: Symbol("AlphaTitle"),
+    Author: Symbol("AlphaAuthor"),
+    ID: Symbol("ID")
+  })
+
 class BookGallery extends Component {
     constructor(props) {
         super(props)
-        
-        this.allBooks = props.allBooks  
+
+        this.allBooks = props.allBooks
         this.viewBook = props.viewBook.bind(this)
         this.addBookToSlideshow = props.addBookToSlideshow.bind(this)
         this.pageSize = props.pageSize
-        this.totalPages = Math.floor(props.allBooks.length / this.pageSize)
-            
-        this.state = { galleryPage: 0 }
+        this.totalPages = Math.floor(props.allBooks.length / this.pageSize)  
+        this.state = { 
+            galleryPage: 0 
+        }
     }
 
     getCurrentPage = () => {
