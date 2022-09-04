@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { GetPagePathMulti } from "../helpers";
+import { GetPagePathMulti } from "../util/helpers";
 import Sidebar from "./slideshow-sidebar";
 
 class Slideshow extends Component {
@@ -94,7 +94,7 @@ class Slideshow extends Component {
         let sidebarProps = {
             toggleSidebar: this.toggleSidebar,
             previousPage: this.previousPage,
-            nextPage: this.nextPage,
+            nextPage: this.nextPage,         
             handleIntervalChange: this.handleIntervalChange,
             playPause: this.playPause,
             resetPage: this.resetPage,
@@ -104,6 +104,9 @@ class Slideshow extends Component {
             removeButtonHandler: this.props.removeButtonHandler,
             emptySlideShow: this.props.emptySlideShow,
             saveCurrentSlideshow: this.props.saveCurrentSlideshow,
+            updateBook: this.props.updateBook,
+            setPage: this.props.setCurrentPage,
+            viewSearchResults: this.props.viewSearchResults,
 
             slideshow: this.props.slideshow,
             showSidebar: this.state.showSidebar,

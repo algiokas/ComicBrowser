@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Navigation from "./components/navigation";
-import MainBody from "./components/mainBody";
-import { slideshowToJSON } from "./helpers";
+import MultiView from "./components/multiView";
+import { slideshowToJSON } from "./util/helpers";
 import './App.css';
 
 const apiBaseUrl = "http://localhost:9000/api/";
@@ -10,6 +10,7 @@ export const ViewMode = Object.freeze({
   Listing: Symbol("Listing"),
   SingleBook: Symbol("SingleBook"),
   Slideshow: Symbol("Slideshow"),
+  SearchResults: Symbol("SearchResults")
 })
 
 class App extends Component {
@@ -22,9 +23,18 @@ class App extends Component {
       viewMode: ViewMode.Listing,
       singleBookPage: 0,
       slideshowPage: 0,
+      currentBook: {},
       currentSlideshow: {
         pageCount: 0,
         books: [],
+      },
+      currentSearchQuery: {
+        filled: false,
+        artist: '',
+        group: '',
+        prefix: '',
+        suffix: '',
+        tag: '',
       },
       slideshowInterval: 5
     }
@@ -49,7 +59,6 @@ class App extends Component {
   }
 
   saveCurrentSlideshow = () => {
-    console.log('save slideshow')
     fetch(apiBaseUrl + 'saveslideshow', {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
@@ -59,6 +68,19 @@ class App extends Component {
     .then(data => {
       console.log(data)
     });
+  }
+
+  updateBook = (book) => {
+    fetch(apiBaseUrl + 'updatebook/' + book.id, {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(book)
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log(data)
+    });
+
   }
 
   viewBook = (book) => {
@@ -76,6 +98,46 @@ class App extends Component {
       })
     }
   }
+
+  resetSearchResults = () => {
+    this.state.currentSearchQuery = {
+      filled: false,
+      artist: '',
+      group: '',
+      prefix: '',
+      suffix: '',
+      tag: '',
+    }
+  }
+
+  
+  viewSearchResults = (query = null) => {
+    if (query) {
+      this.resetSearchResults()
+      this.state.currentSearchQuery = {...this.state.currentSearchQuery, ...query}
+      this.state.currentSearchQuery.filled = true;
+    }
+    if (this.state.currentSearchQuery.filled) {
+      this.setState({
+        viewMode: ViewMode.SearchResults
+      })
+    }
+  }
+
+  viewArtist = (book) => {
+    console.log(`view author`)
+    console.log(book)
+    this.setState({
+      viewMode: ViewMode.SearchResults,
+      currentSearchQuery: {
+        filled: true,
+        artist: book.artists[0]
+      },
+    })
+  }
+
+
+
 
   viewSlideshow = () => {
     if (this.state.currentSlideshow.pageCount > 0) {
@@ -151,23 +213,27 @@ class App extends Component {
   render() {
     const handlers = {
       viewBook: this.viewBook,
+      viewAuthor: this.viewArtist,
       viewSlideshow: this.viewSlideshow,
       viewListing: this.viewListing,
       viewCurrentBook: this.viewCurrentBook,
+      viewSearchResults: this.viewSearchResults,
       addBookToSlideshow: this.addBookToSlideshow,
       removeBookFromSlideshow: this.removeBookFromSlideshow,
       setSlideshowInterval: this.setSlideshowInterval,
       setSlideshowPage: this.setSlideshowPage,
       resetSlideshow: this.resetSlideshow,
-      saveCurrentSlideshow: this.saveCurrentSlideshow
+      saveCurrentSlideshow: this.saveCurrentSlideshow,
+      updateBook: this.updateBook
     }
+
     return (
       <div className="App">
         <Navigation
           handlers={handlers}
           slideshowCount={this.state.currentSlideshow.books.length}>
         </Navigation>
-        <MainBody {...this.state} {...handlers}></MainBody>
+        <MultiView {...this.state} {...handlers}></MultiView>
       </div>
     )
   }

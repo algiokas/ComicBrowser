@@ -4,33 +4,46 @@ class PageSelect extends Component {
     constructor(props) {
         super(props)
 
-        this.previousPageHandler = props.previousPage.bind(this)
-        this.nextPageHandler = props.nextPage.bind(this)
-
+        this.setCurrentPage = props.setPage.bind(this)
         this.totalPages = props.totalPages
 
         this.state = { currentPage: props.currentPage }
     }
 
+    isFirstPage() {
+        return this.state.currentPage <= 0;
+    }
+
+    isLastPage() {
+        return this.state.currentPage >= this.totalPages-1
+    }
+
+    firstPage = () => {
+        if (!this.isFirstPage()) {
+            this.setCurrentPage(0)
+        }
+    }
+
     previousPage = () => {
-        if (this.state.currentPage > 0) {
-            this.previousPageHandler();
-            this.setState((state) => {
-                return {galleryPage: state.galleryPage - 1};
-            });
+        if (!this.isFirstPage()) {
+            this.setCurrentPage(this.state.currentPage-1)
         }
     }
 
     nextPage = () => {
-        if (this.state.currentPage < this.totalPages-1) {
-            this.nextPageHandler()
-            this.setState((state) => {
-                return {galleryPage: state.galleryPage + 1};
-            });
+        if (!this.isLastPage()) {
+            this.setCurrentPage(this.state.currentPage+1)
         }
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    lastPage = () => {
+        if (!this.isLastPage()) {
+            this.setCurrentPage(this.totalPages-1)
+        }
+    }
+
+
+    componentDidUpdate(prevProps) {
         if (this.props.currentPage !== prevProps.currentPage) {
           this.setState({ currentPage: this.props.currentPage })
         }
@@ -39,14 +52,20 @@ class PageSelect extends Component {
     render() {
         return (
             <div className="page-select">
+                <div className="stepper-arrow mirror" onClick={this.firstPage}>
+                    <img className={`svg-icon ${this.isFirstPage() ? 'hidden' : ''}`} src="http://localhost:9000/data/images/chevron-double-right.svg" alt="stepper left"></img>
+                </div>
                 <div className="stepper-arrow mirror" onClick={this.previousPage}>
-                    <img className="svg-icon" src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper left"></img>
+                    <img className={`svg-icon ${this.isFirstPage() ? 'hidden' : ''}`} src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper left"></img>
                 </div>
                 <div className="page-number">
                     {this.state.currentPage + 1}/{this.totalPages}
                 </div>
                 <div className="stepper-arrow" onClick={this.nextPage}>
-                    <img className="svg-icon" src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper right"></img>
+                    <img className={`svg-icon ${this.isLastPage() ? 'hidden' : ''}`} src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper right"></img>
+                </div>
+                <div className="stepper-arrow" onClick={this.lastPage}>
+                    <img className={`svg-icon ${this.isLastPage() ? 'hidden' : ''}`} src="http://localhost:9000/data/images/chevron-double-right.svg" alt="stepper right"></img>
                 </div>
             </div>
         )

@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import GalleryItem from "./galleryItem";
 import PageSelect from "./pageSelect";
+import { getBookAuthor } from "../util/helpers";
 
 export const SortOrder = Object.freeze({
     Random: Symbol("Random"),
     Title: Symbol("AlphaTitle"),
     Author: Symbol("AlphaAuthor"),
+    Artist: Symbol("AlphaArtist"),
     ID: Symbol("ID")
 })
   
@@ -13,11 +15,12 @@ const defaultSortOrder = SortOrder.Random
 
 class BookGallery extends Component {
     constructor(props) {
-        super(props)
-   
+        super(props) 
+
         this.allBooks = props.allBooks
         this.viewBook = props.viewBook.bind(this)
         this.addBookToSlideshow = props.addBookToSlideshow.bind(this)
+        this.subTitleClick = props.subTitleClick.bind(this)
         this.pageSize = props.pageSize
         this.totalPages = Math.floor(props.allBooks.length / this.pageSize)
 
@@ -41,14 +44,33 @@ class BookGallery extends Component {
                 break
             case SortOrder.Author:
                 sortedCopy.sort((a, b) => {
-                    let aAuthor = a.group ?? a.artists[0]
-                    let bAuthor = b.group ?? b.artists[0]
+                    let aAuthor = getBookAuthor(a)
+                    let bAuthor = getBookAuthor(b)
                     if (aAuthor && bAuthor) {
-                        return aAuthor.localeCompare(bAuthor)
+                        let authorCompare = aAuthor.localeCompare(bAuthor)
+                        if (authorCompare === 0) {
+                            return a.title.localeCompare(b.title)
+                        }
+                        return authorCompare
                     }
                     return 0
-                })
+                    
+                })               
                 break
+            case SortOrder.Artist:
+                    sortedCopy.sort((a, b) => {
+                        let aArtists = a.artists.join(',')
+                        let bArtists = b.artists.join(',')
+                        if (aArtists && bArtists) {
+                            let artistCompare = aArtists.localeCompare(bArtists)
+                            if (artistCompare === 0) {
+                                return a.title.localeCompare(b.title)
+                            }
+                            return artistCompare
+                        }
+                        return 0
+                    })
+                    break
             case SortOrder.ID:
                 sortedCopy.sort((a, b) => {
                     if (a.id && b.id) {
@@ -64,7 +86,6 @@ class BookGallery extends Component {
                 break
             default:
                 console.log("getSortedBooks - Invalid Sort Order")
-
         }
         return sortedCopy
     }
@@ -77,37 +98,32 @@ class BookGallery extends Component {
                 bookList: this.getSortedBooks(this.allBooks, newOrder),
                 sortOrder: newOrder
             })
+
         }
+    }
+
+    getItemSubtitle = (book) => {
+        if (this.state.sortOrder === SortOrder.Author) {
+            return getBookAuthor(book)
+        }       
+        return book.artists.join(',')
     }
 
     getCurrentPage = () => {
         let pageStart = this.state.galleryPage * this.pageSize;
         let pageEnd = (this.state.galleryPage+1) * this.pageSize;
-
         return this.state.bookList.slice(pageStart, pageEnd)
     }
 
-    previousPage = () => {
-        if (this.state.galleryPage > 0) {
-            this.setState((state) => {
-                return {galleryPage: state.galleryPage - 1};
-            });
-        }
-    }
-
-    nextPage = () => {
-        if (this.state.galleryPage < this.totalPages-1) {
-            this.setState((state) => {
-                return {galleryPage: state.galleryPage + 1};
-            });
-        }
+    setPage = (page) => {
+        this.setState({ galleryPage : page })
     }
 
     render() {
         return (
             <div className="container index-container dark-theme">
                 <div className="container-header">
-                    <PageSelect previousPage={this.previousPage} nextPage={this.nextPage} totalPages={this.totalPages} currentPage={this.state.galleryPage}></PageSelect>
+                    <PageSelect setPage={this.setPage} totalPages={this.totalPages} currentPage={this.state.galleryPage}></PageSelect>
                     <div className="sort-select">
                         {
                             Object.keys(SortOrder).map((key) => {
@@ -119,12 +135,19 @@ class BookGallery extends Component {
                 </div>
                 <div className="container-inner">
                     {this.getCurrentPage().map((object, i) => {
-                        return <GalleryItem book={object} bodyClickHandler={this.viewBook} addButtonHandler={this.addBookToSlideshow} ></GalleryItem>
+                        return <GalleryItem 
+                        book={object} 
+                        bodyClickHandler={this.viewBook} 
+                        addButtonHandler={this.addBookToSlideshow} 
+                        getSubtitle={this.getItemSubtitle}
+                        subTitleClickHandler={this.subTitleClick}
+                        ></GalleryItem>
                     })
+
                     }
                 </div>
                 <div className="container-footer">
-                    <PageSelect previousPage={this.previousPage} nextPage={this.nextPage} totalPages={this.totalPages} currentPage={this.state.galleryPage}></PageSelect>
+                    <PageSelect setPage={this.setPage} totalPages={this.totalPages} currentPage={this.state.galleryPage}></PageSelect>
                 </div>
             </div>
         )
