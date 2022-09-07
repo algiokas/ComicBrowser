@@ -9,7 +9,6 @@ class Slideshow extends Component {
         this.setSlideshowInterval = props.setSlideshowInterval.bind(this)
         this.setCurrentPage = props.setCurrentPage.bind(this)
         this.onImgLoad = this.onImgLoad.bind(this);
-        console.log('new slideshow')
 
         this.state = {
             showSidebar: true,
@@ -23,13 +22,6 @@ class Slideshow extends Component {
         this.setState({imageDimensions :
             { width:img.naturalWidth, height:img.naturalHeight }
         });
-    }
-
-    isWideImage = () => {
-        if (this.state.imageDimensions) {
-            return this.state.imageDimensions.width * 0.8 > this.state.imageDimensions.height
-        }
-        return false;
     }
 
     toggleSidebar = () => {
@@ -120,9 +112,8 @@ class Slideshow extends Component {
         return (
             <div className={`slideshow-container ${this.state.showSidebar ? "show-sidebar" : ""}`}>
                 <div className="slideshow">
-                    <img className={`slideshow-image ${this.isWideImage() ? "wide" : ""}` }
+                    <img className={ `slideshow-image` }
                         src={GetPagePathMulti(this.props.slideshow.books, this.props.currentPage)}
-                        style={{ left: this.state.showSidebar ? '300px' : '0' }}
                         alt={" page " + this.props.currentPage + 1}
                         onLoad={this.onImgLoad}>
                     </img>

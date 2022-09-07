@@ -52,6 +52,20 @@ class Sidebar extends Component {
         }
     }
 
+    unhidePage = (pageNum) => {
+        console.log(`un-hide page ${pageNum}`)
+        if (this.props.updateBook) {
+            let req = this.props.slideshow.books[0]
+            if (req.hiddenPages && req.hiddenPages.includes(pageNum)) {
+                req.hiddenPages = req.hiddenPages.filter((p) => {
+                    return p !== pageNum
+                })
+                this.props.updateBook(req)
+                this.props.setPage(pageNum)
+            }
+        }
+    }
+
     componentDidMount() {
         this.updateListingHeight()
     }
@@ -117,7 +131,8 @@ class Sidebar extends Component {
                             <BookInfo
                                 book={this.props.slideshow.books[0]}
                                 addButtonHandler={this.props.addButtonHandler}
-                                viewSearchResults={this.props.viewSearchResults}>
+                                viewSearchResults={this.props.viewSearchResults}
+                                unhidePage={this.unhidePage}>
                             </BookInfo>
 
                     }

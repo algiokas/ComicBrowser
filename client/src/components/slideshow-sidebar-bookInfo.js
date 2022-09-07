@@ -10,6 +10,9 @@ class BookInfo extends Component {
         if (this.props.viewSearchResults) {
             this.viewSearchResults = this.props.viewSearchResults.bind(this)
         }
+        if (this.props.unhidePage) {
+            this.unhidePage = this.props.unhidePage.bind(this)
+        }
     }
 
     searchGroup = (g) => {
@@ -30,9 +33,9 @@ class BookInfo extends Component {
         })
     }
 
-    searchSuffix = (s) => {
+    searchTag = (t) => {
         this.viewSearchResults({
-            suffix: s
+            tag: t
         })
     }
 
@@ -94,14 +97,30 @@ class BookInfo extends Component {
                             : null
                     }
                     {
-                        this.book.suffixItems.length > 0 ?
+                        this.book.tags && this.book.tags.length > 0 ?
                             <div className="book-info-line">
-                                <span className="info-label">Suffix:</span>
+                                <span className="info-label">Tags:</span>
                                 <div className="info-items">
                                     {
-                                    this.book.suffixItems.map((item) => {
-                                        return <span className="info-item clickable"  onClick={() => { this.searchSuffix(item)}}>
-                                            {item}
+                                    this.book.tags.map((tag, i) => {
+                                        return <span className="info-item clickable"  onClick={() => { this.searchTag(tag)}} key={i}>
+                                            {tag}
+                                        </span>
+                                    })
+                                    }
+                                </div>
+                            </div>
+                            : null
+                    }
+                    {
+                        this.book.hiddenPages ?
+                            <div className="book-info-line">
+                                <span className="info-label">Hidden Pages:</span>
+                                <div className="info-items">
+                                    {
+                                    this.book.hiddenPages.map((page, i) => {
+                                        return <span className="info-item clickable" onClick={() => { this.unhidePage(page) }} key={i}>
+                                            {page}
                                         </span>
                                     })
                                     }

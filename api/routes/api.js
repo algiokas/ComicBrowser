@@ -10,6 +10,15 @@ const booksDirectory = path.join(dataDirectory, "books")
 const slideshowDirectory = path.join(dataDirectory, 'slideshows')
 const slideshowFileBaseName = "ss_"
 
+function getErrorObject(msg, err = null) {
+  console.log(msg)
+  return {
+    success: false,
+    message: msg,
+    error: err
+  }
+}
+
 router.get('/', function(req, res, next) {
   res.send("Sample API Response");
 });
@@ -81,30 +90,24 @@ router.post('/updatebook/:bookId', function(req, res, next) {
   let fullPath = path.join(booksDirectory, fName)
   fs.readFile(fullPath, { encoding: 'utf-8' }, (err, data) => {
     if (err) {
-      let errMsg = 'Unable to read file: ' + err
-      console.log(errMsg)
-      res.json({
-        success: false,
-        error: errMsg
-      })
+      res.json(getErrorObject('File Read Error', err))
     } else {
       if (data) {
-        var json = JSON.parse(rawData);
+        var json = JSON.parse(data);
         if (json) {
           let updatedBook = Object.assign(json, book)
-          await fs.writeFile(fullPath, JSON.stringify(updatedBook))
+          fs.writeFile(fullPath, JSON.stringify(updatedBook), (err1) => {
+            if (err1) {
+              res.json(getErrorObject('File Write Error', err1))
+            }
+          })
           res.json({
             success: true,
             fileName: fName,
             book: updatedBook
           })
         } else {
-          let errMsg = 'JSON parse failed'
-          console.log(errMsg)
-          res.json({
-            success: false,
-            error: errMsg
-          })
+          res.json(getErrorObject('JSON parse failed'))
         }
       }
     }

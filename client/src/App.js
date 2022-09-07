@@ -33,14 +33,17 @@ class App extends Component {
         artist: '',
         group: '',
         prefix: '',
-        suffix: '',
         tag: '',
       },
       slideshowInterval: 5
     }
   }
+  
+  componentDidMount() {
+    this.fillBooks();
+  }
 
-  getAllBooks() {
+  fillBooks() {
     fetch(apiBaseUrl + "allBooks")
       .then(res => res.json())
       .then(data => {
@@ -66,6 +69,7 @@ class App extends Component {
     })
     .then(res => res.json())
     .then(data => {
+      console.log('save slideshow')
       console.log(data)
     });
   }
@@ -78,7 +82,17 @@ class App extends Component {
     })
     .then(res => res.json())
     .then(data => {
-      console.log(data)
+      if (data.success) {
+        for (let i = 0; i < this.state.allBooks.length;  i++) {
+          if (this.state.allBooks[i] && this.state.allBooks[i].id === data.book.id) {
+            this.setState((state) => {
+              let books = state.allBooks
+              books[i] = data.book
+              return { allBooks: books}
+            })
+          } 
+        }
+      }
     });
 
   }
@@ -99,34 +113,35 @@ class App extends Component {
     }
   }
 
-  resetSearchResults = () => {
-    this.state.currentSearchQuery = {
+  getEmptyQuery = () => {
+    return {
       filled: false,
       artist: '',
       group: '',
       prefix: '',
-      suffix: '',
       tag: '',
     }
   }
 
+  resetSearchResults = () => {
+    console.log('reset search')
+    this.setState({
+      currentSearchQuery: this.getEmptyQuery()
+    })
+  }
   
   viewSearchResults = (query = null) => {
     if (query) {
-      this.resetSearchResults()
-      this.state.currentSearchQuery = {...this.state.currentSearchQuery, ...query}
-      this.state.currentSearchQuery.filled = true;
-    }
-    if (this.state.currentSearchQuery.filled) {
+      let newQuery = {...this.getEmptyQuery(), ...query}
+      newQuery.filled = true
       this.setState({
+        currentSearchQuery: newQuery,
         viewMode: ViewMode.SearchResults
       })
     }
   }
 
   viewArtist = (book) => {
-    console.log(`view author`)
-    console.log(book)
     this.setState({
       viewMode: ViewMode.SearchResults,
       currentSearchQuery: {
@@ -194,7 +209,7 @@ class App extends Component {
   }
 
   setSlideshowPage = (n) => {
-    if (this.state.viewMode === ViewMode.SingleBook) {
+    if (this.state.viewMode === ViewMode.SingleBook) {   
       this.setState({
         singleBookPage: n
       })
@@ -204,10 +219,6 @@ class App extends Component {
         slideshowPage: n
       })
     }
-  }
-
-  componentDidMount() {
-    this.getAllBooks();
   }
 
   render() {

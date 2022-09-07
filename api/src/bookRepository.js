@@ -1,7 +1,7 @@
 const languages = ["Japanese", "English", "Chinese", "Translated"]
 
 exports.getFileName = function(id, book) {
-    return String(id).padStart(3, '0') + ' - ' + book.title
+    return String(id).padStart(4, '0') + ' - ' + book.title
 }
 
 exports.folderToJSON = function(folderName, contents, id) {
@@ -36,12 +36,16 @@ exports.folderToJSON = function(folderName, contents, id) {
     let suffixRegex = /\([^)]*\)|\[[^\]]*\]|\{[^\]]*\}/g;
     let suffixItems = folderName.substring(titleStart).match(suffixRegex)
     if (suffixItems && suffixItems.length > 0) {
-        output.suffixItems = suffixItems
+        let tagsTemp = []
         suffixItems.forEach((item) => {
-            if (languages.includes(item.substring(1, item.length-1))) {
-                output.language = item.substring(1, item.length-1)
+            let itemValue = item.substring(1, item.length-1)
+            if (languages.includes(itemValue)) {
+                output.language = itemValue
+            } else {
+                tagsTemp.push(itemValue)
             }
         })
+        output.tags = tagsTemp
 
         let suffixStart = folderName.indexOf(suffixItems[0])-1
         output.title = folderName.substring(titleStart, suffixStart).trim()

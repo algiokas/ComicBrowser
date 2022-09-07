@@ -9,15 +9,16 @@ export const SortOrder = Object.freeze({
     Author: Symbol("AlphaAuthor"),
     Artist: Symbol("AlphaArtist"),
     ID: Symbol("ID")
+
 })
   
 const defaultSortOrder = SortOrder.Random
 
+
 class BookGallery extends Component {
     constructor(props) {
-        super(props) 
+        super(props)
 
-        this.allBooks = props.allBooks
         this.viewBook = props.viewBook.bind(this)
         this.addBookToSlideshow = props.addBookToSlideshow.bind(this)
         this.subTitleClick = props.subTitleClick.bind(this)
@@ -28,6 +29,14 @@ class BookGallery extends Component {
             galleryPage: 0,
             bookList: this.getSortedBooks(props.allBooks, defaultSortOrder),
             sortOrder: defaultSortOrder
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.allBooks !== this.props.allBooks) {
+            this.setState({
+                bookList: this.getSortedBooks(this.props.allBooks, this.state.sortOrder)
+            })
         }
     }
 
@@ -93,12 +102,10 @@ class BookGallery extends Component {
     sortBooks = (order) =>  {
         let newOrder = SortOrder[order]
         if (SortOrder.hasOwnProperty(order) && (this.state.sortOrder !== newOrder || newOrder === SortOrder.Random)) {
-            console.log(`sort books: ${order}`)
             this.setState({
-                bookList: this.getSortedBooks(this.allBooks, newOrder),
+                bookList: this.getSortedBooks(this.props.allBooks, newOrder),
                 sortOrder: newOrder
             })
-
         }
     }
 
@@ -127,7 +134,7 @@ class BookGallery extends Component {
                     <div className="sort-select">
                         {
                             Object.keys(SortOrder).map((key) => {
-                                return <div className={`sort-order ${this.state.sortOrder === SortOrder[key] ? "selected" : ""}`} 
+                                return <div key={key} className={`sort-order ${this.state.sortOrder === SortOrder[key] ? "selected" : ""}`} 
                                     onClick={() => {this.sortBooks(key)}}>{key}</div>
                             })
                         }

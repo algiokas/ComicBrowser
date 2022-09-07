@@ -129,8 +129,6 @@ h2 {
   margin-bottom: 4px;
 }
 
-
-
 .slideshow-image {
   max-height: 95%;
   max-width: 100%;
@@ -145,8 +143,8 @@ h2 {
   z-index: 2;
 }
 
-.slideshow-image.wide {
-  width: 90%;
+.show-sidebar .slideshow-image {
+  left: 300px;
 }
 
 .slideshow-overlay {
@@ -328,28 +326,36 @@ h2 {
 .book-info-line .info-label{
   padding: 4px;
   margin-right: 10px;
+  text-align: left;
+  max-width: 30%;
 }
 
 .book-info-line .info-items{
-  flex-grow: 1;
   margin: 0;
+  margin-left: auto;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: flex-end;
 }
 
 .book-info-line .info-item {
-  margin: auto;
-  margin-top: 0px;
-  margin-bottom: 10px;
-  padding: 4px 12px;
+  margin: 0 4px 7px auto;
+  padding: 4px 10px;
   overflow-wrap: break-word;
   min-width: 0px;
+}
+
+.book-info-line .info-items .info-item{
+  margin-left: 0;
 }
 
 .book-info-line .info-item.clickable{
   background-color: var(--gray-1);
   color: var(--pink-1);
   border-radius: 4px;
+  cursor: pointer;
 }
 
 .sidebar-stack div {

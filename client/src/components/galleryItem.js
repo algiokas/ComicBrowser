@@ -27,7 +27,6 @@ class GalleryItem extends Component {
   }
 
   bodyClick = (e) => {
-    console.log(`body click ${this.props.book.title}`)
     this.bodyClickHandler(this.props.book, this.props.index)
   }
 

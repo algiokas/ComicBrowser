@@ -1,13 +1,11 @@
 import React, { Component } from "react";
 import GalleryItem from "./galleryItem";
-import { getBookAuthor } from "../util/helpers";
 
 export const SearchType = Object.freeze({
     None: Symbol("None"),
     Artist: Symbol("Artist"),
     Group: Symbol("Group"),
     Prefix: Symbol("Prefix"),
-    Suffix: Symbol("Suffix"),
     Tag: Symbol("Tag"),
     Multi: Symbol("Multi")
 })
@@ -18,8 +16,6 @@ class SearchResults extends Component {
 
         this.allBooks = props.allBooks
         this.searchQuery = props.query
-
-        console.log('')
 
         this.viewBook = props.viewBook.bind(this)
         this.addBookToSlideshow = props.addBookToSlideshow.bind(this)
@@ -33,16 +29,18 @@ class SearchResults extends Component {
 
     setSearchType = (type) => {
         if (this.state.searchType === SearchType.None) {
-            this.state.searchType = type
+            this.setState({
+                searchType: type
+            })
         } else {
-            this.state.searchType = SearchType.Multi
+            this.setState({
+                searchType:  SearchType.Multi
+            })
         }
     }
 
     filterBooks = (books, searchQuery) => {
         let results = books
-        console.log('filter books')
-        console.log(searchQuery)
         if (searchQuery.artist) {
             results = results.filter(book => {
                 if (book.artists) {
@@ -64,18 +62,14 @@ class SearchResults extends Component {
             })
             this.setSearchType(SearchType.Prefix)
         }
-        if (searchQuery.suffix) {
-            console.log('pre-search results:')
-            console.log(results)
+        if (searchQuery.tag) {
             results = results.filter(book => {
-                if (book.suffixItems) {
-                    return book.suffixItems.some((a) => a.toLowerCase() === searchQuery.suffix.toLowerCase())
+                if (book.tags) {
+                    return book.tags.some((a) => a.toLowerCase() === searchQuery.tag.toLowerCase())
                 }
                 return false
             })
-            console.log('post-search results:')
-            console.log(results)
-            this.setSearchType(SearchType.Suffix)
+            this.setSearchType(SearchType.Tag)
         }
         return results
     }
@@ -94,7 +88,7 @@ class SearchResults extends Component {
                 </div>
                 <div className="container-inner">
                     {this.state.filteredBooks.map((object, i) => {
-                        return <GalleryItem book={object} bodyClickHandler={this.viewBook} addButtonHandler={this.addBookToSlideshow} getSubtitle={this.getItemSubtitle}></GalleryItem>
+                        return <GalleryItem key={i} book={object} bodyClickHandler={this.viewBook} addButtonHandler={this.addBookToSlideshow} getSubtitle={this.getItemSubtitle}></GalleryItem>
                     })
                     }
                 </div>
