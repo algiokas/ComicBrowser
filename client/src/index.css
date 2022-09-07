@@ -436,3 +436,14 @@ h2 {
 .hidden {
   visibility: hidden;
 }
+
+.loading-container {
+  height: calc(100vh - 85px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-container img {
+  width: 400px;
+}

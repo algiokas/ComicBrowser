@@ -7,6 +7,7 @@ import './App.css';
 const apiBaseUrl = "http://localhost:9000/api/";
 
 export const ViewMode = Object.freeze({
+  Loading: Symbol("Loading"),
   Listing: Symbol("Listing"),
   SingleBook: Symbol("SingleBook"),
   Slideshow: Symbol("Slideshow"),
@@ -20,7 +21,7 @@ class App extends Component {
     this.state = {
       galleryPageSize: 12,
       allBooks: [],
-      viewMode: ViewMode.Listing,
+      viewMode: ViewMode.Loading,
       singleBookPage: 0,
       slideshowPage: 0,
       currentBook: {},
@@ -41,6 +42,9 @@ class App extends Component {
   
   componentDidMount() {
     this.fillBooks();
+    this.setState({
+      viewMode: ViewMode.Listing
+    })
   }
 
   fillBooks() {
@@ -122,20 +126,17 @@ class App extends Component {
       tag: '',
     }
   }
-
-  resetSearchResults = () => {
-    console.log('reset search')
-    this.setState({
-      currentSearchQuery: this.getEmptyQuery()
-    })
-  }
   
-  viewSearchResults = (query = null) => {
+  viewSearchResults = (query) => {
     if (query) {
       let newQuery = {...this.getEmptyQuery(), ...query}
       newQuery.filled = true
       this.setState({
         currentSearchQuery: newQuery,
+        viewMode: ViewMode.SearchResults
+      })
+    } else {
+      this.setState({
         viewMode: ViewMode.SearchResults
       })
     }
@@ -150,9 +151,6 @@ class App extends Component {
       },
     })
   }
-
-
-
 
   viewSlideshow = () => {
     if (this.state.currentSlideshow.pageCount > 0) {

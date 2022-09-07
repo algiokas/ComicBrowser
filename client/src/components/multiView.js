@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import BookGallery from "./bookGallery";
+import CoverGallery, { SortOrder } from "./coverGallery";
 import Slideshow from "./slideshow";
-import SearchResults from "./SearchResults";
+import LoadingView from "./loadingView";
 import { ViewMode } from "../App";
 
 class MultiView extends Component {
@@ -9,13 +9,13 @@ class MultiView extends Component {
         switch(this.props.viewMode) {
             case ViewMode.Listing:
                 return(
-                    <BookGallery 
+                    <CoverGallery 
                         allBooks={this.props.allBooks} 
                         pageSize={this.props.galleryPageSize} 
                         viewBook={this.props.viewBook}
                         subTitleClick={this.props.viewAuthor}
                         addBookToSlideshow={this.props.addBookToSlideshow}>
-                    </BookGallery>
+                    </CoverGallery>
                 )
             case ViewMode.SingleBook:
                 let singleBook = {
@@ -51,13 +51,20 @@ class MultiView extends Component {
                 )
             case ViewMode.SearchResults:
                 return (
-                    <SearchResults 
+                    <CoverGallery
+                        sortOrder={SortOrder.Title}
                         query={this.props.currentSearchQuery} 
                         allBooks={this.props.allBooks} 
+                        pageSize={this.props.galleryPageSize} 
                         viewBook={this.props.viewBook}
-                        addBookToSlideshow={this.props.addBookToSlideshow}
-                    ></SearchResults>
+                        subTitleClick={this.props.viewAuthor}
+                        addBookToSlideshow={this.props.addBookToSlideshow}>
+                    </CoverGallery>
                 )
+            case ViewMode.Loading:
+                return (
+                    <LoadingView></LoadingView>
+                )           
             default:
                 console.log("INVALID VIEWMODE")
                 return(<p>VIEWMODE ERROR</p>)

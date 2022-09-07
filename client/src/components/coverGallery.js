@@ -11,32 +11,55 @@ export const SortOrder = Object.freeze({
     ID: Symbol("ID")
 
 })
-  
-const defaultSortOrder = SortOrder.Random
 
-
-class BookGallery extends Component {
+class CoverGallery extends Component {
     constructor(props) {
         super(props)
 
         this.viewBook = props.viewBook.bind(this)
         this.addBookToSlideshow = props.addBookToSlideshow.bind(this)
         this.subTitleClick = props.subTitleClick.bind(this)
-        this.pageSize = props.pageSize
-        this.totalPages = Math.floor(props.allBooks.length / this.pageSize)
+        this.totalPages = Math.floor(props.allBooks.length / props.pageSize)
+        let initialSortOrder = props.sortOrder ?? SortOrder.Random
 
         this.state = { 
             galleryPage: 0,
-            bookList: this.getSortedBooks(props.allBooks, defaultSortOrder),
-            sortOrder: defaultSortOrder
+            currentPageSize: props.allBooks.length < props.pageSize ? props.allBooks.length : props.pageSize,
+            bookList: [],
+            sortOrder: initialSortOrder,
+            filterQuery: props.query
+        }
+
+        if (props.query) {
+            let filteredBooks = this.getFilteredBooks(props.allBooks, props.query)
+            this.state.bookList = this.getSortedBooks(filteredBooks, initialSortOrder)
+        } else {
+            this.state.bookList = this.getSortedBooks(props.allBooks, initialSortOrder)
         }
     }
 
+    blankLoadState(n) {
+        let result = []
+        for (let i =  0; i < n; i++) {
+            result.push(false)
+        }
+        return result
+    }
+
+
+
     componentDidUpdate(prevProps) {
-        if (prevProps.allBooks !== this.props.allBooks) {
-            this.setState({
-                bookList: this.getSortedBooks(this.props.allBooks, this.state.sortOrder)
-            })
+        if (prevProps.allBooks !== this.props.allBooks || prevProps.query !== this.props.query) {
+            if (this.props.query) {
+                let filteredBooks = this.getFilteredBooks(this.props.allBooks, this.props.query)
+                this.setState({
+                    bookList: this.getSortedBooks(filteredBooks, this.state.sortOrder)
+                })
+            } else {
+                this.setState({
+                    bookList: this.getSortedBooks(this.props.allBooks, this.state.sortOrder)
+                })
+            }
         }
     }
 
@@ -99,6 +122,37 @@ class BookGallery extends Component {
         return sortedCopy
     }
 
+    getFilteredBooks = (books, searchQuery) => {
+        let results = books
+        if (searchQuery.artist) {
+            results = results.filter(book => {
+                if (book.artists) {
+                    return book.artists.some((a) => a.toLowerCase() === searchQuery.artist.toLowerCase())
+                }
+                return false
+            })
+        }
+        if (searchQuery.group) {
+            results = results.filter(book => {
+                return book.group === searchQuery.group
+            })
+        }
+        if (searchQuery.prefix) {
+            results = results.filter(book => {
+                return book.prefix === searchQuery.prefix
+            })
+        }
+        if (searchQuery.tag) {
+            results = results.filter(book => {
+                if (book.tags) {
+                    return book.tags.some((a) => a.toLowerCase() === searchQuery.tag.toLowerCase())
+                }
+                return false
+            })
+        }
+        return results
+    }
+
     sortBooks = (order) =>  {
         let newOrder = SortOrder[order]
         if (SortOrder.hasOwnProperty(order) && (this.state.sortOrder !== newOrder || newOrder === SortOrder.Random)) {
@@ -117,13 +171,23 @@ class BookGallery extends Component {
     }
 
     getCurrentPage = () => {
-        let pageStart = this.state.galleryPage * this.pageSize;
-        let pageEnd = (this.state.galleryPage+1) * this.pageSize;
+        let pageStart = this.state.galleryPage * this.props.pageSize;
+        let pageEnd = (this.state.galleryPage+1) * this.props.pageSize;
         return this.state.bookList.slice(pageStart, pageEnd)
     }
 
-    setPage = (page) => {
-        this.setState({ galleryPage : page })
+    getPageSize = (pageNum) => {
+        if (pageNum < this.totalPages-1) {
+            return this.props.pageSize
+        } else {
+            return this.state.bookList.length % this.props.pageSize
+        }
+    }
+
+    setPage = (pageNum) => {
+        this.setState({ 
+            galleryPage : pageNum
+        })
     }
 
     render() {
@@ -131,14 +195,18 @@ class BookGallery extends Component {
             <div className="container index-container dark-theme">
                 <div className="container-header">
                     <PageSelect setPage={this.setPage} totalPages={this.totalPages} currentPage={this.state.galleryPage}></PageSelect>
-                    <div className="sort-select">
-                        {
-                            Object.keys(SortOrder).map((key) => {
-                                return <div key={key} className={`sort-order ${this.state.sortOrder === SortOrder[key] ? "selected" : ""}`} 
-                                    onClick={() => {this.sortBooks(key)}}>{key}</div>
-                            })
-                        }
-                    </div>
+                    {
+                        this.props.sortOrder ? null :
+                            <div className="sort-select">
+                                {
+                                    Object.keys(SortOrder).map((key) => {
+                                        return <div key={key} className={`sort-order ${this.state.sortOrder === SortOrder[key] ? "selected" : ""}`} 
+                                            onClick={() => {this.sortBooks(key)}}>{key}</div>
+                                    })
+                                }
+                            </div>
+                    }
+
                 </div>
                 <div className="container-inner">
                     {this.getCurrentPage().map((object, i) => {
@@ -162,4 +230,4 @@ class BookGallery extends Component {
     }
 }
 
-export default BookGallery
+export default CoverGallery

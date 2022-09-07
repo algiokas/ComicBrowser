@@ -23,7 +23,7 @@ class Navigation extends Component {
               <div className="nav-item" onClick={this.viewSlideshow}>
                 Slideshow <span className="slideshow-count">{this.props.slideshowCount}</span> 
               </div>
-              <div className="nav-item" onClick={this.viewSearchResults}>Search Results</div>
+              <div className="nav-item" onClick={() => {this.viewSearchResults()}}>Search Results</div>
             </div>
           </nav>
         )
