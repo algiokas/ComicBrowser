@@ -143,11 +143,12 @@ class BookGallery extends Component {
                 <div className="container-inner">
                     {this.getCurrentPage().map((object, i) => {
                         return <GalleryItem 
-                        book={object} 
-                        bodyClickHandler={this.viewBook} 
-                        addButtonHandler={this.addBookToSlideshow} 
-                        getSubtitle={this.getItemSubtitle}
-                        subTitleClickHandler={this.subTitleClick}
+                            key={i}
+                            book={object} 
+                            bodyClickHandler={this.viewBook} 
+                            addButtonHandler={this.addBookToSlideshow} 
+                            getSubtitle={this.getItemSubtitle}
+                            subTitleClickHandler={this.subTitleClick}
                         ></GalleryItem>
                     })
 

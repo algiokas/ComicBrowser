@@ -64,10 +64,10 @@ class GalleryItem extends Component {
         <div className="gallery-inner" onClick={this.props.bodyClickHandler ? this.bodyClick : undefined}>
           <img className="gallery-image" src={this.state.coverUrl} alt={`${this.props.book.title} cover`}></img>
           <div className="caption">
-            <span class="subtitle" onClick={this.props.subTitleClickHandler ? this.subtitleClick : undefined}>
+            <span className="subtitle" onClick={this.props.subTitleClickHandler ? this.subtitleClick : undefined}>
               {this.getSubtitleText(this.props.book)}
             </span>
-            <span class="title">{this.props.book.title}</span>
+            <span className="title">{this.props.book.title}</span>
           </div>
           {
             this.props.addButtonHandler ? (
