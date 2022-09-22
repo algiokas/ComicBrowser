@@ -221,6 +221,11 @@ h2 {
   padding: 2px 0;
 }
 
+.page-select-number:disabled {
+  width: 1rem;
+  background-color: var(--gray-2);
+}
+
 .page-select-number::-webkit-inner-spin-button, 
 .page-select-number::-webkit-outer-spin-button { 
     -webkit-appearance: none;
@@ -439,6 +444,24 @@ h2 {
 
 .svg-icon {
   filter: var(--black-to-text-filter);
+}
+
+.svg-icon-pink {
+  filter: var(--pink-1-filter);
+}
+
+.text-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.info-icon {
+  background-color: var(--gray-1);
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0 4px 7px 0;
+  padding: 6px 7px 2px 7px ;
+  min-width: 0px;
 }
 
 .sort-select {

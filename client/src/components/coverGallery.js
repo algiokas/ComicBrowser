@@ -19,8 +19,8 @@ class CoverGallery extends Component {
         this.viewBook = props.viewBook.bind(this)
         this.addBookToSlideshow = props.addBookToSlideshow.bind(this)
         this.subTitleClick = props.subTitleClick.bind(this)
-        this.totalPages = Math.floor(props.allBooks.length / props.pageSize)
-        console.log(`total pages ${this.totalPages}`)
+        this.totalPages = this.getTotalPages(props.allBooks)
+
         let initialSortOrder = props.sortOrder ?? SortOrder.Random
 
         this.state = { 
@@ -36,12 +36,10 @@ class CoverGallery extends Component {
             let filteredBooks = this.getFilteredBooks(props.allBooks, props.query)
             this.state.bookList = this.getSortedBooks(filteredBooks, initialSortOrder)
             
-            this.state.totalPages = Math.floor(filteredBooks.length / props.pageSize)
-            console.log(`1 totalPages = floor(${filteredBooks.length}/${props.pageSize})`)
+            this.state.totalPages = this.getTotalPages(filteredBooks)
         } else {
             this.state.bookList = this.getSortedBooks(props.allBooks, initialSortOrder)
-            this.state.totalPages = Math.floor(props.allBooks.length / props.pageSize)
-            console.log(`2 totalPages = floor(${props.allBooks.length}/${props.pageSize})`)
+            this.state.totalPages = this.getTotalPages(this.props.allBooks)
         }
     }
 
@@ -53,7 +51,14 @@ class CoverGallery extends Component {
         return result
     }
 
-
+    getTotalPages = (books) => {
+        console.log(`get total pages: ${books.length} pageSize: ${this.props.pageSize}`)
+        console.log(books)
+        if (books) {
+            return Math.max(1, Math.floor(books.length / this.props.pageSize))
+        }
+        return 1
+    }
 
     componentDidUpdate(prevProps) {
         if (prevProps.allBooks !== this.props.allBooks || prevProps.query !== this.props.query) {
@@ -61,15 +66,13 @@ class CoverGallery extends Component {
                 let filteredBooks = this.getFilteredBooks(this.props.allBooks, this.props.query)
                 this.setState({
                     bookList: this.getSortedBooks(filteredBooks, this.state.sortOrder),
-                    totalPages: Math.floor(filteredBooks.length / this.props.pageSize)
+                    totalPages: this.getTotalPages(filteredBooks)
                 })
-                console.log(`3 totalPages = floor(${filteredBooks.length}/${this.props.pageSize})`)
             } else {
                 this.setState({
                     bookList: this.getSortedBooks(this.props.allBooks, this.state.sortOrder),
-                    totalPages: Math.floor(this.props.allBooks.length / this.props.pageSize)
+                    totalPages: this.getTotalPages(this.props.allBooks)
                 })
-                console.log(`4 totalPages = floor(${this.props.allBooks.length}/${this.props.pageSize})`)
             }
         }
     }

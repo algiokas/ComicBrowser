@@ -75,6 +75,7 @@ class PageSelect extends Component {
                         value={this.state.currentPage+1}
                         onChange={this.setPageNumber}
                         className="page-select-number"
+                        disabled={this.props.totalPages === 1 ? true : false}
                     />
                     &nbsp;/&nbsp;
                     <div>{this.props.totalPages}</div>

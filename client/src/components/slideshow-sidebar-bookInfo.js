@@ -65,7 +65,7 @@ class BookInfo extends Component {
                                 <div className="info-items">
                                     {
                                         this.book.artists.map((artist) => {
-                                            return <span className="info-item clickable" onClick={() => { this.searchArtist(artist)}}>
+                                            return <span className="info-item clickable" onClick={() => { this.searchArtist(artist) }}>
                                                 {artist}
                                             </span>
                                         })
@@ -90,39 +90,39 @@ class BookInfo extends Component {
                         this.book.prefix ?
                             <div className="book-info-line">
                                 <span className="info-label">Prefix:</span>
-                                <span className="info-item clickable" onClick={() => { this.searchPrefix(this.book.prefix)}}>
+                                <span className="info-item clickable" onClick={() => { this.searchPrefix(this.book.prefix) }}>
                                     {this.book.prefix}
-                                    </span>
+                                </span>
                             </div>
                             : null
                     }
-                    {
-                        this.book.tags && this.book.tags.length > 0 ?
-                            <div className="book-info-line">
-                                <span className="info-label">Tags:</span>
-                                <div className="info-items">
-                                    {
+                    <div className="book-info-line">
+                        <span className="info-label">Tags:</span>
+                        <div className="info-items">
+                            {
+                                this.book.tags && this.book.tags.length > 0 ?
                                     this.book.tags.map((tag, i) => {
-                                        return <span className="info-item clickable"  onClick={() => { this.searchTag(tag)}} key={i}>
+                                        return <span className="info-item clickable" onClick={() => { this.searchTag(tag) }} key={i}>
                                             {tag}
                                         </span>
-                                    })
-                                    }
-                                </div>
-                            </div>
-                            : null
-                    }
+                                    }) : null
+                            }
+                            <span className="info-icon">
+                                <img className="svg-icon-pink text-icon" src="http://localhost:9000/data/images/plus-symbol.svg" alt="add to slideshow"></img>
+                            </span>
+                        </div>
+                    </div>
                     {
                         this.book.hiddenPages ?
                             <div className="book-info-line">
                                 <span className="info-label">Hidden Pages:</span>
                                 <div className="info-items">
                                     {
-                                    this.book.hiddenPages.map((page, i) => {
-                                        return <span className="info-item clickable" onClick={() => { this.unhidePage(page) }} key={i}>
-                                            {page}
-                                        </span>
-                                    })
+                                        this.book.hiddenPages.map((page, i) => {
+                                            return <span className="info-item clickable" onClick={() => { this.unhidePage(page) }} key={i}>
+                                                {page}
+                                            </span>
+                                        })
                                     }
                                 </div>
                             </div>
