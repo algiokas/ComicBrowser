@@ -9,6 +9,7 @@ class Navigation extends Component {
         this.viewSlideshow = props.handlers.viewSlideshow.bind(this)
         this.viewCurrentbook = props.handlers.viewCurrentBook.bind(this)
         this.viewSearchResults = props.handlers.viewSearchResults.bind(this)
+        this.importBooks = props.handlers.importBooks.bind(this)
     }
 
     render() {
@@ -24,6 +25,7 @@ class Navigation extends Component {
                 Slideshow <span className="slideshow-count">{this.props.slideshowCount}</span> 
               </div>
               <div className="nav-item" onClick={() => {this.viewSearchResults()}}>Search Results</div>
+              <div className="nav-item" onClick={this.importBooks}>Import Books</div>
             </div>
           </nav>
         )

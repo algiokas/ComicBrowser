@@ -34,8 +34,12 @@ router.get('/allbooks', function(req, res, next) {
       if (!fs.statSync(fullpath).isDirectory()) {
         let rawData = fs.readFileSync(fullpath);
         if (rawData) {
-          var json = JSON.parse(rawData);
-          books.push(json);
+          try {
+            var json = JSON.parse(rawData);
+            books.push(json);
+          } catch(err) {
+            console.log('Invalid Json in file: ' + file)
+          }
         }
       }
     })
@@ -44,42 +48,60 @@ router.get('/allbooks', function(req, res, next) {
   }) 
 });
 
-router.get('/importbooks', function(req, res, next) {
-  let booksDirItems = fs.readdirSync(booksDirectory)
-  let existingBooks = booksDirItems.map((str) => {
+router.post('/importbooks', function(req, res, next) {
+  console.log('Import Books')
+  if (req.body && req.body.deleteExistingItems) {
+    fs.readdir(booksDirectory, (err, files) => {
+      if (err) {
+        console.log('readdir error')
+        console.log(err)
+      }
+      for (const f of files) {
+        fs.unlink(path.join(booksDirectory, f), err => {
+          if (err) console.error(err)
+        });
+      }
+    })
+  }
 
-  })
   fs.readdir(imageDirectory, function(err, files) {
     if (err) {
       return console.log('Unable to scan directory: ' + err);
     }
     let importCount = 0;
+    let books = []
     files.forEach((file) => {
       let fullpath = path.join(imageDirectory, file)
       if (fs.statSync(fullpath).isDirectory())
       {
         let index = importCount + 1     
-        let folderContents = []
-        fs.readdir(fullpath, function(err, files) {
-          if (err) {
-            return console.log('Unable to scan directory: ' + err);
-          }
+        try {
+          const files = fs.readdirSync(fullpath)
+          let folderContents = []
           files.forEach((file) => {
             folderContents.push(file);
           })
           let json = bookRepo.folderToJSON(file, folderContents, index)
+          if (!json.title) console.log(`no title: ${file}`)
           if (json && json.title)
           {
+            books.push(json)
             let fname = bookRepo.getFileName(index, json)
             let fpath = path.join(booksDirectory, fname)
             let fdata = JSON.stringify(json)
             fs.writeFileSync(fpath, fdata)
           }
-        })
+        } catch(err) {
+          console.log(err)
+        }
         importCount++
       }   
     })
-    res.send(`<p>Import Complete, imported ${importCount} books`);
+    console.log(books.length)
+    res.json({ 
+      importCount: importCount,
+      books: books
+    });
   })
   
 });

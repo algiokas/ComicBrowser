@@ -98,7 +98,28 @@ class App extends Component {
         }
       }
     });
+  }
 
+  importBooks = () => {
+    fetch(apiBaseUrl + 'importbooks', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ deleteExistingItems: true })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.importCount) {
+        console.log(`imported ${data.importCount} books`)
+        this.setState({ 
+          allBooks: data.books,
+          currentBook: {},
+          currentSlideshow: {
+            pageCount: 0,
+            books: [],
+          }
+        })
+      }
+    });
   }
 
   viewBook = (book) => {
@@ -135,7 +156,7 @@ class App extends Component {
         currentSearchQuery: newQuery,
         viewMode: ViewMode.SearchResults
       })
-    } else {
+    } else if (this.state.currentSearchQuery.filled) {
       this.setState({
         viewMode: ViewMode.SearchResults
       })
@@ -233,7 +254,8 @@ class App extends Component {
       setSlideshowPage: this.setSlideshowPage,
       resetSlideshow: this.resetSlideshow,
       saveCurrentSlideshow: this.saveCurrentSlideshow,
-      updateBook: this.updateBook
+      updateBook: this.updateBook,
+      importBooks: this.importBooks
     }
 
     return (

@@ -5,7 +5,6 @@ class PageSelect extends Component {
         super(props)
 
         this.setCurrentPage = props.setPage.bind(this)
-        this.totalPages = props.totalPages
 
         this.state = { currentPage: props.currentPage }
     }
@@ -15,7 +14,7 @@ class PageSelect extends Component {
     }
 
     isLastPage() {
-        return this.state.currentPage >= this.totalPages-1
+        return this.state.currentPage >= this.props.totalPages-1
     }
 
     firstPage = () => {
@@ -38,7 +37,19 @@ class PageSelect extends Component {
 
     lastPage = () => {
         if (!this.isLastPage()) {
-            this.setCurrentPage(this.totalPages-1)
+            this.setCurrentPage(this.props.totalPages-1)
+        }
+    }
+
+    setPageNumber = (e) => {
+        let pageNum = e.target.value
+        console.log(pageNum)
+        if (pageNum < 1) {
+            this.setCurrentPage(0)
+        } else if (pageNum > this.props.totalPages) {
+            this.setCurrentPage(this.props.totalPages-1)
+        } else {
+            this.setCurrentPage(pageNum-1)
         }
     }
 
@@ -59,7 +70,14 @@ class PageSelect extends Component {
                     <img className={`svg-icon ${this.isFirstPage() ? 'hidden' : ''}`} src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper left"></img>
                 </div>
                 <div className="page-number">
-                    {this.state.currentPage + 1}/{this.totalPages}
+                    <input
+                        type='number'
+                        value={this.state.currentPage+1}
+                        onChange={this.setPageNumber}
+                        className="page-select-number"
+                    />
+                    &nbsp;/&nbsp;
+                    <div>{this.props.totalPages}</div>
                 </div>
                 <div className="stepper-arrow" onClick={this.nextPage}>
                     <img className={`svg-icon ${this.isLastPage() ? 'hidden' : ''}`} src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper right"></img>
