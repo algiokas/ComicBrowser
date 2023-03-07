@@ -36,7 +36,8 @@ class App extends Component {
         prefix: '',
         tag: '',
       },
-      slideshowInterval: 5
+      slideshowInterval: 5,
+      
     }
   }
   
@@ -47,8 +48,15 @@ class App extends Component {
     })
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    console.log('update artist listing')
+    if (prevState.allBooks !== this.state.allBooks) {
+
+    }
+  }
+
   fillBooks() {
-    fetch(apiBaseUrl + "allBooks")
+    fetch(apiBaseUrl + "allbooks")
       .then(res => res.json())
       .then(data => {
         this.setState({ allBooks: data })
@@ -102,9 +110,8 @@ class App extends Component {
 
   importBooks = () => {
     fetch(apiBaseUrl + 'importbooks', {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ deleteExistingItems: true })
+      method: 'get',
+      headers: { 'Content-Type': 'application/json' }
     })
     .then(res => res.json())
     .then(data => {
@@ -262,7 +269,8 @@ class App extends Component {
       <div className="App">
         <Navigation
           handlers={handlers}
-          slideshowCount={this.state.currentSlideshow.books.length}>
+          slideshowCount={this.state.currentSlideshow.books.length}
+          viewMode={this.state.viewMode}>
         </Navigation>
         <MultiView {...this.state} {...handlers}></MultiView>
       </div>
