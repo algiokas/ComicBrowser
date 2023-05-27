@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import GalleryItem from "./galleryItem";
 import PageSelect from "./pageSelect";
 import { getBookAuthor } from "../util/helpers";
+import FilterInfo from "./filterInfo";
 
 export const SortOrder = Object.freeze({
     Random: Symbol("Random"),
@@ -52,8 +53,6 @@ class CoverGallery extends Component {
     }
 
     getTotalPages = (books) => {
-        console.log(`get total pages: ${books.length} pageSize: ${this.props.pageSize}`)
-        console.log(books)
         if (books) {
             return Math.max(1, Math.floor(books.length / this.props.pageSize))
         }
@@ -146,9 +145,9 @@ class CoverGallery extends Component {
                 return false
             })
         }
-        if (searchQuery.group) {
+        if (searchQuery.artGroup) {
             results = results.filter(book => {
-                return book.group === searchQuery.group
+                return book.artGroup === searchQuery.group
             })
         }
         if (searchQuery.prefix) {
@@ -208,6 +207,11 @@ class CoverGallery extends Component {
         return (
             <div className="container index-container dark-theme">
                 <div className="container-header">
+                    {
+                        this.state.filterQuery && this.state.filterQuery.filled ?
+                        <FilterInfo filterQuery={this.state.filterQuery}></FilterInfo>
+                        : null
+                    }
                     <PageSelect setPage={this.setPage} totalPages={this.state.totalPages} currentPage={this.state.galleryPage}></PageSelect>
                     {
                         this.props.sortOrder ? null :
@@ -220,7 +224,6 @@ class CoverGallery extends Component {
                                 }
                             </div>
                     }
-
                 </div>
                 <div className="container-inner">
                     {this.getCurrentPage().map((object, i) => {

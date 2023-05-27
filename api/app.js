@@ -5,6 +5,7 @@ var cors = require('cors');
 var bodyParser = require('body-parser');
 var path = require('path');
 var createError = require('http-errors');
+var sqlite3 = require('sqlite3').verbose();
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -26,9 +27,6 @@ app.use(cookieParser());
 app.use('/data', express.static(path.join(__dirname, 'data')));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-var imageDirectory = path.join(__dirname, '../../Images')
-app.use('/img', express.static(imageDirectory));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

@@ -6,12 +6,21 @@ class BookInfo extends Component {
         super(props);
 
         this.book = props.book
+        this.inputRef = React.createRef()
 
         if (this.props.viewSearchResults) {
             this.viewSearchResults = this.props.viewSearchResults.bind(this)
         }
         if (this.props.unhidePage) {
             this.unhidePage = this.props.unhidePage.bind(this)
+        }
+        if (this.props.addTagToBook) {
+            this.addTagToBook = this.props.addTagToBook.bind(this)
+        }
+
+        this.state = {
+            showTagModal: false,
+            tagToAdd: ""
         }
     }
 
@@ -39,6 +48,31 @@ class BookInfo extends Component {
         })
     }
 
+    toggleTagModal = () => {
+        if (!this.state.showTagModal && this.inputRef) {
+            this.inputRef.current.focus()
+        }
+        this.setState((state) => {
+            return { showTagModal: !state.showTagModal }
+        })
+    }
+
+    handleTagInputChange = (e) => {
+        this.setState({ tagToAdd: e.target.value })
+    }
+
+    handleTagInputKey = (e) => {
+        if (e.key === 'Enter') {
+            this.addTagToBook(this.state.tagToAdd)
+            this.setState({ tagToAdd: '' })
+        }
+    }
+
+    handleTagButtonClick = () => {
+        this.addTagToBook(this.state.tagToAdd)
+        this.setState({ tagToAdd: '' })
+    }
+
     render() {
         return (
             <div className="book-info">
@@ -49,11 +83,11 @@ class BookInfo extends Component {
                 </GalleryItem>
                 <div className="book-info-inner">
                     {
-                        this.book.group ?
+                        this.book.artGroup ?
                             <div className="book-info-line">
                                 <span className="info-label">Group:</span>
-                                <span className="info-item clickable" onClick={() => { this.searchGroup(this.book.group) }}>
-                                    {this.book.group}
+                                <span className="info-item clickable" onClick={() => { this.searchGroup(this.book.artGroup) }}>
+                                    {this.book.artGroup}
                                 </span>
                             </div>
                             : null
@@ -64,8 +98,8 @@ class BookInfo extends Component {
                                 <span className="info-label">Artists:</span>
                                 <div className="info-items">
                                     {
-                                        this.book.artists.map((artist) => {
-                                            return <span className="info-item clickable" onClick={() => { this.searchArtist(artist) }}>
+                                        this.book.artists.map((artist, i) => {
+                                            return <span className="info-item clickable" onClick={() => { this.searchArtist(artist) }} key={i}>
                                                 {artist}
                                             </span>
                                         })
@@ -107,11 +141,31 @@ class BookInfo extends Component {
                                         </span>
                                     }) : null
                             }
-                            <span className="info-icon">
+                            <span className="info-icon" onClick={() => { this.toggleTagModal() }}>
                                 <img className="svg-icon-pink text-icon" src="http://localhost:9000/data/images/plus-symbol.svg" alt="add to slideshow"></img>
                             </span>
                         </div>
                     </div>
+                    <dialog id="tag-modal" 
+                        className="modal-background"
+                        open={this.state.showTagModal}
+                        onClick={() => { this.toggleTagModal() }}>
+                        <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
+                            <div className="modal-dialog-inner">
+                                <h3>Add New Tag</h3>
+                                <div className="input-container">
+                                    <input 
+                                        type="text"
+                                        value={this.state.tagToAdd}
+                                        onChange={this.handleTagInputChange}
+                                        onKeyDown={this.handleTagInputKey}
+                                        ref={this.inputRef}>
+                                    </input>
+                                    <button type="buttton" onClick={() => { this.handleTagButtonClick() }}>Add</button>
+                                </div>
+                            </div>
+                        </div>
+                    </dialog>
                     {
                         this.book.hiddenPages ?
                             <div className="book-info-line">

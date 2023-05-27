@@ -117,6 +117,7 @@ class App extends Component {
     .then(data => {
       if (data && data.importCount) {
         console.log(`imported ${data.importCount} books`)
+        console.log(data.books)
         this.setState({ 
           allBooks: data.books,
           currentBook: {},

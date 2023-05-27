@@ -1,7 +1,7 @@
-const imageBaseUrl = "http://localhost:9000/img/"
+const imageBaseUrl = "http://localhost:9000/api/page/"
 
 export function GetCoverPath(book) {
-    return imageBaseUrl + book.folderName + "/" + book.cover
+    return imageBaseUrl + book.id + "/0"
 }
 
 export function GetPagePath(book, pageNum) {
@@ -11,8 +11,11 @@ export function GetPagePath(book, pageNum) {
     if (pageNum < 0 || pageNum >= book.pageCount) {
         console.log("GetPagePath - page number out of range")
     }
+    if (!book.pages) {
+        console.log(book)
+    }
     let fname = book.pages[pageNum]
-    return imageBaseUrl + book.folderName + "/" + fname;
+    return imageBaseUrl + book.id + "/" + pageNum;
 }
 
 export function GetPagePathMulti(books, pageNum) {
@@ -48,8 +51,8 @@ export function slideshowToJSON(slideshow) {
 }
 
 export function getBookAuthor(book) {
-    if (book.group || (book.artists && book.artists.length > 0)) {
-        let author = book.group
+    if (book.artGroup || (book.artists && book.artists.length > 0)) {
+        let author = book.artGroup
         if (!author) {
             author = book.artists[0]
         }

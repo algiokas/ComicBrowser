@@ -66,6 +66,19 @@ class Sidebar extends Component {
         }
     }
 
+    addTagToBook = (tag) => {
+        console.log(`add tag "${tag}" to book`)
+        if (this.props.updateBook) {
+            let req = this.props.slideshow.books[0]
+            if (req.tags) {
+                req.tags.push(tag)
+            } else {
+                req.tags = [tag]
+            }
+            this.props.updateBook(req)
+        }
+    }
+
     componentDidMount() {
         this.updateListingHeight()
     }
@@ -132,7 +145,8 @@ class Sidebar extends Component {
                                 book={this.props.slideshow.books[0]}
                                 addButtonHandler={this.props.addButtonHandler}
                                 viewSearchResults={this.props.viewSearchResults}
-                                unhidePage={this.unhidePage}>
+                                unhidePage={this.unhidePage}
+                                addTagToBook={this.addTagToBook}>
                             </BookInfo>
 
                     }
