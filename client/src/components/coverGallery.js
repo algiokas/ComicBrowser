@@ -22,7 +22,7 @@ class CoverGallery extends Component {
         this.subTitleClick = props.subTitleClick.bind(this)
         this.totalPages = this.getTotalPages(props.allBooks)
 
-        let initialSortOrder = props.sortOrder ?? SortOrder.Random
+        let initialSortOrder = props.sortOrder ?? SortOrder.Title
 
         this.state = { 
             galleryPage: 0,

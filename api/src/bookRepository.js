@@ -1,11 +1,19 @@
 const languages = ["Japanese", "English", "Chinese", "Translated"]
 const db = require('../src/database')
+const fs = require('fs');
+const path = require('path');
+
+const dataDirectory = path.join(__dirname, '../data');
+const imageDirectory = path.join(__dirname, '../../../Images');
+const booksDirectory = path.join(dataDirectory, "books")
+const slideshowDirectory = path.join(dataDirectory, 'slideshows')
+const slideshowFileBaseName = "ss_"
 
 exports.getFileName = function (id, book) {
     return String(id).padStart(4, '0') + ' - ' + book.title
 }
 
-exports.folderToJSON = function (folderName, contents, id) {
+function folderToJSON(folderName, contents, id) {
     let output = {}
     if (!folderName || !contents || contents.length < 1) {
         return
@@ -70,9 +78,83 @@ const selectBooks = 'SELECT * FROM books'
 const getBookByID = "SELECT * FROM books WHERE id = ?"
 const getBookByTitle = "SELECT * FROM books WHERE title = ?"
 
-exports.importBook = async function (bookJSON) {
+exports.importBooks = function (res, callback) {
+    let count = 0;
+    let books = [];
+    fs.readdir(imageDirectory, function (err, files) {
+        if (err) {
+            return console.log('Unable to scan directory: ' + err);
+        }
+
+        files.forEach((file) => {
+            let json = getBookData(file)
+            if (json && !json.error) {
+                books.push(json)
+            }
+        })
+        
+        db.serialize(function () {
+            books.forEach((book) => {
+                importBookIfMissing(book, (importResult) => {
+                    if (importResult && importResult.success) {
+                        count++
+                    }
+                    else if (importResult && !importResult.success) {
+                        if (importResult.error) {
+                            console.log(importResult.error)
+                        }
+                        else {
+                            console.log("unable to import file: " + file)
+                        }
+                    }
+                    else {
+                        console.log("import failed")
+                    }
+                })
+            })
+        })
+        
+        callback(res, { books: books })
+    })
+}
+
+function getBookData(file) {
+    let fullpath = path.join(imageDirectory, file);
+    if (fs.statSync(fullpath).isDirectory()) {
+        try {
+            const files = fs.readdirSync(fullpath);
+            let folderContents = [];
+            files.forEach((file) => {
+                folderContents.push(file);
+            });
+            return folderToJSON(file, folderContents);
+        } catch (err) {
+            return { error: err } 
+        }
+    }
+}
+
+function importBookIfMissing(bookJson, callback) {
+    let checkParams = [bookJson.title]
+    db.get(getBookByTitle, checkParams, (err, row) => {
+        if (err || !row) {
+            addBookToDb(bookJson, callback)
+        } else {
+            if (err) {
+                callback({ success: false, error: err })
+            } else if (row) {
+                callback({ success: false, error: `existing book found with ID: ${row.id}` })
+            } else {
+                callback({ success: false })
+            }  
+        }
+    })
+}
+
+ function addBookToDb(bookJSON, callback) {
     if (!bookJSON.title)
         console.log('importBook - invalid JSON')
+
     let bookParams = [
         bookJSON.title,
         bookJSON.folderName,
@@ -83,29 +165,18 @@ exports.importBook = async function (bookJSON) {
         0,
         JSON.stringify(bookJSON.pages)
     ]
-    let checkParams = [
-        bookJSON.title
-    ]
-    db.get(getBookByTitle, checkParams, (err, row) => {
-        if (err || !row) {
-            db.run(insertBook, bookParams, function (err) {
-                if (err) {
-                    console.log(err)
-                } else {
-                    console.log("inserting book with ID: " + this.lastID)
-                    if (bookJSON.artists && bookJSON.artists.length > 0) {
-                        bookJSON.artists.forEach(artist => {
-                            console.log(artist)
-                        })
-                    }
-                    return { success: true, id: this.lastID}
-                }
-            })
+
+    db.run(insertBook, bookParams, function (err) {
+        if (err) {
+            console.log(err)
         } else {
-            if (err) {
-                console.log(err)
-            }       
-            return {success: false, id: row.id}
+            //console.log("inserting book with ID: " + this.lastID)
+            if (bookJSON.artists && bookJSON.artists.length > 0) {
+                bookJSON.artists.forEach(artist => {
+                    //console.log(artist)
+                })
+            }
+            callback({ success: true, book: bookJSON })
         }
     })
 }
@@ -142,11 +213,46 @@ exports.importAuthors = function (bookJSON) {
     })
 }
 
-exports.getBooks = function () {
+exports.getBooks = function (callback) {
+    console.log("/allbooks")
     var params = []
-    db.all(selectBooks, params, function (err, rows) {
-        console.log(err)
-        console.log(rows)
-        return rows
+    db.all('SELECT * FROM books', params, function (err, rows) {
+        if (err) {
+            console.log(err)
+        }
+        rows.forEach(row => {
+            if (row.pages) {
+                try {
+                    pageArray = JSON.parse(row.pages);
+                    row.pages = pageArray
+                } catch (e) {
+                    console.err(e);
+                }
+            }
+            //TEMP
+            if (!row.artists) row.artists = []
+            if (!row.tags) row.tags = []
+        });
+        callback(rows)
+    })
+}
+
+exports.getBookData = function (id, pageNum, res, callback) {
+    var params = [id]
+    db.get(getBookByID, params, (err, row) => {
+        if (err) {
+            console.log(err)
+        }
+        if (row && row.pages) {
+            //console.log(row.title + " page " + req.params.pageNum)
+            let pageList = JSON.parse(row.pages)
+            if (pageNum < pageList.length) {
+                callback(res, row.folderName, pageList[pageNum])
+            } else {
+                console.log('page number out of range')
+            }
+        } else {
+            console.log(`unable to fetch data for book ID: ${id}`)
+        }
     })
 }
