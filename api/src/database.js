@@ -1,81 +1,94 @@
-var sqlite3 = require('sqlite3')
-
 const DBSOURCE = "data/db.sqlite"
+const Database = require('better-sqlite3');
 
-function handleError(err) {
-    let test = err.message.match(/table .* already exists/)
-    if (!test) {
-        console.log(err.message)
+const db = new Database(DBSOURCE, { verbose: console.log });
+
+const insertBook = db.prepare('INSERT INTO books (title, folderName, artGroup, prefix, language, pageCount, coverIndex, pages) VALUES (?,?,?,?,?,?,?,?)');
+const insertArtist = db.prepare('INSERT INTO artists (name) VALUES (?)')
+const insertTag = db.prepare('INSERT INTO tags (name) VALUES (?)')
+const selectBooks = db.prepare('SELECT * FROM books')
+const getBookByID = db.prepare('SELECT * FROM books WHERE id = ?')
+const getBookByTitle = db.prepare('SELECT * FROM books WHERE title = ?')
+
+function init() {
+    try {
+        db.prepare(`CREATE TABLE books (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT, 
+            folderName TEXT,
+            artGroup TEXT,
+            prefix TEXT,
+            language TEXT,
+            pageCount INTEGER,
+            coverIndex INTEGER,
+            pages TEXT)`).run()
+        console.log('created table: books')
+    } catch (err) {
+        if (err.message === 'table books already exists') {
+            console.log(err.message)
+        } else {
+            console.error(err)
+        }
+        
+    }
+    
+    try {
+        db.prepare(`CREATE TABLE artists (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE)`).run()
+        console.log('created table: artists')
+    } catch (err) {
+        if (err.message === 'table artists already exists') {
+            console.log(err.message)
+        } else {
+            console.error(err)
+        }
+    }
+    
+    try {
+        db.prepare(`CREATE TABLE bookArtists (
+        bookId INTEGER
+        artistsId INTEGER)`).run()
+        console.log('created table: bookArtists')
+    } catch (err) {
+        if (err.message === 'table bookArtists already exists') {
+            console.log(err.message)
+        } else {
+            console.error(err)
+        }
+    }
+    
+    try {
+        db.prepare(`CREATE TABLE tags (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE)`).run()
+        console.log('created table: tags')
+    } catch (err) {
+        if (err.message === 'table tags already exists') {
+            console.log(err.message)
+        } else {
+            console.error(err)
+        }
+    }
+    
+    try {
+        db.prepare(`CREATE TABLE bookTags (
+        bookId INTEGER
+        tagId INTEGER)`).run()
+        console.log('created table: bookTags')
+    } catch (err) {
+        if (err.message === 'table bookTags already exists') {
+            console.log(err.message)
+        } else {
+            console.error(err)
+        }
     }
 }
 
-let db = new sqlite3.Database(DBSOURCE, (err) => {
-    console.log("API Started in " + process.cwd())
-    if (err) {
-        // Cannot open database
-        console.error(err.message)
-        throw err
-    } else {
-        console.log('Connected to the SQLite database.')
-        db.run(`CREATE TABLE books (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT, 
-                folderName TEXT,
-                artGroup TEXT,
-                prefix TEXT,
-                language TEXT,
-                pageCount INTEGER,
-                coverIndex INTEGER,
-                pages TEXT)`,
-            (err) => {
-                if (err) {
-                    handleError(err)
-                } else {
-                    console.log('created "books" table')
-                }
-            });
-        db.run(`CREATE TABLE artists (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT UNIQUE)`,
-            (err) => {
-                if (err) {
-                    handleError(err)
-                } else {
-                    console.log('created "artists" table')
-                }
-            });
-        db.run(`CREATE TABLE bookArtists (
-                bookId INTEGER
-                artistsId INTEGER)`,
-            (err) => {
-                if (err) {
-                    handleError(err)
-                } else {
-                    console.log('created "bookArtists" table')
-                }
-            });
-        db.run(`CREATE TABLE tags (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT UNIQUE)`,
-            (err) => {
-                if (err) {
-                    handleError(err)
-                } else {
-                    console.log('created "tags" table')
-                }
-            });
-        db.run(`CREATE TABLE bookTags (
-            bookId INTEGER
-            tagId INTEGER)`,
-                (err) => {
-                    if (err) {
-                        handleError(err)
-                    } else {
-                        console.log('created "bookTags" table')
-                    }
-            });
-    }
+let test = selectBooks.run()
+
+test.forEach(book => {
+    console.log(book.title)  
 });
 
-
-module.exports = db
+init();

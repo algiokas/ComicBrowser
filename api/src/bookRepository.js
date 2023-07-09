@@ -71,12 +71,7 @@ function folderToJSON(folderName, contents, id) {
     return output
 }
 
-const insertBook = 'INSERT INTO books (title, folderName, artGroup, prefix, language, pageCount, coverIndex, pages) VALUES (?,?,?,?,?,?,?,?)'
-const insertArtist = 'INSERT INTO artists (name) VALUES (?)'
-const insertTag = 'INSERT INTO tags (name) VALUES (?)'
-const selectBooks = 'SELECT * FROM books'
-const getBookByID = "SELECT * FROM books WHERE id = ?"
-const getBookByTitle = "SELECT * FROM books WHERE title = ?"
+
 
 exports.importBooks = function (res, callback) {
     let count = 0;
