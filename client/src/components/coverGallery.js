@@ -5,12 +5,12 @@ import { getBookAuthor } from "../util/helpers";
 import FilterInfo from "./filterInfo";
 
 export const SortOrder = Object.freeze({
+    Favorite: Symbol("Favorite"),
     Random: Symbol("Random"),
     Title: Symbol("AlphaTitle"),
     Author: Symbol("AlphaAuthor"),
     Artist: Symbol("AlphaArtist"),
     ID: Symbol("ID")
-
 })
 
 class CoverGallery extends Component {
@@ -22,7 +22,7 @@ class CoverGallery extends Component {
         this.subTitleClick = props.subTitleClick.bind(this)
         this.totalPages = this.getTotalPages(props.allBooks)
 
-        let initialSortOrder = props.sortOrder ?? SortOrder.Title
+        let initialSortOrder = props.sortOrder ?? SortOrder.Favorite
 
         this.state = { 
             galleryPage: 0,
@@ -129,6 +129,14 @@ class CoverGallery extends Component {
                     return 0.5 - Math.random()
                 })
                 break
+            case SortOrder.Favorite:
+                sortedCopy.sort((a, b) => {
+                    return 0.5 - Math.random()
+                })
+                let favorites = sortedCopy.filter(b => b.isFavorite)
+                let other = sortedCopy.filter(b => !b.isFavorite)
+                sortedCopy = favorites.concat(other)
+                break
             default:
                 console.log("getSortedBooks - Invalid Sort Order")
         }
@@ -203,6 +211,14 @@ class CoverGallery extends Component {
         })
     }
 
+    favoriteClick = (book) => {
+        console.log("toggle favorite for book: " + book.id)
+        if (this.props.updateBook) {
+            book.isFavorite = !book.isFavorite; //toggle value
+            this.props.updateBook(book)
+        }
+    }
+
     render() {
         return (
             <div className="container index-container dark-theme">
@@ -234,6 +250,7 @@ class CoverGallery extends Component {
                             addButtonHandler={this.addBookToSlideshow} 
                             getSubtitle={this.getItemSubtitle}
                             subTitleClickHandler={this.subTitleClick}
+                            favoriteClickHandler={this.favoriteClick}
                         ></GalleryItem>
                     })
 

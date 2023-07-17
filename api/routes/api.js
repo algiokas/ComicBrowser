@@ -63,7 +63,7 @@ router.get('/importbooks', function (req, res, next) {
 router.post('/updatebook/:bookId', function (req, res, next) {
   if (req.body) console.log("invalid book data")
   if (req.body.id.toString() === req.params.bookId) {
-    req.json(bookRepo.updateBook(req.body.id, req.body))
+    res.json(bookRepo.updateBook(req.body.id, req.body))
   }
 })
 

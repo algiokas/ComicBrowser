@@ -24,6 +24,9 @@ class GalleryItem extends Component {
     if (props.subTitleClickHandler) {
       this.subTitleClickHandler = props.subTitleClickHandler.bind(this)
     }
+    if (props.favoriteClickHandler) {
+      this.favoriteClickHandler = props.favoriteClickHandler.bind(this)
+    }
   }
 
   bodyClick = (e) => {
@@ -45,6 +48,11 @@ class GalleryItem extends Component {
     this.subTitleClickHandler(this.props.book)
   }
 
+  favoriteClick = (e) => {
+    e.stopPropagation()
+    this.favoriteClickHandler(this.props.book)
+  }
+
   getSubtitleText = (book) => {
     if (this.getSubtitle) {
       return this.getSubtitle(book)
@@ -63,11 +71,21 @@ class GalleryItem extends Component {
       <div className="gallery" key={this.props.book.title}>
         <div className="gallery-inner" onClick={this.props.bodyClickHandler ? this.bodyClick : undefined}>
           <img className="gallery-image" src={this.state.coverUrl} alt={`${this.props.book.title} cover`}></img>
-          <div className="caption">
-            <span className="subtitle" onClick={this.props.subTitleClickHandler ? this.subtitleClick : undefined}>
-              {this.getSubtitleText(this.props.book)}
-            </span>
-            <span className="title">{this.props.book.title}</span>
+          <div className={ this.props.book.isFavorite ? "caption favorite" : "caption"}>
+            <div className="caption-text">
+              <span className="subtitle" onClick={this.props.subTitleClickHandler ? this.subtitleClick : undefined}>
+                {this.getSubtitleText(this.props.book)}
+              </span>
+              <span className="title">{this.props.book.title}</span>
+            </div>
+            <div className="favorite-icon" onClick={this.props.favoriteClickHandler ? this.favoriteClick : undefined}>
+              {
+                this.props.book.isFavorite ?
+                <img className="svg-icon-favorite" src="http://localhost:9000/data/images/stars.svg" alt="remove from favorites"></img>
+                :
+                <img className="svg-icon-disabled test" src="http://localhost:9000/data/images/stars.svg" alt="add to favorites"></img>
+              }
+            </div>
           </div>
           {
             this.props.addButtonHandler ? (

@@ -134,7 +134,7 @@ function fillBook(booksRow) {
         try {
             book.pages = JSON.parse(booksRow.pages)
             book.hiddenPages = JSON.parse(booksRow.hiddenPages)
-            book.isFavorite = booksRow.isFavorite ? 1 : 0
+            book.isFavorite = booksRow.isFavorite > 0
         } catch (e) {
             console.log(e);
         }
@@ -179,19 +179,49 @@ exports.getBook = function (id) {
 }
 
 exports.updateBook = function(id, newBookData) {
+    let response = { success: false, errors: "" }
     let bookData = exports.getBook(id);
     if (newBookData.tags && bookData.tags) {
         let tagsToAdd = newBookData.tags.filter(t => !bookData.tags.includes(t))
         let tagsToRemove = bookData.tags.filter(t => !newBookData.tags.includes(t))
 
-        if (tagsToAdd.length) db.addTags(id, tagsToAdd)
-        if (tagsToRemove.length) db.removeTags(id, tagsToRemove)
+        if (tagsToAdd.length) {
+            let addResult = db.addTags(id, tagsToAdd)
+            if (addResult.length === tagsToAdd.length) {
+                response.success = true;
+            } else {
+                response.errors = response.errors + "Adding tags failed"
+            }
+        } 
+        if (tagsToRemove.length) {
+            let removeResult = db.removeTags(id, tagsToRemove)
+            if (removeResult.length === tagsToRemove.length) {
+                response.success = true;
+            } else {
+                response.errors = response.errors + "Adding tags failed"
+            }
+        }
     }
     if (newBookData.hiddenPages && bookData.hiddenPages) {
-        if (JSON.stringify(newBookData.hiddenPages) !== JSON.stringify(bookData.hiddenPages))
-        db.setHiddenPages(id, newBookData.hiddenPages)
+        if (JSON.stringify(newBookData.hiddenPages) !== JSON.stringify(bookData.hiddenPages)) {
+            try {
+                let updateResult = db.setHiddenPages(id, newBookData.hiddenPages)
+                if (updateResult) response.success = true
+            } catch (err) {
+                response.errors = response.errors + err.message
+            }
+        }
+        
     }
     if (newBookData.isFavorite !== bookData.isFavorite) {
-        db.setFavoriteValue(id, newBookData.isFavorite)
+        try {
+            let updateResult = db.setFavoriteValue(id, newBookData.isFavorite)
+            if (updateResult) response.success = true
+        } catch (err) {
+            response.errors = response.errors + err.message
+        } 
     }
+    if (response.errors) response.success = false
+    response.book = exports.getBook(id)
+    return response
 }

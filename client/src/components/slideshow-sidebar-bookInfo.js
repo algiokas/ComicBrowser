@@ -174,7 +174,7 @@ class BookInfo extends Component {
                                     {
                                         this.book.hiddenPages.map((page, i) => {
                                             return <span className="info-item clickable" onClick={() => { this.unhidePage(page) }} key={i}>
-                                                {page}
+                                                {page+1}
                                             </span>
                                         })
                                     }

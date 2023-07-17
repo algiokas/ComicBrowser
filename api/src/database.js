@@ -118,6 +118,7 @@ function insertBookFromJson(bookJson) {
 function insertArtistIfMissing(artistName) {
     if (!artistName) {
         console.log('cannot input blank artist name')
+        return null
     }
     let existing = getArtistByName.get(artistName)
     if (existing) {
@@ -137,10 +138,12 @@ function insertArtistsForBook(bookId, artists) {
     let artistIds = []
     artists.forEach((artist) => {
         let insertResult = insertArtistIfMissing(artist)
-        let artistId = insertResult.lastInsertRowid 
-                    ?? insertResult.existingRowId
-        insertBookArtist.run(bookId, artistId)
-        artistIds.push(artistId)
+        if (insertResult) {
+            let artistId = insertResult.lastInsertRowid 
+                        ?? insertResult.existingRowId
+            insertBookArtist.run(bookId, artistId)
+            artistIds.push(artistId)
+        }
     })
     return artistIds
 }
@@ -148,6 +151,7 @@ function insertArtistsForBook(bookId, artists) {
 function insertTagIfMissing(tagName) {
     if (!tagName) {
         console.log('cannot input blank tag name')
+        return null
     }
     let existing = getTagByName.get(tagName)
     if (existing) {
@@ -167,10 +171,13 @@ function insertTagsForBook(bookId, tags) {
     let tagIds = []
     tags.forEach((tag) => {
         let insertResult = insertTagIfMissing(tag)
-        let tagId = insertResult.lastInsertRowid 
-                    ?? insertResult.existingRowId;
-        insertBookTag.run(bookId, tagId)
-        tagIds.push(tagId)
+        if (insertResult) {
+            let tagId = insertResult.lastInsertRowid 
+                     ?? insertResult.existingRowId;
+            insertBookTag.run(bookId, tagId)
+            tagIds.push(tagId)
+        }
+
     })
     return tagIds
 }
@@ -181,14 +188,19 @@ function removeTagsFromBook(bookId, tags) {
         return []
     }
 
+    let tagIds = []
     tags.forEach((tag) => {
         let tagRow = getTagByName.get(tag)
-        deleteBookTag.run(bookId, tagRow.id)
-        let otherBookTags = selectBookTagsByTag.all(tagRow.id)
-        if (otherBookTags.length < 1) {
-            deleteTag.run(tagRow.id)
+        if (tagRow) {
+            tagIds.push(tagRow.id)
+            deleteBookTag.run(bookId, tagRow.id)
+            let otherBookTags = selectBookTagsByTag.all(tagRow.id)
+            if (otherBookTags.length < 1) {
+                deleteTag.run(tagRow.id)
+            }
         }
     })
+    return tagIds
 }
 
 //Adds book, artists and (soon) tags to all relevant DBs
@@ -265,8 +277,8 @@ exports.setHiddenPages = function(bookId, hiddenPages) {
 }
 
 exports.setFavoriteValue = function(bookId, value) {
-    if (typeof variable !== "boolean") {
-        console.err('favorite value can only be set to 0 or 1')
+    if (typeof value !== "boolean") {
+        throw new Error("TypeError - Favorite value must be boolean")    
     }
     return updateFavoriteValue.run(value ? 1 : 0, bookId)
 }
