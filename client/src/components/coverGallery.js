@@ -145,7 +145,7 @@ class CoverGallery extends Component {
                 return false
             })
         }
-        if (searchQuery.artGroup) {
+        if (searchQuery.group) {
             results = results.filter(book => {
                 return book.artGroup === searchQuery.group
             })
@@ -208,7 +208,7 @@ class CoverGallery extends Component {
             <div className="container index-container dark-theme">
                 <div className="container-header">
                     {
-                        this.state.filterQuery && this.state.filterQuery.filled ?
+                        this.props.showFilters && this.state.filterQuery && this.state.filterQuery.filled ?
                         <FilterInfo filterQuery={this.state.filterQuery}></FilterInfo>
                         : null
                     }

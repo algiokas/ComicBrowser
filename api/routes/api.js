@@ -3,7 +3,6 @@ var router = express.Router();
 const path = require('path');
 const fs = require('fs');
 const bookRepo = require('../src/bookRepository');
-const db = require('../src/database')
 
 const dataDirectory = path.join(__dirname, '../data');
 const imageDirectory = path.join(__dirname, '../../../Images');
@@ -37,87 +36,38 @@ function deleteAllItems(dir) {
 }
 
 router.get('/', function (req, res, next) {
-  res.send("Hentai Browser API Root");
+  res.send("Comic Browser API Root");
 });
 
 router.get('/page/:bookId/:pageNum', function (req, res, next) {
-  bookRepo.getBookData(req.params.bookId, req.params.pageNum, res, (res, folderName, imgFile) => {
-    let fpath = path.join(folderName, imgFile)
-    res.sendFile(fpath, { root: imageDirectory })
-  })
+  let fpath = bookRepo.getBookPage(req.params.bookId, req.params.pageNum);
+  if (fpath) res.sendFile(fpath, { root: imageDirectory });
+  else {
+    res.sendStatus(404).end();
+  }
 });
 
 router.get('/allbooks', function (req, res, next) {
-  bookRepo.getBooks((bookData) => {
-    res.json(bookData)
-  })
+  let books = bookRepo.getBooks()
+  res.json(books)
 });
 
 router.get('/importbooks', function (req, res, next) {
   bookRepo.importBooks(res, (res, importResult) => {
-    console.log("imported books")
-    res.json(importResult.books)
+
+    console.log("imported " + importResult.importCount + " books")
+    res.json(importResult)
   })
 });
 
 router.post('/updatebook/:bookId', function (req, res, next) {
-  var book = req.body;
-  fName = bookRepo.getFileName(book.id, book)
-  let fullPath = path.join(booksDirectory, fName)
-  fs.readFile(fullPath, { encoding: 'utf-8' }, (err, data) => {
-    if (err) {
-      res.json(getErrorObject('File Read Error', err))
-    } else {
-      if (data) {
-        var json = JSON.parse(data);
-        if (json) {
-          let updatedBook = Object.assign(json, book)
-          fs.writeFile(fullPath, JSON.stringify(updatedBook), (err1) => {
-            if (err1) {
-              res.json(getErrorObject('File Write Error', err1))
-            }
-          })
-          res.json({
-            success: true,
-            fileName: fName,
-            book: updatedBook
-          })
-        } else {
-          res.json(getErrorObject('JSON parse failed'))
-        }
-      }
-    }
-  })
+  if (req.body) console.log("invalid book data")
+  if (req.body.id.toString() === req.params.bookId) {
+    req.json(bookRepo.updateBook(req.body.id, req.body))
+  }
 })
 
 router.post('/saveslideshow', function (req, res, next) {
-  let fileIndex = 01
-  let fname = slideshowFileBaseName + fileIndex
-
-  fs.readdir(slideshowDirectory, function (err, files) {
-    while (files.includes(fname)) {
-      fileIndex++;
-      fname = slideshowFileBaseName + fileIndex
-    }
-
-    let fpath = path.join(slideshowDirectory, fname)
-
-    if (req.body && req.body.ids) {
-      fs.writeFileSync(fpath, JSON.stringify(req.body))
-
-      res.json({
-        Status: "success",
-        FileName: fname,
-        Size: req.body.ids.length
-      })
-    }
-    else {
-      res.json({
-        Status: "Fail",
-        Detail: "Invalid Request"
-      })
-    }
-  })
 });
 
 module.exports = router;

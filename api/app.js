@@ -5,7 +5,6 @@ var cors = require('cors');
 var bodyParser = require('body-parser');
 var path = require('path');
 var createError = require('http-errors');
-var sqlite3 = require('sqlite3').verbose();
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');

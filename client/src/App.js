@@ -115,7 +115,7 @@ class App extends Component {
     })
     .then(res => res.json())
     .then(data => {
-      if (data && data.books) {
+      if (data) {
         this.setState({ 
           allBooks: data.books,
           currentBook: {},

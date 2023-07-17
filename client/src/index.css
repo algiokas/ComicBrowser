@@ -3,7 +3,8 @@
   --link-color: #00B7FF;
   --gray-1: #404040;
   --gray-2: #1f1f1f;
-  --gray-3: #0d0d0d;
+  --gray-3: #292929;
+  --gray-4: #0d0d0d;
   --red: #a10016;
   --pink-1: #e619c3;
   --yellow-highlight: #e6e3aa;
@@ -23,7 +24,7 @@ html, body {
 
 .dark-theme {
   color: var(--text-color);
-  background-color: var(--gray-3);
+  background-color: var(--gray-4);
 }
 
 nav {
@@ -317,7 +318,7 @@ h2 {
   flex-direction: column;
   overflow-y: auto;
   max-height: 1020px;
-  background-color: var(--gray-3);
+  background-color: var(--gray-4);
 }
 
 .slideshow-covers .gallery {
@@ -403,11 +404,14 @@ h2 {
   margin-left: 0;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 .book-info-line .info-item.clickable{
   background-color: var(--gray-1);
   color: var(--pink-1);
   border-radius: 4px;
-  cursor: pointer;
 }
 
 .sidebar-stack div {
@@ -563,9 +567,29 @@ h2 {
 .filter-info-container {
   display: flex;
   flex-direction: row;
+  padding-left: 5em;
 }
 
 .filter-info-item {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  background-color: var(--gray-3);
+  border-radius: 10px;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.filter-info-label {
+  background-color: var(--gray-1);
+  padding: 8px 8px 8px 16px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  color: var(--pink-1)
+
+}
+
+.filter-info-value {
+  padding: 8px 16px 8px 8px;
+  color: var(--text-color);
+  text-decoration: none;
 }

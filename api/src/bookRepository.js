@@ -13,6 +13,7 @@ exports.getFileName = function (id, book) {
     return String(id).padStart(4, '0') + ' - ' + book.title
 }
 
+//Parse data from a 
 function folderToJSON(folderName, contents, id) {
     let output = {}
     if (!folderName || !contents || contents.length < 1) {
@@ -65,7 +66,7 @@ function folderToJSON(folderName, contents, id) {
     }
 
     output.pageCount = contents.length
-    output.cover = contents[0]
+    output.coverIndex = 0
     output.pages = contents
 
     return output
@@ -75,41 +76,37 @@ function folderToJSON(folderName, contents, id) {
 
 exports.importBooks = function (res, callback) {
     let count = 0;
-    let books = [];
+    
     fs.readdir(imageDirectory, function (err, files) {
         if (err) {
             return console.log('Unable to scan directory: ' + err);
         }
 
+        bookData = []
         files.forEach((file) => {
             let json = getBookData(file)
             if (json && !json.error) {
-                books.push(json)
+                bookData.push(json)
             }
         })
         
-        db.serialize(function () {
-            books.forEach((book) => {
-                importBookIfMissing(book, (importResult) => {
-                    if (importResult && importResult.success) {
-                        count++
-                    }
-                    else if (importResult && !importResult.success) {
-                        if (importResult.error) {
-                            console.log(importResult.error)
-                        }
-                        else {
-                            console.log("unable to import file: " + file)
-                        }
-                    }
-                    else {
-                        console.log("import failed")
-                    }
-                })
-            })
+        let dbrows = [];
+        bookData.forEach((book) => {
+            let addResult = db.addBook(book)
+            if (addResult) {
+                if (addResult.lastInsertRowid) {
+                    book.id = addResult.lastInsertRowid
+                    dbrows.push(book)
+                    count++
+                }
+                else if (addResult.existingRowId) {
+                    book.id = addResult.existingRowId
+                    dbrows.push(book)
+                }
+            } 
         })
         
-        callback(res, { books: books })
+        callback(res, { books: dbrows, importCount: count })
     })
 }
 
@@ -129,125 +126,72 @@ function getBookData(file) {
     }
 }
 
-function importBookIfMissing(bookJson, callback) {
-    let checkParams = [bookJson.title]
-    db.get(getBookByTitle, checkParams, (err, row) => {
-        if (err || !row) {
-            addBookToDb(bookJson, callback)
-        } else {
-            if (err) {
-                callback({ success: false, error: err })
-            } else if (row) {
-                callback({ success: false, error: `existing book found with ID: ${row.id}` })
-            } else {
-                callback({ success: false })
-            }  
+//takes a row from the books table, converts some data from SQL format to JSON,
+//and fills artists + tags with data from artist and tag tables
+function fillBook(booksRow) {
+    let book = booksRow
+    if (booksRow.pages) {
+        try {
+            book.pages = JSON.parse(booksRow.pages)
+            book.hiddenPages = JSON.parse(booksRow.hiddenPages)
+            book.isFavorite = booksRow.isFavorite ? 1 : 0
+        } catch (e) {
+            console.log(e);
         }
-    })
+    }
+    if (!booksRow.artists) book.artists = db.getBookArtists(booksRow.id)
+    if (!booksRow.tags) book.tags = db.getBookTags(booksRow.id)
+    return book;
 }
 
- function addBookToDb(bookJSON, callback) {
-    if (!bookJSON.title)
-        console.log('importBook - invalid JSON')
-
-    let bookParams = [
-        bookJSON.title,
-        bookJSON.folderName,
-        bookJSON.artGroup,
-        bookJSON.prefix,
-        bookJSON.language,
-        bookJSON.pageCount,
-        0,
-        JSON.stringify(bookJSON.pages)
-    ]
-
-    db.run(insertBook, bookParams, function (err) {
-        if (err) {
-            console.log(err)
-        } else {
-            //console.log("inserting book with ID: " + this.lastID)
-            if (bookJSON.artists && bookJSON.artists.length > 0) {
-                bookJSON.artists.forEach(artist => {
-                    //console.log(artist)
-                })
-            }
-            callback({ success: true, book: bookJSON })
-        }
-    })
-}
-
-exports.importTags = function (bookJSON) {
-    if (!bookJSON.tags || bookJSON.tags.length < 1) console.log('importTags - no tags')
-    bookJSON.tags.forEach(tag => {
-        db.run(insertTag, [], (err) => {
-            if (err) {
-                console.log(err)
-            }
-        })
-    })
-
-}
-
-exports.importAuthors = function (bookJSON) {
-    if (!bookJSON.title) console.log('importAuthors - invalid JSON')
-    let params = [
-        bookJSON.title,
-        bookJSON.folderName,
-        bookJSON.prefix,
-        bookJSON.artGroup,
-        bookJSON.language,
-        bookJSON.pageCount,
-        0,
-        JSON.stringify(bookJSON.pages)
-    ]
-    console.log(params)
-    db.run(insertBook, params, (err) => {
-        if (err) {
-            console.log(err)
-        }
-    })
-}
-
-exports.getBooks = function (callback) {
+exports.getBooks = function () {
     console.log("/allbooks")
-    var params = []
-    db.all('SELECT * FROM books', params, function (err, rows) {
-        if (err) {
-            console.log(err)
-        }
-        rows.forEach(row => {
-            if (row.pages) {
-                try {
-                    pageArray = JSON.parse(row.pages);
-                    row.pages = pageArray
-                } catch (e) {
-                    console.err(e);
-                }
-            }
-            //TEMP
-            if (!row.artists) row.artists = []
-            if (!row.tags) row.tags = []
-        });
-        callback(rows)
-    })
+    let booksRow = db.getBooks()
+    if (!booksRow || booksRow.length < 1) {
+        console.log("no books found")
+        return booksRow
+    }
+    let books = []
+    booksRow.forEach(row => {
+        books.push(fillBook(row))
+    });
+    return books
 }
 
-exports.getBookData = function (id, pageNum, res, callback) {
-    var params = [id]
-    db.get(getBookByID, params, (err, row) => {
-        if (err) {
-            console.log(err)
-        }
-        if (row && row.pages) {
-            //console.log(row.title + " page " + req.params.pageNum)
-            let pageList = JSON.parse(row.pages)
-            if (pageNum < pageList.length) {
-                callback(res, row.folderName, pageList[pageNum])
-            } else {
-                console.log('page number out of range')
-            }
+exports.getBookPage = function (id, pageNum) {
+    let book = db.getBookByID(id)
+    if (book && book.pages) {
+        //console.log(row.title + " page " + req.params.pageNum)
+        let pageList = JSON.parse(book.pages)
+        if (pageNum < pageList.length) {
+            return path.join(book.folderName, pageList[pageNum]);
         } else {
-            console.log(`unable to fetch data for book ID: ${id}`)
+            console.log('page number out of range')
         }
-    })
+    } else {
+        console.log(`unable to fetch data for book ID: ${id}`)
+    }
+}
+
+exports.getBook = function (id) {
+    let book = db.getBookByID(id)
+    return fillBook(book)
+}
+
+exports.updateBook = function(id, newBookData) {
+    let bookData = exports.getBook(id);
+    if (newBookData.tags && bookData.tags) {
+        let tagsToAdd = newBookData.tags.filter(t => !bookData.tags.includes(t))
+        let tagsToRemove = bookData.tags.filter(t => !newBookData.tags.includes(t))
+
+        if (tagsToAdd.length) db.addTags(id, tagsToAdd)
+        if (tagsToRemove.length) db.removeTags(id, tagsToRemove)
+    }
+    if (newBookData.hiddenPages && bookData.hiddenPages) {
+        if (JSON.stringify(newBookData.hiddenPages) !== JSON.stringify(bookData.hiddenPages))
+        db.setHiddenPages(id, newBookData.hiddenPages)
+    }
+    if (newBookData.isFavorite !== bookData.isFavorite) {
+        db.setFavoriteValue(id, newBookData.isFavorite)
+    }
 }

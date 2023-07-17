@@ -1,6 +1,23 @@
 import React, { Component } from "react";
 
+const baseURL = "https://nhentai.net/"
+
+
+
 class FilterInfo extends Component {
+    getExternalURL = (filterType, filterValue) => {
+        if (!baseURL || !filterType || !filterValue) return ''
+
+        console.log('getExternalURL...')
+        console.log(filterValue)
+        let withDashes = filterValue.toLowerCase().replaceAll(' ', '-')
+        console.log(withDashes)
+        let alphanumeric = withDashes.replace(/[^0-9a-z-]/gi, '')
+        console.log(alphanumeric)
+
+        return baseURL + filterType + '/' + alphanumeric
+    }
+
     render() {
         return(
             <div className="filter-info">
@@ -9,32 +26,32 @@ class FilterInfo extends Component {
                 {
                     this.props.filterQuery.artist ?
                     <div className="filter-info-item">
-                        <span>Artist:</span>
-                        <span class="info-item clickable">{this.props.filterQuery.artist}</span>
+                        <span className="filter-info-label">Artist</span>
+                        <a href={this.getExternalURL('artist', this.props.filterQuery.artist)} target="_blank" rel="noreferrer" className="filter-info-value clickable">{this.props.filterQuery.artist}</a>
                     </div>
                     : null
                 }
                 {
                     this.props.filterQuery.group ?
                     <div className="filter-info-item">
-                        <span>Group:</span>
-                        <span class="info-item clickable">{this.props.filterQuery.group}</span>
+                        <span className="filter-info-label">Group</span>
+                        <a href={this.getExternalURL('group', this.props.filterQuery.group)} target="_blank" rel="noreferrer" className="filter-info-value clickable">{this.props.filterQuery.group}</a>
                     </div>
                     : null
                 }
                 {
                     this.props.filterQuery.prefix ?
                     <div className="filter-info-item">
-                        <span>Prefix:</span>
-                        <span class="info-item clickable">{this.props.filterQuery.prefix}</span>
+                        <span className="filter-info-label">Prefix</span>
+                        <span className="filter-info-value clickable">{this.props.filterQuery.prefix}</span>
                     </div>
                     : null
                 }
                 {
                     this.props.filterQuery.tag ?
                     <div className="filter-info-item">
-                        <span>Tag:</span>
-                        <span class="info-item clickable">{this.props.filterQuery.tag}</span>
+                        <span className="filter-info-label">Tag</span>
+                        <span href={this.getExternalURL('tag', this.props.filterQuery.tag)} target="_blank" rel="noreferrer" className="filter-info-value clickable">{this.props.filterQuery.tag}</span>
                     </div>
                     : null
                 }

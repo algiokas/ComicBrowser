@@ -58,7 +58,8 @@ class MultiView extends Component {
                         pageSize={this.props.galleryPageSize} 
                         viewBook={this.props.viewBook}
                         subTitleClick={this.props.viewAuthor}
-                        addBookToSlideshow={this.props.addBookToSlideshow}>
+                        addBookToSlideshow={this.props.addBookToSlideshow}
+                        showFilters={true}>
                     </CoverGallery>
                 )
             case ViewMode.Loading:
