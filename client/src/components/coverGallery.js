@@ -10,7 +10,8 @@ export const SortOrder = Object.freeze({
     Title: Symbol("AlphaTitle"),
     Author: Symbol("AlphaAuthor"),
     Artist: Symbol("AlphaArtist"),
-    ID: Symbol("ID")
+    ID: Symbol("ID"),
+    Date: Symbol("Date")
 })
 
 class CoverGallery extends Component {
@@ -137,6 +138,15 @@ class CoverGallery extends Component {
                 let other = sortedCopy.filter(b => !b.isFavorite)
                 sortedCopy = favorites.concat(other)
                 break
+            case SortOrder.Date:
+                sortedCopy.sort((a, b) => {
+                    let adate = Date.parse(a.addedDate)
+                    let bdate = Date.parse(b.addedDate)
+                    if (adate && bdate) {
+                        return bdate - adate
+                    }
+                    return 0
+                })
             default:
                 console.log("getSortedBooks - Invalid Sort Order")
         }

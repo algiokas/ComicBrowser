@@ -14,13 +14,10 @@ exports.getFileName = function (id, book) {
 }
 
 //Parse data from a 
-function folderToJSON(folderName, contents, id) {
+function folderToJSON(folderName, contents, fileStats) {
     let output = {}
     if (!folderName || !contents || contents.length < 1) {
         return
-    }
-    if (id > 0) {
-        output.id = id
     }
     output.folderName = folderName
     if (folderName[0] == '(')
@@ -69,10 +66,14 @@ function folderToJSON(folderName, contents, id) {
     output.coverIndex = 0
     output.pages = contents
 
+    if (fileStats) {
+        output.addedDate = fileStats.birthtime
+    } else {
+        output.addedDate = Date.now()
+    }
+
     return output
 }
-
-
 
 exports.importBooks = function (res, callback) {
     let count = 0;
@@ -99,27 +100,27 @@ exports.importBooks = function (res, callback) {
                     dbrows.push(book)
                     count++
                 }
-                else if (addResult.existingRowId) {
-                    book.id = addResult.existingRowId
-                    dbrows.push(book)
+                else if (addResult.existingRow) {
+                    book.id = addResult.existingRow.id
+                    dbrows.push(addResult.existingRow)
                 }
             } 
-        })
-        
+        })      
         callback(res, { books: dbrows, importCount: count })
     })
 }
 
 function getBookData(file) {
     let fullpath = path.join(imageDirectory, file);
-    if (fs.statSync(fullpath).isDirectory()) {
+    let fileStats = fs.statSync(fullpath)
+    if (fileStats.isDirectory()) {
         try {
             const files = fs.readdirSync(fullpath);
             let folderContents = [];
             files.forEach((file) => {
                 folderContents.push(file);
             });
-            return folderToJSON(file, folderContents);
+            return folderToJSON(file, folderContents, fileStats);
         } catch (err) {
             return { error: err } 
         }
@@ -141,6 +142,7 @@ function fillBook(booksRow) {
     }
     if (!booksRow.artists) book.artists = db.getBookArtists(booksRow.id)
     if (!booksRow.tags) book.tags = db.getBookTags(booksRow.id)
+
     return book;
 }
 

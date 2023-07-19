@@ -15,6 +15,7 @@ function init() {
             pageCount INTEGER,
             coverIndex INTEGER,
             pages TEXT,
+            addedDate TEXT,
             hiddenPages TEXT,
             isFavorite INTEGER)`).run()
         console.log('created table: books')
@@ -82,7 +83,7 @@ function init() {
 
 init();
 
-const insertBook = db.prepare('INSERT INTO books (title, folderName, artGroup, prefix, language, pageCount, coverIndex, pages, hiddenPages, isFavorite) VALUES (?,?,?,?,?,?,?,?,?,?)');
+const insertBook = db.prepare('INSERT INTO books (title, folderName, artGroup, prefix, language, pageCount, coverIndex, addedDate, pages, hiddenPages, isFavorite) VALUES (?,?,?,?,?,?,?,?,?,?,?)');
 const insertArtist = db.prepare('INSERT INTO artists (name) VALUES (?)')
 const insertBookArtist = db.prepare('INSERT INTO bookArtists (bookId, artistId) VALUES (?, ?)')
 const insertTag = db.prepare('INSERT INTO tags (name) VALUES (?)')
@@ -110,7 +111,8 @@ function insertBookFromJson(bookJson) {
         bookJson.prefix, 
         bookJson.language, 
         bookJson.pageCount, 
-        bookJson.coverIndex, 
+        bookJson.coverIndex,
+        bookJson.addedDate,
         JSON.stringify(bookJson.pages),
         JSON.stringify([]), 0)
 }
@@ -213,12 +215,17 @@ function addBookToDb(bookJson) {
     return insertResult
 }
 
+const updateAddDate = db.prepare('UPDATE books SET addedDate = ? WHERE id = ?')
+
 exports.addBook = function(bookJson, replace = false) {
     if (!replace) {
         let existing = getBookByTitle.get(bookJson.title)
         if (existing) {
+            if (existing.addedDate == null && bookJson.addedDate) {
+                updateAddDate.run(bookJson.addedDate.toString(), existing.id)
+            }
             console.log('Book: "' + bookJson.title + '" found. Skipping...')
-            return { existingRowId: existing.id}
+            return { existingRow: existing}
         } else {
             console.log('Added book: "' + bookJson.title + '"')
             return addBookToDb(bookJson)

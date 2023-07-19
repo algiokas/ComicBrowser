@@ -7,15 +7,7 @@ const baseURL = "https://nhentai.net/"
 class FilterInfo extends Component {
     getExternalURL = (filterType, filterValue) => {
         if (!baseURL || !filterType || !filterValue) return ''
-
-        console.log('getExternalURL...')
-        console.log(filterValue)
-        let withDashes = filterValue.toLowerCase().replaceAll(' ', '-')
-        console.log(withDashes)
-        let alphanumeric = withDashes.replace(/[^0-9a-z-]/gi, '')
-        console.log(alphanumeric)
-
-        return baseURL + filterType + '/' + alphanumeric
+        return baseURL + filterType + '/' + filterValue.toLowerCase().replaceAll(' ', '-').replace(/[^0-9a-z-]/gi, '')
     }
 
     render() {
