@@ -449,6 +449,18 @@ h2 {
   font-size: 17px;
 }
 
+.interval-counter input {
+  width: 35px;
+  height: 25px;
+  text-align: center;
+  background-color: var(--gray-1);
+  color: var(--text-color);
+  font-family: 'Noto Sans', sans-serif;
+  border: 1px solid #343434;
+  border-radius: 3px;
+  font-size: 17px;
+}
+
 .slideshow-controls button {
   display: flex;
   justify-content: center;

@@ -105,8 +105,12 @@ class Sidebar extends Component {
                         <span className="control-label">Interval</span>
                         <div className="interval-input">
                             <input type="number"
-                                value={this.props.interval}
+                                value={this.props.intervalLength}
                                 onChange={this.props.handleIntervalChange}></input>
+                        </div>
+                        <div className="interval-counter">
+                            <input type="number" disabled
+                                value={this.props.intervalCount}></input>
                         </div>
                     </div>
                     <div className="sidebar-stack slideshow-controls">

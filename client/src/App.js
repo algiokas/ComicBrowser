@@ -48,13 +48,6 @@ class App extends Component {
     })
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    console.log('update artist listing')
-    if (prevState.allBooks !== this.state.allBooks) {
-
-    }
-  }
-
   fillBooks() {
     fetch(apiBaseUrl + "allbooks")
       .then(res => res.json())
@@ -122,7 +115,8 @@ class App extends Component {
           currentSlideshow: {
             pageCount: 0,
             books: [],
-          }
+          },
+          viewMode: ViewMode.Listing
         })
       }
     });

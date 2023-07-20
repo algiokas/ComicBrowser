@@ -102,7 +102,7 @@ exports.importBooks = function (res, callback) {
                 }
                 else if (addResult.existingRow) {
                     book.id = addResult.existingRow.id
-                    dbrows.push(addResult.existingRow)
+                    dbrows.push(fillBook(addResult.existingRow))
                 }
             } 
         })      

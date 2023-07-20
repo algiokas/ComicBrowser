@@ -28,8 +28,6 @@ class MultiView extends Component {
                         slideshow={singleBook}
                         currentPage={this.props.singleBookPage}
                         viewMode={this.props.viewMode}
-                        interval={this.props.slideshowInterval}
-                        setSlideshowInterval={this.props.setSlideshowInterval}
                         setCurrentPage={this.props.setSlideshowPage}
                         addButtonHandler={this.props.addBookToSlideshow}
                         updateBook={this.props.updateBook}
@@ -42,8 +40,6 @@ class MultiView extends Component {
                         slideshow={this.props.currentSlideshow}
                         currentPage={this.props.slideshowPage}
                         viewMode={this.props.viewMode}
-                        interval={this.props.slideshowInterval}
-                        setSlideshowInterval={this.props.setSlideshowInterval}
                         setCurrentPage={this.props.setSlideshowPage}
                         removeButtonHandler={this.props.removeBookFromSlideshow}
                         emptySlideShow={this.props.resetSlideshow}

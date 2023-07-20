@@ -200,8 +200,14 @@ class CoverGallery extends Component {
     getItemSubtitle = (book) => {
         if (this.state.sortOrder === SortOrder.Author) {
             return getBookAuthor(book)
-        }       
-        return book.artists.join(',')
+        }
+        try {
+            let test = book.artists.join(',')
+            return test
+        } catch (err) {
+            return ''
+        }
+        //return book.artists.join(',')
     }
 
     getCurrentPage = () => {
