@@ -65,11 +65,13 @@ class CoverGallery extends Component {
             if (this.props.query) {
                 let filteredBooks = this.getFilteredBooks(this.props.allBooks, this.props.query)
                 this.setState({
+                    galleryPage: 0,
                     bookList: this.getSortedBooks(filteredBooks, this.state.sortOrder),
                     totalPages: this.getTotalPages(filteredBooks)
                 })
             } else {
                 this.setState({
+                    galleryPage: 0,
                     bookList: this.getSortedBooks(this.props.allBooks, this.state.sortOrder),
                     totalPages: this.getTotalPages(this.props.allBooks)
                 })
@@ -188,6 +190,7 @@ class CoverGallery extends Component {
         let newOrder = SortOrder[order]
         if (SortOrder.hasOwnProperty(order) && (this.state.sortOrder !== newOrder || newOrder === SortOrder.Random)) {
             this.setState({
+                galleryPage: 0,
                 bookList: this.getSortedBooks(this.props.allBooks, newOrder),
                 sortOrder: newOrder
             })
