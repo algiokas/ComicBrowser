@@ -91,8 +91,8 @@ class Sidebar extends Component {
 
     render() {
         return (
-            <div className="sidebar-container">
-                <div className="sidebar-toggle stepper-arrow" onClick={this.props.toggleSidebar}>
+            <div className="slideshow-sidebar-container">
+                <div className="slideshow-sidebar-toggle stepper-arrow" onClick={this.props.toggleSidebar}>
                     <img src="http://localhost:9000/data/images/chevron-right.svg" className={`svg-icon ${this.props.showSidebar ? 'mirror' : ''}`} alt="stepper left"></img>
                 </div>
                 <div className="slideshow-sidebar" ref={this.sidebarRef}>
@@ -101,7 +101,7 @@ class Sidebar extends Component {
                         totalPages={this.props.pageCount}
                         setPage={this.props.setPage}>
                     </PageSelect>
-                    <div className="sidebar-stack slideshow-controls">
+                    <div className="slideshow-sidebar-stack slideshow-controls">
                         <span className="control-label">Interval</span>
                         <div className="interval-input">
                             <input type="number"
@@ -113,18 +113,18 @@ class Sidebar extends Component {
                                 value={this.props.intervalCount}></input>
                         </div>
                     </div>
-                    <div className="sidebar-stack slideshow-controls">
+                    <div className="slideshow-sidebar-stack slideshow-controls">
                         <button className="media-button play" onClick={this.props.playPause}>{this.props.playing ? "Pause" : "Play"}</button>
                         <button className="media-button reset" onClick={this.props.resetPage}>Reset</button>
                     </div>
                     {
                         this.props.viewMode === ViewMode.Slideshow ?
-                            <div className="sidebar-stack slideshow-controls">
+                            <div className="slideshow-sidebar-stack slideshow-controls">
                                 <button className="media-button play" onClick={this.props.emptySlideShow}>Clear</button>
                                 <button className="media-button reset" onClick={this.props.saveCurrentSlideshow}>Save</button>
                             </div>
                             : 
-                            <div className="sidebar-stack slideshow-controls">
+                            <div className="slideshow-sidebar-stack slideshow-controls">
                             <button className="media-button" onClick={this.hideCurrentPage}>Hide Page</button>
                             <button className="media-button">TEST</button>
                         </div>

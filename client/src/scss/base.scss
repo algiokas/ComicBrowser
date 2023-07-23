@@ -1,0 +1,94 @@
+@use 'vars' as *;
+
+html,
+body {
+    font-size: 14px;
+    line-height: 1.42857143;
+    height: 100%;
+    margin: 0;
+    text-align: center;
+    box-sizing: border-box;
+    font-family: 'Noto Sans', sans-serif;
+}
+
+.dark-theme {
+    color: $text-color;
+    background-color: $gray-4;
+}
+
+a {
+    color: $link-color;
+}
+
+button {
+    cursor: pointer;
+}
+
+input {
+    text-align: center;
+    background-color: $gray-1;
+    color: $text-color;
+    font-family: 'Noto Sans', sans-serif;
+    border: 1px solid #343434;
+    border-radius: 3px;
+    font-size: 17px;
+}
+
+h2 {
+    display: block;
+    font-size: 1.5em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+
+.App {
+    text-align: center;
+}
+
+.mirror {
+    -moz-transform: scale(-1, 1);
+    -webkit-transform: scale(-1, 1);
+    -o-transform: scale(-1, 1);
+    -ms-transform: scale(-1, 1);
+    transform: scale(-1, 1);
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.add-button {
+    z-index: 3;
+    border: 2px solid $gray-2;
+    border-radius: 3px;
+    margin: 0;
+    padding: 2px;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: $gray-1;
+
+    img {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.loading-container {
+    height: calc(100vh - 85px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+        width: 400px;
+    }
+}

@@ -17,7 +17,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "sass": "node-sass -w scss/ -o css/ --recursive"
+    "sass": "sass src/scss/styles.scss:src/css/stylesheet.css",
+    "sass-watch": "sass --watch src/scss/styles.scss:src/css/stylesheet.css"
   },
   "eslintConfig": {
     "extends": [

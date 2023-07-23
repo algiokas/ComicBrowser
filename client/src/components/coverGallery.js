@@ -240,8 +240,8 @@ class CoverGallery extends Component {
 
     render() {
         return (
-            <div className="container index-container dark-theme">
-                <div className="container-header">
+            <div className="gallery-container dark-theme">
+                <div className="gallery-container-header">
                     {
                         this.props.showFilters && this.state.filterQuery && this.state.filterQuery.filled ?
                         <FilterInfo filterQuery={this.state.filterQuery}></FilterInfo>
@@ -260,7 +260,7 @@ class CoverGallery extends Component {
                             </div>
                     }
                 </div>
-                <div className="container-inner">
+                <div className="gallery-container-inner">
                     {this.getCurrentPage().map((object, i) => {
                         return <GalleryItem 
                             key={i}
@@ -275,7 +275,7 @@ class CoverGallery extends Component {
 
                     }
                 </div>
-                <div className="container-footer">
+                <div className="gallery-container-footer">
                     <PageSelect setPage={this.setPage} totalPages={this.state.totalPages} currentPage={this.state.galleryPage}></PageSelect>
                 </div>
             </div>

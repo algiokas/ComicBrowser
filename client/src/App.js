@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import Navigation from "./components/navigation";
 import MultiView from "./components/multiView";
 import { slideshowToJSON } from "./util/helpers";
-import './App.css';
 
 const apiBaseUrl = "http://localhost:9000/api/";
 
