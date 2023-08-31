@@ -105,7 +105,7 @@ class App extends Component<AppProps, AppState> {
     .then(data => {
       if (data.changes > 0) {
         console.log('removed book ID: ' + bookId)
-        this.setState((state) => {
+        this.setState((state : AppState) : object | null => {
           return ({
             allBooks: state.allBooks.filter((b) => b.id !== bookId),
             currentBook: {},
@@ -117,7 +117,7 @@ class App extends Component<AppProps, AppState> {
           this.setState((state) => {
             return ({
               currentSlideshow: {
-                pageCount: state.currentSlideshow.pageCount - bookInSlideshow.pageCount,
+                pageCount: state.currentSlideshow.pageCount - bookInSlideshow!.pageCount,
                 books: state.currentSlideshow.books.filter((b) => b.id !== bookId)
               }
             })
@@ -176,7 +176,7 @@ class App extends Component<AppProps, AppState> {
     }
   }
   
-  viewSearchResults = (query) => {
+  viewSearchResults(query?: ISearchQuery) {
     if (query) {
       let newQuery = {...this.getEmptyQuery(), ...query}
       newQuery.filled = true
@@ -191,17 +191,7 @@ class App extends Component<AppProps, AppState> {
     }
   }
 
-  viewArtist = (book) => {
-    this.setState({
-      viewMode: ViewMode.SearchResults,
-      currentSearchQuery: {
-        filled: true,
-        artist: book.artists[0]
-      },
-    })
-  }
-
-  viewSlideshow = () => {
+  viewSlideshow() {
     if (this.state.currentSlideshow.pageCount > 0) {
       this.setState({
         viewMode: ViewMode.Slideshow
@@ -209,13 +199,13 @@ class App extends Component<AppProps, AppState> {
     }
   }
 
-  viewListing = () => {
+  viewListing() {
     this.setState({
       viewMode: ViewMode.Listing
     })
   }
 
-  addBookToSlideshow = (book) => {
+  addBookToSlideshow(book : IBook) {
     this.setState((state) => {
       return {
         currentSlideshow: {
@@ -226,8 +216,8 @@ class App extends Component<AppProps, AppState> {
     })
   }
 
-  removeBookFromSlideshow = (index) => {
-    this.setState((state) => {
+  removeBookFromSlideshow(index : number) {
+    this.setState((state : AppState) : object => {
       let matchingBook = state.currentSlideshow.books[index]
       let remainingBooks = state.currentSlideshow.books.filter((_, i) => i !== index)
       if (matchingBook) {
@@ -246,16 +236,17 @@ class App extends Component<AppProps, AppState> {
             books: remainingBooks
           }
         }
-
       }
+      console.log('Remove failed - book not found at index ' + index)
+      return {}
     })
   }
 
-  setSlideshowInterval = (interval) => {
+  setSlideshowInterval(interval : number) {
     this.setState({ slideshowInterval: interval })
   }
 
-  setSlideshowPage = (n) => {
+  setSlideshowPage(n : number) {
     if (this.state.viewMode === ViewMode.SingleBook) {   
       this.setState({
         singleBookPage: n
@@ -271,7 +262,6 @@ class App extends Component<AppProps, AppState> {
   render() {
     const handlers = {
       viewBook: this.viewBook,
-      viewAuthor: this.viewArtist,
       viewSlideshow: this.viewSlideshow,
       viewListing: this.viewListing,
       viewCurrentBook: this.viewCurrentBook,
@@ -281,7 +271,6 @@ class App extends Component<AppProps, AppState> {
       setSlideshowInterval: this.setSlideshowInterval,
       setSlideshowPage: this.setSlideshowPage,
       resetSlideshow: this.resetSlideshow,
-      saveCurrentSlideshow: this.saveCurrentSlideshow,
       updateBook: this.updateBook,
       deleteBook: this.deleteBook,
       importBooks: this.importBooks
@@ -290,9 +279,13 @@ class App extends Component<AppProps, AppState> {
     return (
       <div className="App">
         <Navigation
-          handlers={handlers}
           slideshowCount={this.state.currentSlideshow.books.length}
-          viewMode={this.state.viewMode}>
+          viewMode={this.state.viewMode}
+          viewListing={handlers.viewListing}
+          viewSlideshow={handlers.viewSlideshow}
+          viewCurrentBook={handlers.viewCurrentBook}
+          viewSearchResults={handlers.viewSearchResults}
+          importBooks={handlers.importBooks}>
         </Navigation>
         <MultiView {...this.state} {...handlers}></MultiView>
       </div>
