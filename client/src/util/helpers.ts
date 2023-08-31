@@ -1,10 +1,12 @@
+import Book from "../interfaces/book"
+
 const imageBaseUrl = "http://localhost:9000/api/page/"
 
-export function GetCoverPath(book) {
+export function GetCoverPath(book : Book) : string {
     return imageBaseUrl + book.id + "/0"
 }
 
-export function GetPagePath(book, pageNum) {
+export function GetPagePath(book : Book, pageNum : number) : string {
     if (!book) {
         console.log("GetPagePath - book cannot be null")
     }
@@ -17,7 +19,7 @@ export function GetPagePath(book, pageNum) {
     return imageBaseUrl + book.id + "/" + pageNum;
 }
 
-export function GetPagePathMulti(books, pageNum) {
+export function GetPagePathMulti(books : Book[], pageNum : number) : string {
     if (books.length < 2) {
         return GetPagePath(books[0], pageNum)
     }
@@ -31,6 +33,7 @@ export function GetPagePathMulti(books, pageNum) {
         }
     }
     console.log(`GetPagePathMulti - page ${pageNum} not found in books`)
+    return ""
 }
 
 export function slideshowToJSON(slideshow) {

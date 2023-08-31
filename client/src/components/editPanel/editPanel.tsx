@@ -1,16 +1,7 @@
 import React, { Component } from "react";
 import EditPanelRow from "./editPanel-row";
 import EditPanelRowMulti from "./editPanel-row-multi";
-import { safeBind } from "../util/helpers";
-
-export const EditField = Object.freeze({
-    Title: "Title",
-    Group: "Group",
-    Artists: "Artists",
-    Tags: "Tags",
-    Prefix: "Prefix",
-    HiddenPages: "HiddenPages"
-})
+import { EditField } from "../../util/enums";
 
 class EditPanel extends Component {
     constructor(props) {

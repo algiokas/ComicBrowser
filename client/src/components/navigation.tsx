@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import logo from '../logo.svg';
-import { ViewMode } from "../App";
+import { ViewMode } from "../util/enums";
 
 class Navigation extends Component {
   constructor(props) {

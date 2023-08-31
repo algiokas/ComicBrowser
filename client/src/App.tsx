@@ -1,20 +1,29 @@
 import React, { Component } from "react";
 import Navigation from "./components/navigation";
 import MultiView from "./components/multiView";
-import { slideshowToJSON } from "./util/helpers";
+import { ViewMode } from "./util/enums";
+import IBook from "./interfaces/book";
+import ISlideshow from "./interfaces/slideshow";
+import ISearchQuery from "./interfaces/searchQuery";
 
 const apiBaseUrl = "http://localhost:9000/api/";
 
-export const ViewMode = Object.freeze({
-  Loading: Symbol("Loading"),
-  Listing: Symbol("Listing"),
-  SingleBook: Symbol("SingleBook"),
-  Slideshow: Symbol("Slideshow"),
-  SearchResults: Symbol("SearchResults")
-})
+interface AppProps {} //empty
 
-class App extends Component {
-  constructor(props) {
+interface AppState {
+  galleryPageSize: number,
+  allBooks: IBook[],
+  viewMode: ViewMode,
+  singleBookPage: number,
+  slideshowPage: number,
+  currentBook: IBook | null,
+  currentSlideshow: ISlideshow,
+  currentSearchQuery: ISearchQuery,
+  slideshowInterval: number,
+}
+
+class App extends Component<AppProps, AppState> {
+  constructor(props: AppProps) {
     super(props);
 
     this.state = {
@@ -23,7 +32,7 @@ class App extends Component {
       viewMode: ViewMode.Loading,
       singleBookPage: 0,
       slideshowPage: 0,
-      currentBook: {},
+      currentBook: null,
       currentSlideshow: {
         pageCount: 0,
         books: [],
@@ -36,7 +45,6 @@ class App extends Component {
         tag: '',
       },
       slideshowInterval: 5,
-      
     }
   }
   
@@ -55,7 +63,7 @@ class App extends Component {
       });
   }
 
-  resetSlideshow = () => {
+  resetSlideshow() {
     this.setState({
       viewMode: ViewMode.Listing,
       currentSlideshow: {
@@ -65,20 +73,7 @@ class App extends Component {
     })
   }
 
-  saveCurrentSlideshow = () => {
-    fetch(apiBaseUrl + 'saveslideshow', {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(slideshowToJSON(this.state.currentSlideshow))
-    })
-    .then(res => res.json())
-    .then(data => {
-      console.log('save slideshow')
-      console.log(data)
-    });
-  }
-
-  updateBook = (book) => {
+  updateBook(book : IBook) {
     fetch(apiBaseUrl + 'updatebook/' + book.id, {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
@@ -101,7 +96,7 @@ class App extends Component {
     });
   }
 
-  deleteBook = (bookId) => {
+  deleteBook(bookId : number) {
     console.log('delete book with id: ' + bookId)
     fetch(apiBaseUrl + 'deletebook/' + bookId, {
       method: 'delete'
@@ -118,7 +113,7 @@ class App extends Component {
           })
         })
         let bookInSlideshow = this.state.currentSlideshow.books.find((b) => b.id === bookId)
-        if (bookInSlideshow) {
+        if (bookInSlideshow !== undefined) {
           this.setState((state) => {
             return ({
               currentSlideshow: {
@@ -132,7 +127,7 @@ class App extends Component {
     });
   }
 
-  importBooks = () => {
+  importBooks() {
     console.log("Importing Books")
     this.setState({ viewMode: ViewMode.Loading })
     fetch(apiBaseUrl + 'importbooks', {
@@ -144,7 +139,7 @@ class App extends Component {
       if (data) {
         this.setState({ 
           allBooks: data.books,
-          currentBook: {},
+          currentBook: null,
           currentSlideshow: {
             pageCount: 0,
             books: [],
@@ -155,7 +150,7 @@ class App extends Component {
     });
   }
 
-  viewBook = (book) => {
+  viewBook(book : IBook) {
     this.setState({
       viewMode: ViewMode.SingleBook,
       currentBook: book,
@@ -163,7 +158,7 @@ class App extends Component {
     })
   }
 
-  viewCurrentBook = () => {
+  viewCurrentBook() {
     if (this.state.currentBook && this.state.currentBook.title) {
       this.setState({
         viewMode: ViewMode.SingleBook
@@ -171,7 +166,7 @@ class App extends Component {
     }
   }
 
-  getEmptyQuery = () => {
+  getEmptyQuery() : ISearchQuery {
     return {
       filled: false,
       artist: '',

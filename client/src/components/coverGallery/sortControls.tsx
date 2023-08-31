@@ -1,16 +1,7 @@
 import React, { Component } from "react";
-import { getAlphabet } from "../util/helpers";
-import { getBookAuthor } from "../util/helpers";
-
-export const SortOrder = Object.freeze({
-    Favorite: Symbol("Favorite"),
-    Random: Symbol("Random"),
-    Title: Symbol("AlphaTitle"),
-    Author: Symbol("AlphaAuthor"),
-    Artist: Symbol("AlphaArtist"),
-    ID: Symbol("ID"),
-    Date: Symbol("Date")
-})
+import { getAlphabet } from "../../util/helpers";
+import { getBookAuthor } from "../../util/helpers";
+import { SortOrder } from "../../util/enums";
 
 class SortControls extends Component {
     constructor(props) {

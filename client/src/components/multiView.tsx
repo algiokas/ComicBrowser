@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import CoverGallery from "./coverGallery";
-import Slideshow from "./slideshow";
+import CoverGallery from "./coverGallery/coverGallery";
+import Slideshow from "./slideshow/slideshow";
 import LoadingView from "./loadingView";
-import { ViewMode } from "../App";
-import { SortOrder } from "./sortControls";
+import { ViewMode } from "../util/enums";
+import { SortOrder } from "../util/enums";
 
 class MultiView extends Component {
     render() {

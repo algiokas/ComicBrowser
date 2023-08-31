@@ -1,9 +1,19 @@
 import React, { Component } from "react";
 import GalleryItem from "./galleryItem";
-import PageSelect from "./pageSelect";
-import { getBookAuthor } from "../util/helpers";
+import PageSelect from "../shared/pageSelect";
+import { getBookAuthor } from "../../util/helpers";
 import FilterInfo from "./filterInfo";
-import SortControls, { SortOrder } from "./sortControls";
+import SortControls from "./sortControls";
+import Book from "../../interfaces/book";
+import { SortOrder } from "../../util/enums";
+
+interface CoverGalleryProps {
+    allBooks: Book[],
+    pageSize: number,
+    viewBook(): void,
+
+
+}
 
 class CoverGallery extends Component {
     constructor(props) {
@@ -241,7 +251,7 @@ class CoverGallery extends Component {
                         return <GalleryItem 
                             key={i}
                             book={object} 
-                            bodyClickHandler={this.viewBook} 
+                            bodyClickHandler={this.props.viewBook} 
                             addButtonHandler={this.addBookToSlideshow} 
                             getSubtitle={this.getItemSubtitle}
                             subTitleClickHandler={this.subTitleClick}

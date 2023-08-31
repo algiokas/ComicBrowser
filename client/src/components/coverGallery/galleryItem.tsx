@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { GetCoverPath } from "../util/helpers";
+import { GetCoverPath } from "../../util/helpers";
 
 class GalleryItem extends Component {
   constructor(props) {

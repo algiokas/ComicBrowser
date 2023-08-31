@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import GalleryItem from "./galleryItem";
+import GalleryItem from "./coverGallery/galleryItem";
 import PageSelect from "./pageSelect";
 import BookInfo from "./slideshow-sidebar-bookInfo";
 import { ViewMode } from "../App";
