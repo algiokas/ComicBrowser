@@ -6,6 +6,11 @@
 
     h3 {
         font-size: 1.2em;
+        margin-bottom: 0;
+    }
+    
+    h4 {
+        margin-top: 0.2em;
     }
 
     &-inner {
@@ -43,6 +48,25 @@
             margin-left: auto;
             text-align: flex-end;
             padding-top: 2px;
+
+            .click-items {
+                margin: 0;
+                margin-left: auto;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: flex-end;
+                justify-content: flex-end;
+            }
+        
+            .click-item {
+                margin: 0 4px 7px 4px;
+                padding: 4px 10px;
+                overflow-wrap: break-word;
+                min-width: 0px;
+                background-color: $gray-1;
+                border-radius: 4px;
+            }
 
             input {
                 width: 450px;

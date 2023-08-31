@@ -50,14 +50,11 @@ export function slideshowToJSON(slideshow) {
 }
 
 export function getBookAuthor(book) {
-    if (book.artGroup || (book.artists && book.artists.length > 0)) {
-        let author = book.artGroup
-        if (!author) {
-            author = book.artists[0]
-        }
-        return author
-    }
-    return "" 
+    if (book.artGroup) 
+        return book.artGroup
+    if (book.artists && book.artists.length > 0) 
+        return book.artists[0]
+    return ""
 }
 
 export function safeBind(caller, f) {

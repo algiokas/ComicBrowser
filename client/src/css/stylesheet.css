@@ -314,7 +314,7 @@ nav .logo img {
   height: 38px;
 }
 nav .logo-pink {
-  filter: invert(36%) sepia(82%) saturate(5169%) hue-rotate(291deg) brightness(88%) contrast(113%) drop-shadow(0 0 20px #e619c3);
+  filter: brightness(0) saturate(100%) invert(17%) sepia(91%) saturate(2562%) hue-rotate(293deg) brightness(87%) contrast(92%);
 }
 
 .page-select {
@@ -641,6 +641,10 @@ nav .logo-pink {
 }
 .edit-panel h3 {
   font-size: 1.2em;
+  margin-bottom: 0;
+}
+.edit-panel h4 {
+  margin-top: 0.2em;
 }
 .edit-panel-inner {
   display: flex;
@@ -673,6 +677,23 @@ nav .logo-pink {
   margin-left: auto;
   text-align: flex-end;
   padding-top: 2px;
+}
+.edit-panel-row-value .click-items {
+  margin: 0;
+  margin-left: auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+.edit-panel-row-value .click-item {
+  margin: 0 4px 7px 4px;
+  padding: 4px 10px;
+  overflow-wrap: break-word;
+  min-width: 0px;
+  background-color: #404040;
+  border-radius: 4px;
 }
 .edit-panel-row-value input {
   width: 450px;

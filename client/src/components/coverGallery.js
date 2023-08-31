@@ -11,7 +11,7 @@ class CoverGallery extends Component {
 
         this.viewBook = props.viewBook.bind(this)
         this.addBookToSlideshow = props.addBookToSlideshow.bind(this)
-        this.subTitleClick = props.subTitleClick.bind(this)
+        this.viewSearchResults = props.viewSearchResults.bind(this)
         this.totalPages = this.getTotalPages(props.allBooks)
 
         let initialSortOrder = props.sortOrder ?? SortOrder.Favorite
@@ -22,7 +22,6 @@ class CoverGallery extends Component {
             bookList: [],
             totalPages: 0,
             sortOrder: initialSortOrder,
-            filterQuery: props.query
         }
 
         if (props.query) {
@@ -172,13 +171,7 @@ class CoverGallery extends Component {
         if (this.state.sortOrder === SortOrder.Author) {
             return getBookAuthor(book)
         }
-        try {
-            let test = book.artists.join(',')
-            return test
-        } catch (err) {
-            return ''
-        }
-        //return book.artists.join(',')
+        return book.artists.join(',')
     }
 
     getCurrentPage = () => {
@@ -201,6 +194,16 @@ class CoverGallery extends Component {
         })
     }
 
+    subTitleClick = (book) => {
+        let subtitle = this.getItemSubtitle(book)
+        if (subtitle === book.artGroup) {
+            this.viewSearchResults({ group: subtitle })
+        }
+        else {
+            this.viewSearchResults({ artist: subtitle })
+        }      
+    }
+
     favoriteClick = (book) => {
         console.log("toggle favorite for book: " + book.id)
         if (this.props.updateBook) {
@@ -214,8 +217,8 @@ class CoverGallery extends Component {
             <div className="gallery-container dark-theme">
                 <div className="gallery-container-header">
                     {
-                        this.props.showFilters && this.state.filterQuery && this.state.filterQuery.filled ?
-                        <FilterInfo filterQuery={this.state.filterQuery}></FilterInfo>
+                        this.props.showFilters && this.props.query && this.props.query.filled ?
+                        <FilterInfo filterQuery={this.props.query}></FilterInfo>
                         : null
                     }
                     <PageSelect 

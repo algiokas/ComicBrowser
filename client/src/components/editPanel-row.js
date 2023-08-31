@@ -60,7 +60,14 @@ class EditPanelRow extends Component {
                         </div> :
                         <div className="edit-panel-row-inner">
                             <span className="edit-panel-row-value">
-                                {this.props.tempValue}
+                                {
+                                    this.props.valueClick ?
+                                    <span className="click-item clickable" onClick={() => this.props.valueClick(this.props.tempValue)}>
+                                        {this.props.tempValue}
+                                    </span>
+                                    : this.props.tempValue
+
+                                }
                             </span>
                             <div className="edit-panel-row-buttons">
                                 <button type="button" onClick={this.toggleEditMode}>

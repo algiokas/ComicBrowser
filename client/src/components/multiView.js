@@ -15,7 +15,7 @@ class MultiView extends Component {
                         pageSize={this.props.galleryPageSize} 
                         viewBook={this.props.viewBook}
                         updateBook={this.props.updateBook}
-                        subTitleClick={this.props.viewAuthor}
+                        viewSearchResults={this.props.viewSearchResults}
                         addBookToSlideshow={this.props.addBookToSlideshow}>
                     </CoverGallery>
                 )
@@ -56,7 +56,7 @@ class MultiView extends Component {
                         allBooks={this.props.allBooks} 
                         pageSize={this.props.galleryPageSize} 
                         viewBook={this.props.viewBook}
-                        subTitleClick={this.props.viewAuthor}
+                        viewSearchResults={this.props.viewSearchResults}
                         updateBook={this.props.updateBook}
                         addBookToSlideshow={this.props.addBookToSlideshow}
                         showFilters={true}>

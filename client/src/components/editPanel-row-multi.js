@@ -10,6 +10,7 @@ class EditPanelRowMulti extends Component {
             collection: this.props.tempValue ?? []
         }
         this.hideTextInput = this.props.hideTextInput ?? false
+        this.props.valueClick ? console.log('valueClick found') : console.log('valueClick not found')
     }
 
     componentDidUpdate(prevProps) {
@@ -117,7 +118,17 @@ class EditPanelRowMulti extends Component {
                         <div className="edit-panel-row-inner">
                             <div className="edit-panel-row-value ">
                                 {
-                                    this.state.collection ? 
+                                    this.props.valueClick ? 
+                                    <div className="click-items">
+                                        {
+                                            this.state.collection.map((item, i) => {
+                                                return <span className="click-item clickable" onClick={() => this.props.valueClick(item)} key={i}>
+                                                    {item}
+                                                </span>
+                                            })
+                                        }
+                                    </div>
+                                    :
                                     this.state.collection.map((item, i) => {
                                         return <span key={i}>
                                             {
@@ -126,7 +137,7 @@ class EditPanelRowMulti extends Component {
                                                     item
                                             }
                                         </span>
-                                    }) : null
+                                    })
                                 }
                             </div>
                             <div className="edit-panel-row-buttons">

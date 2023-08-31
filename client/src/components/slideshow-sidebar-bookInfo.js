@@ -48,11 +48,8 @@ class BookInfo extends Component {
     }
 
     toggleEditModal = () => {
-        // if (!this.state.showEditModal && this.inputRef) {
-        //     this.inputRef.current.focus()
-        // }
         this.setState((state) => {
-            return { showEditModal: !state.showEditModal }
+            return ({ showEditModal: !state.showEditModal })
         })
     }
 
@@ -61,6 +58,12 @@ class BookInfo extends Component {
     }
 
     render() {
+        const searchHandlers = {
+            searchGroup: this.searchGroup,
+            searchArtist: this.searchArtist,
+            searchPrefix: this.searchPrefix,
+            searchTag: this.searchTag
+        }
         return (
             <div className="book-info">
                 <GalleryItem
@@ -77,19 +80,9 @@ class BookInfo extends Component {
                             book={this.props.book}
                             updateBook={this.props.updateBook}
                             deleteBook={this.props.deleteBook}
-                            toggleDisplay={this.toggleEditModal}>
+                            toggleDisplay={this.toggleEditModal}
+                            {...searchHandlers}>
                         </EditPanel>
-                        {/* <h3>Add New Tag</h3>
-                        <div className="input-container">
-                            <input
-                                type="text"
-                                value={this.state.tagToAdd}
-                                onChange={this.handleTagInputChange}
-                                onKeyDown={this.handleTagInputKey}
-                                ref={this.inputRef}>
-                            </input>
-                            <button type="button" onClick={() => { this.handleTagButtonClick() }}>Add</button>
-                        </div> */}
                     </Modal>
                 </div>
                 <div className="book-info-inner">

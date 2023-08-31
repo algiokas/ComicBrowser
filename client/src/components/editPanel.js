@@ -8,6 +8,7 @@ export const EditField = Object.freeze({
     Group: "Group",
     Artists: "Artists",
     Tags: "Tags",
+    Prefix: "Prefix",
     HiddenPages: "HiddenPages"
 })
 
@@ -21,14 +22,13 @@ class EditPanel extends Component {
                 group: this.props.book.artGroup,
                 artists: this.props.book.artists,
                 tags: this.props.book.tags,
+                prefix: this.props.book.prefix,
                 hiddenPages: this.props.book.hiddenPages,
             },
             artistToAdd: '',
             tagToAdd: '',
             changesPending: false
         }
-
-        this.toggleDisplay = safeBind(this, props.toggleDisplay);
     }
 
     arrayChangesPending = (temp, original) => {
@@ -59,6 +59,7 @@ class EditPanel extends Component {
                 group: this.props.book.artGroup,
                 artists: this.props.book.artists,
                 tags: this.props.book.tags,
+                prefix: this.props.book.prefix,
                 hiddenPages: this.props.book.hiddenPages,
             },
             changesPending: false
@@ -79,6 +80,9 @@ class EditPanel extends Component {
                 break
             case EditField.Tags:
                 fieldValues.tags = value
+                break
+            case EditField.Prefix:
+                fieldValues.prefix = value
                 break
             case EditField.HiddenPages:
                 fieldValues.hiddenPages = value
@@ -106,7 +110,7 @@ class EditPanel extends Component {
         console.log(tempBook)
 
         this.props.updateBook(tempBook)
-        this.toggleDisplay()
+        this.props.toggleDisplay()
     }
 
     deleteBook = () => {
@@ -117,29 +121,32 @@ class EditPanel extends Component {
         return (
             <div className="edit-panel">
                 <h3>Edit Book</h3>
+                <h4>{"ID: " + this.props.book.id}</h4>
                 <div className="edit-panel-inner">
-                    <div className="edit-panel-row">
-                        <span className="edit-panel-row-label">ID:</span>
-                        <span className="edit-panel-row-value">
-                                {this.props.book.id}
-                        </span>
-                    </div>
                     <EditPanelRow editField={EditField.Title}
                         tempValue={this.state.tempFields.title}
                         updateTempValue={this.updateTempValue}>
                     </EditPanelRow>
                     <EditPanelRow editField={EditField.Group}
                         tempValue={this.state.tempFields.group}
-                        updateTempValue={this.updateTempValue}>
+                        updateTempValue={this.updateTempValue}
+                        valueClick={this.props.searchGroup}>
                     </EditPanelRow>
                     <EditPanelRowMulti editField={EditField.Artists}
                         tempValue={this.state.tempFields.artists}
-                        updateTempValue={this.updateTempValue}>
+                        updateTempValue={this.updateTempValue}
+                        valueClick={this.props.searchArtist}>
                     </EditPanelRowMulti>
                     <EditPanelRowMulti editField={EditField.Tags}
                         tempValue={this.state.tempFields.tags}
-                        updateTempValue={this.updateTempValue}>
+                        updateTempValue={this.updateTempValue}
+                        valueClick={this.props.searchTag}>
                     </EditPanelRowMulti>
+                    <EditPanelRow editField={EditField.Prefix}
+                        tempValue={this.state.tempFields.prefix}
+                        updateTempValue={this.updateTempValue}
+                        valueClick={this.props.searchPrefix}
+                    ></EditPanelRow>
                     <EditPanelRowMulti editField={EditField.HiddenPages}
                         tempValue={this.state.tempFields.hiddenPages}
                         updateTempValue={this.updateTempValue}
