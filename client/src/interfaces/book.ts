@@ -1,15 +1,15 @@
 export default interface IBook{
     id: number,
-    title: number,
-    folderName: number,
-    artGroup: number,
+    title: string,
+    folderName: string,
+    artGroup: string,
     artists: string[],
     tags: string[],
-    prefix: number,
-    language: number,
+    prefix: string,
+    language: string,
     pageCount: number,
     coverIndex: number,
-    pages: number[],
+    pages: string[],
     addedDate: Date,
     hiddenPages: number[]
     isFavorite: boolean

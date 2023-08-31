@@ -10,7 +10,7 @@ const apiBaseUrl = "http://localhost:9000/api/";
 
 interface AppProps {} //empty
 
-interface AppState {
+export interface AppState {
   galleryPageSize: number,
   allBooks: IBook[],
   viewMode: ViewMode,
@@ -260,6 +260,16 @@ class App extends Component<AppProps, AppState> {
   }
 
   render() {
+    const navProps = {
+      slideshowCount: this.state.currentSlideshow.books.length,
+      viewMode: this.state.viewMode,
+      viewListing: this.viewListing,
+      viewSlideshow: this.viewSlideshow,
+      viewCurrentBook: this.viewCurrentBook,
+      viewSearchResults: this.viewSearchResults,
+      importBooks: this.importBooks
+    }
+
     const handlers = {
       viewBook: this.viewBook,
       viewSlideshow: this.viewSlideshow,
@@ -278,14 +288,7 @@ class App extends Component<AppProps, AppState> {
 
     return (
       <div className="App">
-        <Navigation
-          slideshowCount={this.state.currentSlideshow.books.length}
-          viewMode={this.state.viewMode}
-          viewListing={handlers.viewListing}
-          viewSlideshow={handlers.viewSlideshow}
-          viewCurrentBook={handlers.viewCurrentBook}
-          viewSearchResults={handlers.viewSearchResults}
-          importBooks={handlers.importBooks}>
+        <Navigation {...navProps}>
         </Navigation>
         <MultiView {...this.state} {...handlers}></MultiView>
       </div>

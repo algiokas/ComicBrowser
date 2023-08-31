@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import logo from '../logo.svg';
+import Logo from '../logo.svg';
 import { ViewMode } from "../util/enums";
 import ISearchQuery from "../interfaces/searchQuery";
 
@@ -23,8 +23,8 @@ class Navigation extends Component<NavProps, NavState>  {
   render() {
     return (
       <nav role="navigation">
-        <div className="logo">
-          <img className="logo-pink" src={logo} alt="Logo" onClick={this.props.viewListing} />
+        <div className="logo" onClick={this.props.viewListing}>
+          <Logo className="logo-pink"/>
         </div>
         <div className="nav-items">
           <div className="nav-item" onClick={this.props.viewListing}>

@@ -1,11 +1,16 @@
 import React, { Component } from "react";
+import ISearchQuery from "../../interfaces/searchQuery";
 
 const baseURL = "https://nhentai.net/"
 
+interface FilterInfoProps {
+    filterQuery: ISearchQuery
+}
 
+interface FilterInfoState {}
 
-class FilterInfo extends Component {
-    getExternalURL = (filterType, filterValue) => {
+class FilterInfo extends Component<FilterInfoProps, FilterInfoState> {
+    getExternalURL = (filterType: string, filterValue: string) => {
         if (!baseURL || !filterType || !filterValue) return ''
         return baseURL + filterType + '/' + filterValue.toLowerCase().replaceAll(' ', '-').replace(/[^0-9a-z-]/gi, '')
     }
@@ -43,7 +48,7 @@ class FilterInfo extends Component {
                     this.props.filterQuery.tag ?
                     <div className="filter-info-item">
                         <span className="filter-info-label">Tag</span>
-                        <span href={this.getExternalURL('tag', this.props.filterQuery.tag)} target="_blank" rel="noreferrer" className="filter-info-value clickable">{this.props.filterQuery.tag}</span>
+                        <a href={this.getExternalURL('tag', this.props.filterQuery.tag)} target="_blank" rel="noreferrer" className="filter-info-value clickable">{this.props.filterQuery.tag}</span>
                     </div>
                     : null
                 }

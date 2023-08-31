@@ -1,10 +1,12 @@
-import logo from '../logo.svg';
+import Logo from '../logo.svg';
 
-const LoadingView = (props) => {
+interface loadingViewProps{}
+
+const LoadingView = (props: loadingViewProps) => {
     return (
         <div className="container dark-theme">
             <div className="loading-container">
-                <img className="logo-pink loading-logo" src={logo} alt="Loading Logo" />
+                <Logo className="logo-pink loading-logo" />
             </div>           
         </div>
     )

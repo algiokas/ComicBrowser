@@ -1,12 +1,12 @@
-import Book from "../interfaces/book"
+import IBook from "../interfaces/book"
 
 const imageBaseUrl = "http://localhost:9000/api/page/"
 
-export function GetCoverPath(book : Book) : string {
+export function GetCoverPath(book : IBook) : string {
     return imageBaseUrl + book.id + "/0"
 }
 
-export function GetPagePath(book : Book, pageNum : number) : string {
+export function GetPagePath(book : IBook, pageNum : number) : string {
     if (!book) {
         console.log("GetPagePath - book cannot be null")
     }
@@ -19,7 +19,7 @@ export function GetPagePath(book : Book, pageNum : number) : string {
     return imageBaseUrl + book.id + "/" + pageNum;
 }
 
-export function GetPagePathMulti(books : Book[], pageNum : number) : string {
+export function GetPagePathMulti(books : IBook[], pageNum : number) : string {
     if (books.length < 2) {
         return GetPagePath(books[0], pageNum)
     }
@@ -36,23 +36,7 @@ export function GetPagePathMulti(books : Book[], pageNum : number) : string {
     return ""
 }
 
-export function slideshowToJSON(slideshow) {
-    let output = {}
-    if (!slideshow || !slideshow.books) {
-        return output
-    }
-    
-    output.ids = slideshow.books.map((book) => {
-        return book.id
-    })
-  
-    output.titles = slideshow.books.map((book) => {
-        return book.title
-    })
-    return output
-}
-
-export function getBookAuthor(book) {
+export function getBookAuthor(book: IBook) {
     if (book.artGroup) 
         return book.artGroup
     if (book.artists && book.artists.length > 0) 
@@ -60,25 +44,10 @@ export function getBookAuthor(book) {
     return ""
 }
 
-export function safeBind(caller, f) {
-    let errString = "safeBind: Failed to bind function for " + typeof caller
-    if (f) {
-        try {
-            let bound = f.bind(caller)
-            return bound
-        } catch (err) {
-            console.log(err)
-            return () => { console.error(errString) }
-        }
-    }
-    console.error(errString)
-    return () => { console.error(errString) }
-}
-
 //compare two arrays with elements that can be compared using === 
 //returns true if arrays are identical, false otherwise
 //arrays are compared in order, so arrays with identical elements but different order will return false
-export function scalarArrayCompare(array1, array2) {
+export function scalarArrayCompare(array1: any[], array2: any[]) {
     if (!array1 && !array2) return true
     if (!array1 || !array2) return false
     return array1.length === array2.length && array1.every(function(value, index) { return value === array2[index]})

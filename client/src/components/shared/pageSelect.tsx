@@ -1,54 +1,54 @@
 import React, { Component } from "react";
 
-class PageSelect extends Component {
-    constructor(props) {
-        super(props)
+interface PageSelectProps{
+    totalPages: number,
+    currentPage: number,
+    setPage(pageNum: number): void
+}
 
-        this.setCurrentPage = props.setPage.bind(this)
+interface PageSelectState{}
 
-        this.state = { currentPage: props.currentPage }
-    }
-
+class PageSelect extends Component<PageSelectProps, PageSelectState> {
     isFirstPage() {
-        return this.state.currentPage <= 0;
+        return this.props.currentPage <= 0;
     }
 
     isLastPage() {
-        return this.state.currentPage >= this.props.totalPages-1
+        return this.props.currentPage >= this.props.totalPages-1
     }
 
     firstPage = () => {
         if (!this.isFirstPage()) {
-            this.setCurrentPage(0)
+            this.props.setPage(0)
         }
     }
 
     previousPage = () => {
         if (!this.isFirstPage()) {
-            this.setCurrentPage(this.state.currentPage-1)
+            this.props.setPage(this.props.currentPage-1)
         }
     }
 
     nextPage = () => {
         if (!this.isLastPage()) {
-            this.setCurrentPage(this.state.currentPage+1)
+            this.props.setPage(this.props.currentPage+1)
         }
     }
 
     lastPage = () => {
         if (!this.isLastPage()) {
-            this.setCurrentPage(this.props.totalPages-1)
+            this.props.setPage(this.props.totalPages-1)
         }
     }
 
-    setPageNumber = (e) => {
-        let pageNum = e.target.value
+    setPageNumber(e: Event) {
+        let pageNum = (e.target as HTMLInputElement).value
         if (pageNum < 1) {
-            this.setCurrentPage(0)
+            this.props.setPage(0)
         } else if (pageNum > this.props.totalPages) {
-            this.setCurrentPage(this.props.totalPages-1)
+            this.props.setPage(this.props.totalPages-1)
         } else {
-            this.setCurrentPage(pageNum-1)
+            this.props.setPage(pageNum-1)
         }
     }
 
@@ -71,7 +71,7 @@ class PageSelect extends Component {
                 <div className="page-number">
                     <input
                         type='number'
-                        value={this.state.currentPage+1}
+                        value={this.props.currentPage+1}
                         onChange={this.setPageNumber}
                         className="page-select-number"
                         disabled={this.props.totalPages === 1 ? true : false}
