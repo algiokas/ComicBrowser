@@ -31,6 +31,51 @@
             flex-wrap: wrap;
         }
 
+        .sort {
+            &-select {
+                display: flex;
+                justify-content: center;
+                font-size: large;
+                padding-bottom: 10px;
+            }
+
+            &-order {
+                cursor: pointer;
+                background-color: $gray-1;
+                padding: 5px 20px;
+                margin: 3px 15px;
+                border: 2px solid black;
+                border-radius: 3px;
+    
+                &.selected {
+                    border: 2px solid $yellow-highlight;
+                }
+            }
+
+            &-index {
+                display: flex;
+                flex-direction: row;
+                padding: 0 40px;
+                flex-wrap: wrap;
+                padding-bottom: 10px;
+                font-size: large;
+
+                &-item {
+                    cursor: pointer;
+                    background-color: $gray-1;
+                    padding: 3px 10px;
+                    margin: auto;
+                    border: 2px solid black;
+                    border-radius: 3px;
+        
+                    &.selected {
+                        border: 2px solid $yellow-highlight;
+                    }
+                }
+
+            }
+        }
+
         .sort-select {
             display: flex;
             justify-content: center;
@@ -49,6 +94,10 @@
                     border: 2px solid $yellow-highlight;
                 }
             }
+        }
+
+        .sort-index {
+
         }
     }
 

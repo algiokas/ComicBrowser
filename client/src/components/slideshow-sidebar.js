@@ -150,7 +150,8 @@ class Sidebar extends Component {
                                 addButtonHandler={this.props.addButtonHandler}
                                 viewSearchResults={this.props.viewSearchResults}
                                 unhidePage={this.unhidePage}
-                                addTagToBook={this.addTagToBook}>
+                                updateBook={this.props.updateBook}
+                                deleteBook={this.props.deleteBook}>
                             </BookInfo>
 
                     }

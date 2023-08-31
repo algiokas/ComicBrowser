@@ -4,7 +4,7 @@ const LoadingView = (props) => {
     return (
         <div className="container dark-theme">
             <div className="loading-container">
-                <img className="logo-pink" src={logo} alt="Loading Logo" />
+                <img className="logo-pink loading-logo" src={logo} alt="Loading Logo" />
             </div>           
         </div>
     )

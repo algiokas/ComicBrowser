@@ -38,7 +38,6 @@ class Slideshow extends Component {
     }
 
     componentWillUnmount() {
-        console.log(this.state.intervalId)
         clearInterval(this.state.intervalId)
     }
 
@@ -91,7 +90,6 @@ class Slideshow extends Component {
     }
 
     incrementInterval = () => {
-        console.log('increment interval ' + this.state.intervalId)
         let counterVal = this.state.intervalCounter + 1
         if (counterVal < this.state.intervalLength) {
             this.setState({ intervalCounter: counterVal })
@@ -140,6 +138,7 @@ class Slideshow extends Component {
             emptySlideShow: this.props.emptySlideShow,
             saveCurrentSlideshow: this.props.saveCurrentSlideshow,
             updateBook: this.props.updateBook,
+            deleteBook: this.props.deleteBook,
             viewSearchResults: this.props.viewSearchResults,
 
             slideshow: this.props.slideshow,

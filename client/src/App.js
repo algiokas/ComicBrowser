@@ -87,6 +87,7 @@ class App extends Component {
     .then(res => res.json())
     .then(data => {
       if (data.success) {
+        console.log("Book " + book.id + " Updated")
         for (let i = 0; i < this.state.allBooks.length;  i++) {
           if (this.state.allBooks[i] && this.state.allBooks[i].id === data.book.id) {
             this.setState((state) => {
@@ -100,7 +101,40 @@ class App extends Component {
     });
   }
 
+  deleteBook = (bookId) => {
+    console.log('delete book with id: ' + bookId)
+    fetch(apiBaseUrl + 'deletebook/' + bookId, {
+      method: 'delete'
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.changes > 0) {
+        console.log('removed book ID: ' + bookId)
+        this.setState((state) => {
+          return ({
+            allBooks: state.allBooks.filter((b) => b.id !== bookId),
+            currentBook: {},
+            viewMode: ViewMode.Listing
+          })
+        })
+        let bookInSlideshow = this.state.currentSlideshow.books.find((b) => b.id === bookId)
+        if (bookInSlideshow) {
+          this.setState((state) => {
+            return ({
+              currentSlideshow: {
+                pageCount: state.currentSlideshow.pageCount - bookInSlideshow.pageCount,
+                books: state.currentSlideshow.books.filter((b) => b.id !== bookId)
+              }
+            })
+          })
+        }
+      }
+    });
+  }
+
   importBooks = () => {
+    console.log("Importing Books")
+    this.setState({ viewMode: ViewMode.Loading })
     fetch(apiBaseUrl + 'importbooks', {
       method: 'get',
       headers: { 'Content-Type': 'application/json' }
@@ -254,6 +288,7 @@ class App extends Component {
       resetSlideshow: this.resetSlideshow,
       saveCurrentSlideshow: this.saveCurrentSlideshow,
       updateBook: this.updateBook,
+      deleteBook: this.deleteBook,
       importBooks: this.importBooks
     }
 

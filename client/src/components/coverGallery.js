@@ -3,16 +3,7 @@ import GalleryItem from "./galleryItem";
 import PageSelect from "./pageSelect";
 import { getBookAuthor } from "../util/helpers";
 import FilterInfo from "./filterInfo";
-
-export const SortOrder = Object.freeze({
-    Favorite: Symbol("Favorite"),
-    Random: Symbol("Random"),
-    Title: Symbol("AlphaTitle"),
-    Author: Symbol("AlphaAuthor"),
-    Artist: Symbol("AlphaArtist"),
-    ID: Symbol("ID"),
-    Date: Symbol("Date")
-})
+import SortControls, { SortOrder } from "./sortControls";
 
 class CoverGallery extends Component {
     constructor(props) {
@@ -55,7 +46,7 @@ class CoverGallery extends Component {
 
     getTotalPages = (books) => {
         if (books) {
-            return Math.max(1, Math.floor(books.length / this.props.pageSize))
+            return Math.max(1, Math.ceil(books.length / this.props.pageSize))
         }
         return 1
     }
@@ -72,8 +63,9 @@ class CoverGallery extends Component {
             } else {
                 this.setState({
                     galleryPage: 0,
-                    bookList: this.getSortedBooks(this.props.allBooks, this.state.sortOrder),
-                    totalPages: this.getTotalPages(this.props.allBooks)
+                    bookList: this.getSortedBooks(this.props.allBooks, SortOrder.Favorite),
+                    totalPages: this.getTotalPages(this.props.allBooks),
+                    sortOrder: SortOrder.Favorite
                 })
             }
         }
@@ -84,47 +76,26 @@ class CoverGallery extends Component {
         switch (sortOrder) {
             case SortOrder.Title:
                 sortedCopy.sort((a, b) => {
-                    if (a.title && b.title) {
-                        return a.title.localeCompare(b.title)
-                    }
-                    return 0
+                    return a.title.localeCompare(b.title)
                 })
                 break
             case SortOrder.Author:
                 sortedCopy.sort((a, b) => {
                     let aAuthor = getBookAuthor(a)
                     let bAuthor = getBookAuthor(b)
-                    if (aAuthor && bAuthor) {
-                        let authorCompare = aAuthor.localeCompare(bAuthor)
-                        if (authorCompare === 0) {
-                            return a.title.localeCompare(b.title)
-                        }
-                        return authorCompare
-                    }
-                    return 0
-                    
+                    return aAuthor.localeCompare(bAuthor)      
                 })               
                 break
             case SortOrder.Artist:
                     sortedCopy.sort((a, b) => {
                         let aArtists = a.artists.join(',')
                         let bArtists = b.artists.join(',')
-                        if (aArtists && bArtists) {
-                            let artistCompare = aArtists.localeCompare(bArtists)
-                            if (artistCompare === 0) {
-                                return a.title.localeCompare(b.title)
-                            }
-                            return artistCompare
-                        }
-                        return 0
+                        return aArtists.localeCompare(bArtists)
                     })
                     break
             case SortOrder.ID:
                 sortedCopy.sort((a, b) => {
-                    if (a.id && b.id) {
-                        return a.id - b.id
-                    }
-                    return 0
+                    return a.id - b.id
                 })
                 break
             case SortOrder.Random:
@@ -144,10 +115,10 @@ class CoverGallery extends Component {
                 sortedCopy.sort((a, b) => {
                     let adate = Date.parse(a.addedDate)
                     let bdate = Date.parse(b.addedDate)
-                    if (adate && bdate) {
-                        return bdate - adate
-                    }
-                    return 0
+                    //Date.parse can return NaN
+                    if (!adate) adate = 0
+                    if (!bdate) bdate = 0
+                    return bdate - adate
                 })
             default:
                 console.log("getSortedBooks - Invalid Sort Order")
@@ -247,17 +218,19 @@ class CoverGallery extends Component {
                         <FilterInfo filterQuery={this.state.filterQuery}></FilterInfo>
                         : null
                     }
-                    <PageSelect setPage={this.setPage} totalPages={this.state.totalPages} currentPage={this.state.galleryPage}></PageSelect>
+                    <PageSelect 
+                        setPage={this.setPage} 
+                        totalPages={this.state.totalPages} 
+                        currentPage={this.state.galleryPage}>            
+                    </PageSelect>
                     {
                         this.props.sortOrder ? null :
-                            <div className="sort-select">
-                                {
-                                    Object.keys(SortOrder).map((key) => {
-                                        return <div key={key} className={`sort-order ${this.state.sortOrder === SortOrder[key] ? "selected" : ""}`} 
-                                            onClick={() => {this.sortBooks(key)}}>{key}</div>
-                                    })
-                                }
-                            </div>
+                        <SortControls sortOrder={this.state.sortOrder}
+                            bookList={this.state.bookList}
+                            pageSize={this.props.pageSize}
+                            sortBooks={this.sortBooks}
+                            setPage={this.setPage}>
+                        </SortControls>
                     }
                 </div>
                 <div className="gallery-container-inner">

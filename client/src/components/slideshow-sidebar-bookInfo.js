@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import GalleryItem from "./galleryItem";
+import Modal from "./modal";
+import EditPanel from "./editPanel";
 
 class BookInfo extends Component {
     constructor(props) {
@@ -14,12 +16,9 @@ class BookInfo extends Component {
         if (this.props.unhidePage) {
             this.unhidePage = this.props.unhidePage.bind(this)
         }
-        if (this.props.addTagToBook) {
-            this.addTagToBook = this.props.addTagToBook.bind(this)
-        }
 
         this.state = {
-            showTagModal: false,
+            showEditModal: false,
             tagToAdd: ""
         }
     }
@@ -48,29 +47,17 @@ class BookInfo extends Component {
         })
     }
 
-    toggleTagModal = () => {
-        if (!this.state.showTagModal && this.inputRef) {
-            this.inputRef.current.focus()
-        }
+    toggleEditModal = () => {
+        // if (!this.state.showEditModal && this.inputRef) {
+        //     this.inputRef.current.focus()
+        // }
         this.setState((state) => {
-            return { showTagModal: !state.showTagModal }
+            return { showEditModal: !state.showEditModal }
         })
     }
 
     handleTagInputChange = (e) => {
         this.setState({ tagToAdd: e.target.value })
-    }
-
-    handleTagInputKey = (e) => {
-        if (e.key === 'Enter') {
-            this.addTagToBook(this.state.tagToAdd)
-            this.setState({ tagToAdd: '' })
-        }
-    }
-
-    handleTagButtonClick = () => {
-        this.addTagToBook(this.state.tagToAdd)
-        this.setState({ tagToAdd: '' })
     }
 
     render() {
@@ -81,6 +68,30 @@ class BookInfo extends Component {
                     index={0}
                     addButtonHandler={this.props.addButtonHandler}>
                 </GalleryItem>
+                <div className="edit-container">
+                    <button type="button" className="edit-button" onClick={() => { this.toggleEditModal() }}>
+                        Edit Book
+                    </button>
+                    <Modal modalId={"bookinfo-edit-modal"} displayModal={this.state.showEditModal} toggleModal={this.toggleEditModal}>
+                        <EditPanel 
+                            book={this.props.book}
+                            updateBook={this.props.updateBook}
+                            deleteBook={this.props.deleteBook}
+                            toggleDisplay={this.toggleEditModal}>
+                        </EditPanel>
+                        {/* <h3>Add New Tag</h3>
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                value={this.state.tagToAdd}
+                                onChange={this.handleTagInputChange}
+                                onKeyDown={this.handleTagInputKey}
+                                ref={this.inputRef}>
+                            </input>
+                            <button type="button" onClick={() => { this.handleTagButtonClick() }}>Add</button>
+                        </div> */}
+                    </Modal>
+                </div>
                 <div className="book-info-inner">
                     {
                         this.book.artGroup ?
@@ -141,40 +152,17 @@ class BookInfo extends Component {
                                         </span>
                                     }) : null
                             }
-                            <span className="info-icon" onClick={() => { this.toggleTagModal() }}>
-                                <img className="svg-icon-pink text-icon" src="http://localhost:9000/data/images/plus-symbol.svg" alt="add to slideshow"></img>
-                            </span>
                         </div>
                     </div>
-                    <dialog id="tag-modal" 
-                        className="modal-background"
-                        open={this.state.showTagModal}
-                        onClick={() => { this.toggleTagModal() }}>
-                        <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
-                            <div className="modal-dialog-inner">
-                                <h3>Add New Tag</h3>
-                                <div className="input-container">
-                                    <input 
-                                        type="text"
-                                        value={this.state.tagToAdd}
-                                        onChange={this.handleTagInputChange}
-                                        onKeyDown={this.handleTagInputKey}
-                                        ref={this.inputRef}>
-                                    </input>
-                                    <button type="buttton" onClick={() => { this.handleTagButtonClick() }}>Add</button>
-                                </div>
-                            </div>
-                        </div>
-                    </dialog>
                     {
-                        this.book.hiddenPages ?
+                        this.book.hiddenPages && this.book.hiddenPages.length ?
                             <div className="book-info-line">
                                 <span className="info-label">Hidden Pages:</span>
                                 <div className="info-items">
                                     {
                                         this.book.hiddenPages.map((page, i) => {
                                             return <span className="info-item clickable" onClick={() => { this.unhidePage(page) }} key={i}>
-                                                {page+1}
+                                                {page + 1}
                                             </span>
                                         })
                                     }

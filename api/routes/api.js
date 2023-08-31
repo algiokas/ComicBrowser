@@ -61,10 +61,15 @@ router.get('/importbooks', function (req, res, next) {
 });
 
 router.post('/updatebook/:bookId', function (req, res, next) {
-  if (req.body) console.log("invalid book data")
+  if (!req.body) console.log("invalid book data")
   if (req.body.id.toString() === req.params.bookId) {
-    res.json(bookRepo.updateBook(req.body.id, req.body))
+    res.json(bookRepo.updateBook(req.params.bookId, req.body))
   }
+})
+
+router.delete('/deletebook/:bookId', function (req, res) {
+  console.log('delete book id: ' + req.params.bookId)
+  res.json(bookRepo.deleteBook(req.params.bookId))
 })
 
 router.post('/saveslideshow', function (req, res, next) {

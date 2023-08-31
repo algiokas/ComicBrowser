@@ -42,6 +42,8 @@
         background-color: $gray-2;
         z-index: 1;
         visibility: hidden;
+        display: flex;
+        flex-direction: column;
 
         .show-sidebar & {
             visibility: visible;
@@ -79,7 +81,6 @@
     }
 
     &-controls {
-        padding: 5px 0 15px 0;
 
         button {
             display: flex;

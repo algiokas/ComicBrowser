@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import CoverGallery, { SortOrder } from "./coverGallery";
+import CoverGallery from "./coverGallery";
 import Slideshow from "./slideshow";
 import LoadingView from "./loadingView";
 import { ViewMode } from "../App";
+import { SortOrder } from "./sortControls";
 
 class MultiView extends Component {
     render() {
@@ -31,6 +32,7 @@ class MultiView extends Component {
                         setCurrentPage={this.props.setSlideshowPage}
                         addButtonHandler={this.props.addBookToSlideshow}
                         updateBook={this.props.updateBook}
+                        deleteBook={this.props.deleteBook}
                         viewSearchResults={this.props.viewSearchResults}
                     ></Slideshow>
                 )

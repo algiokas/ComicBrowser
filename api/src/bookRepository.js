@@ -181,8 +181,36 @@ exports.getBook = function (id) {
 }
 
 exports.updateBook = function(id, newBookData) {
+    console.log("updating book with id " + id)
     let response = { success: false, errors: "" }
     let bookData = exports.getBook(id);
+    if (newBookData.title !== bookData.title) {
+        db.setTitle(id, newBookData.title)
+    }
+    if (newBookData.artGroup !== bookData.artGroup) {
+        db.setArtGroup(id, newBookData.artGroup)
+    }
+    if (newBookData.artists && bookData.artists) {
+        let artistsToAdd = newBookData.artists.filter(t => !bookData.artists.includes(t))
+        let artistsToRemove = bookData.artists.filter(t => !newBookData.artists.includes(t))
+
+        if (artistsToAdd.length) {
+            let addResult = db.addArtists(id, artistsToAdd)
+            if (addResult.length === artistsToAdd.length) {
+                response.success = true;
+            } else {
+                response.errors = response.errors + "Adding artists failed"
+            }
+        } 
+        if (artistsToRemove.length) {
+            let removeResult = db.removeArtists(id, artistsToRemove)
+            if (removeResult.length === artistsToRemove.length) {
+                response.success = true;
+            } else {
+                response.errors = response.errors + "Adding artists failed"
+            }
+        }
+    }
     if (newBookData.tags && bookData.tags) {
         let tagsToAdd = newBookData.tags.filter(t => !bookData.tags.includes(t))
         let tagsToRemove = bookData.tags.filter(t => !newBookData.tags.includes(t))
@@ -226,4 +254,8 @@ exports.updateBook = function(id, newBookData) {
     if (response.errors) response.success = false
     response.book = exports.getBook(id)
     return response
+}
+
+exports.deleteBook = function(id) {
+    return db.deleteBook(id)
 }

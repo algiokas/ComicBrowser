@@ -43,7 +43,6 @@ class PageSelect extends Component {
 
     setPageNumber = (e) => {
         let pageNum = e.target.value
-        console.log(pageNum)
         if (pageNum < 1) {
             this.setCurrentPage(0)
         } else if (pageNum > this.props.totalPages) {
