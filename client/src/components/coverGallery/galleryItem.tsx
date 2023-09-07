@@ -1,68 +1,52 @@
 import React, { Component } from "react";
 import { GetCoverPath } from "../../util/helpers";
+import IBook from "../../interfaces/book";
 
-class GalleryItem extends Component {
-  constructor(props) {
-    super(props)
-    this.state = { coverUrl: GetCoverPath(props.book) }
+interface GalleryItemProps {
+  index: number,
+  book: IBook,
+  coverUrl: string,
+  subtitle: string,
+  bodyClickHandler?: (book: IBook, bookIndex: number) => void,
+  addButtonHandler?: (book: IBook) => void,
+  removeButtonHandler?: (index: number) => void,
+  subTitleClickHandler?: (book: IBook) => void,
+  favoriteClickHandler?: (book: IBook) => void,
+}
 
-    if (props.viewBook) {
-      this.viewBook = props.viewBook.bind(this)
-    }
-    if (props.addButtonHandler) {
-      this.addButtonHandler = props.addButtonHandler.bind(this)
-    }
-    if (props.removeButtonHandler) {
-      this.removeButtonHandler = props.removeButtonHandler.bind(this)
-    }
-    if (props.bodyClickHandler) {
-      this.bodyClickHandler = props.bodyClickHandler.bind(this)
-    }
-    if (props.getSubtitle) {
-      this.getSubtitle = props.getSubtitle.bind(this)
-    }
-    if (props.subTitleClickHandler) {
-      this.subTitleClickHandler = props.subTitleClickHandler.bind(this)
-    }
-    if (props.favoriteClickHandler) {
-      this.favoriteClickHandler = props.favoriteClickHandler.bind(this)
+interface GalleryItemState {}
+
+class GalleryItem extends Component<GalleryItemProps, GalleryItemState> {
+  bodyClick = (e: React.MouseEvent) => {
+    if (this.props.bodyClickHandler)
+      this.props.bodyClickHandler(this.props.book, this.props.index)
+  }
+
+  addButtonClick = (e: React.MouseEvent) => {
+    if (this.props.addButtonHandler) {
+      e.stopPropagation()
+      this.props.addButtonHandler(this.props.book)
     }
   }
 
-  bodyClick = (e) => {
-    this.bodyClickHandler(this.props.book, this.props.index)
-  }
-
-  addButtonClick = (e) => {
-    e.stopPropagation()
-    this.addButtonHandler(this.props.book)
-  }
-
-  removeButtonClick = (e) => {
-    e.stopPropagation()
-    this.removeButtonHandler(this.props.index)
-  }
-
-  subtitleClick = (e) => {
-    e.stopPropagation()
-    this.subTitleClickHandler(this.props.book)
-  }
-
-  favoriteClick = (e) => {
-    e.stopPropagation()
-    this.favoriteClickHandler(this.props.book)
-  }
-
-  getSubtitleText = (book) => {
-    if (this.getSubtitle) {
-      return this.getSubtitle(book)
+  removeButtonClick = (e: React.MouseEvent) => {
+    if (this.props.removeButtonHandler) {
+      e.stopPropagation()
+      this.props.removeButtonHandler(this.props.index)
     }
-    return ""
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.props.book.title !== prevProps.book.title) {
-      this.setState({ coverUrl: GetCoverPath(this.props.book) })
+  subtitleClick = (e: React.MouseEvent) => {
+    if (this.props.subTitleClickHandler) {
+      e.stopPropagation()
+      this.props.subTitleClickHandler(this.props.book)
+    }
+  }
+
+  favoriteClick = (e: React.MouseEvent) => {
+    if (this.props.favoriteClickHandler) {
+      e.stopPropagation()
+      this.props.favoriteClickHandler(this.props.book)
     }
   }
 
@@ -70,11 +54,11 @@ class GalleryItem extends Component {
     return (
       <div className="gallery" key={this.props.book.title}>
         <div className="gallery-inner" onClick={this.props.bodyClickHandler ? this.bodyClick : undefined}>
-          <img className="gallery-image" src={this.state.coverUrl} alt={`${this.props.book.title} cover`}></img>
+          <img className="gallery-image" src={this.props.coverUrl} alt={`${this.props.book.title} cover`}></img>
           <div className={ this.props.book.isFavorite ? "caption favorite" : "caption"}>
             <div className="caption-text">
               <span className="subtitle" onClick={this.props.subTitleClickHandler ? this.subtitleClick : undefined}>
-                {this.getSubtitleText(this.props.book)}
+                {this.props.subtitle}
               </span>
               <span className="title">{this.props.book.title}</span>
             </div>

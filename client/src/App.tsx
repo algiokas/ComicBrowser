@@ -55,7 +55,7 @@ class App extends Component<AppProps, AppState> {
     })
   }
 
-  fillBooks() {
+  fillBooks = () => {
     fetch(apiBaseUrl + "allbooks")
       .then(res => res.json())
       .then(data => {
@@ -63,7 +63,7 @@ class App extends Component<AppProps, AppState> {
       });
   }
 
-  resetSlideshow() {
+  resetSlideshow = () => {
     this.setState({
       viewMode: ViewMode.Listing,
       currentSlideshow: {
@@ -73,7 +73,7 @@ class App extends Component<AppProps, AppState> {
     })
   }
 
-  updateBook(book : IBook) {
+  updateBook = (book : IBook) => {
     fetch(apiBaseUrl + 'updatebook/' + book.id, {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
@@ -96,7 +96,7 @@ class App extends Component<AppProps, AppState> {
     });
   }
 
-  deleteBook(bookId : number) {
+  deleteBook = (bookId : number) => {
     console.log('delete book with id: ' + bookId)
     fetch(apiBaseUrl + 'deletebook/' + bookId, {
       method: 'delete'
@@ -127,7 +127,7 @@ class App extends Component<AppProps, AppState> {
     });
   }
 
-  importBooks() {
+  importBooks = () => {
     console.log("Importing Books")
     this.setState({ viewMode: ViewMode.Loading })
     fetch(apiBaseUrl + 'importbooks', {
@@ -150,7 +150,7 @@ class App extends Component<AppProps, AppState> {
     });
   }
 
-  viewBook(book : IBook) {
+  viewBook = (book : IBook) => {
     this.setState({
       viewMode: ViewMode.SingleBook,
       currentBook: book,
@@ -158,7 +158,7 @@ class App extends Component<AppProps, AppState> {
     })
   }
 
-  viewCurrentBook() {
+  viewCurrentBook = () => {
     if (this.state.currentBook && this.state.currentBook.title) {
       this.setState({
         viewMode: ViewMode.SingleBook
@@ -176,7 +176,7 @@ class App extends Component<AppProps, AppState> {
     }
   }
   
-  viewSearchResults(query?: ISearchQuery) {
+  viewSearchResults = (query?: ISearchQuery) => {
     if (query) {
       let newQuery = {...this.getEmptyQuery(), ...query}
       newQuery.filled = true
@@ -191,7 +191,7 @@ class App extends Component<AppProps, AppState> {
     }
   }
 
-  viewSlideshow() {
+  viewSlideshow = () => {
     if (this.state.currentSlideshow.pageCount > 0) {
       this.setState({
         viewMode: ViewMode.Slideshow
@@ -199,13 +199,13 @@ class App extends Component<AppProps, AppState> {
     }
   }
 
-  viewListing() {
+  viewListing = () => {
     this.setState({
       viewMode: ViewMode.Listing
     })
   }
 
-  addBookToSlideshow(book : IBook) {
+  addBookToSlideshow = (book : IBook) => {
     this.setState((state) => {
       return {
         currentSlideshow: {
@@ -216,7 +216,7 @@ class App extends Component<AppProps, AppState> {
     })
   }
 
-  removeBookFromSlideshow(index : number) {
+  removeBookFromSlideshow = (index : number) => {
     this.setState((state : AppState) : object => {
       let matchingBook = state.currentSlideshow.books[index]
       let remainingBooks = state.currentSlideshow.books.filter((_, i) => i !== index)
@@ -242,11 +242,11 @@ class App extends Component<AppProps, AppState> {
     })
   }
 
-  setSlideshowInterval(interval : number) {
+  setSlideshowInterval = (interval : number) => {
     this.setState({ slideshowInterval: interval })
   }
 
-  setSlideshowPage(n : number) {
+  setSlideshowPage = (n : number) => {
     if (this.state.viewMode === ViewMode.SingleBook) {   
       this.setState({
         singleBookPage: n

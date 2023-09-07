@@ -48,7 +48,7 @@ class FilterInfo extends Component<FilterInfoProps, FilterInfoState> {
                     this.props.filterQuery.tag ?
                     <div className="filter-info-item">
                         <span className="filter-info-label">Tag</span>
-                        <a href={this.getExternalURL('tag', this.props.filterQuery.tag)} target="_blank" rel="noreferrer" className="filter-info-value clickable">{this.props.filterQuery.tag}</span>
+                        <a href={this.getExternalURL('tag', this.props.filterQuery.tag)} target="_blank" rel="noreferrer" className="filter-info-value clickable">{this.props.filterQuery.tag}</a>
                     </div>
                     : null
                 }

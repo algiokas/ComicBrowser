@@ -1,42 +1,78 @@
 import React, { Component } from "react";
-import GalleryItem from "./coverGallery/galleryItem";
-import PageSelect from "./pageSelect";
+import GalleryItem from "../coverGallery/galleryItem";
+import PageSelect from "../shared/pageSelect";
 import BookInfo from "./slideshow-sidebar-bookInfo";
-import { ViewMode } from "../App";
+import { ViewMode } from "../../util/enums";
+import ISlideshow from "../../interfaces/slideshow";
+import IBook from "../../interfaces/book";
+import ISearchQuery from "../../interfaces/searchQuery";
+import { GetCoverPath } from "../../util/helpers";
 
-class Sidebar extends Component {
-    constructor(props) {
+interface SidebarProps {
+    showSidebar: boolean,
+    slideshow: ISlideshow,
+    currentPage: number,
+    pageCount: number,
+    intervalLength: number,
+    intervalCount: number,
+    viewMode: ViewMode,
+    playing: boolean,
+
+    toggleSidebar(): void,
+    previousPage(): void,
+    nextPage(): void,
+    handleIntervalChange(e: React.ChangeEvent<HTMLInputElement>) : void,
+    playPause(): void,
+    setPage(n: number): void,
+    resetPage(): void,
+
+    galleryItemClickHandler(book: IBook, bookIndex: number): void,
+    addButtonHandler(book: IBook): void,
+    removeButtonHandler(index: number): void,
+    emptySlideshow(): void,
+    updateBook(book: IBook): void,
+    deleteBook(bookId: number): void,
+    viewSearchResults(query?: ISearchQuery): void
+}
+
+interface SidebarState {
+    sidebarRef: React.RefObject<HTMLDivElement>,
+    coversRef: React.RefObject<HTMLDivElement>,
+    listingHeight: number
+}
+
+class Sidebar extends Component<SidebarProps, SidebarState> {
+    constructor(props: SidebarProps) {
         super(props);
-    
+
         this.state = {
-          containerRect: { left: 0, width: 0 },
-          listingHeight: 0
+            sidebarRef: React.createRef<HTMLDivElement>(),
+            coversRef: React.createRef<HTMLDivElement>(),
+            listingHeight: 0
         };
-
-        this.sidebarRef = React.createRef()
-        this.coversRef = React.createRef()
     }
 
-    updateListingHeight() {
-        if (this.sidebarRef && this.sidebarRect) {
-            const sidebarRect = this.sidebarRef.current.getBoundingClientRect();
-            const listingRect = this.coversRef.current.getBoundingClientRect();
-    
-            const sidebarBottom = sidebarRect.top + sidebarRect.height
-            const targetHeight = sidebarBottom - 10 - listingRect.top
-    
-            this.setState({
-                listingHeight: targetHeight
-            })
-        }
-    }
+    // NOTE: Pretty sure this function will never fire since sidebarRect is never set 
+    // updateListingHeight() {
+    //     if (this.sidebarRef && this.sidebarRect) {
+    //         const sidebarRect = this.sidebarRef.current.getBoundingClientRect();
+    //         const listingRect = this.coversRef.current.getBoundingClientRect();
+
+    //         const sidebarBottom = sidebarRect.top + sidebarRect.height
+    //         const targetHeight = sidebarBottom - 10 - listingRect.top
+
+    //         this.setState({
+    //             listingHeight: targetHeight
+    //         })
+    //     }
+    // }
 
     hideCurrentPage = () => {
         console.log(`hide page ${this.props.currentPage}`)
         if (this.props.updateBook) {
             let req = this.props.slideshow.books[0]
             if (!req.hiddenPages) {
-                req.hiddenPages = [ this.props.currentPage ]
+                req.hiddenPages = [this.props.currentPage]
             }
             else {
                 if (!req.hiddenPages.includes(this.props.currentPage)) {
@@ -44,15 +80,15 @@ class Sidebar extends Component {
                 }
             }
             this.props.updateBook(req)
-            if (this.props.currentPage < this.props.pageCount-1) {
-                this.props.setPage(this.props.currentPage+1)
+            if (this.props.currentPage < this.props.pageCount - 1) {
+                this.props.setPage(this.props.currentPage + 1)
             } else {
-                this.props.setPage(this.props.currentPage-1)
+                this.props.setPage(this.props.currentPage - 1)
             }
         }
     }
 
-    unhidePage = (pageNum) => {
+    unhidePage = (pageNum: number) => {
         console.log(`un-hide page ${pageNum}`)
         if (this.props.updateBook) {
             let req = this.props.slideshow.books[0]
@@ -66,7 +102,7 @@ class Sidebar extends Component {
         }
     }
 
-    addTagToBook = (tag) => {
+    addTagToBook = (tag: string) => {
         console.log(`add tag "${tag}" to book`)
         if (this.props.updateBook) {
             let req = this.props.slideshow.books[0]
@@ -79,14 +115,18 @@ class Sidebar extends Component {
         }
     }
 
-    componentDidMount() {
-        this.updateListingHeight()
-    }
+    // componentDidMount() {
+    //     this.updateListingHeight()
+    // }
 
-    componentDidUpdate(prevProps) {
-        if (prevProps.viewMode !== this.props.viewMode) {
-            this.updateListingHeight()
-        }
+    // componentDidUpdate(prevProps) {
+    //     if (prevProps.viewMode !== this.props.viewMode) {
+    //         this.updateListingHeight()
+    //     }
+    // }
+
+    resetSlideshow = () => {
+        this.props.setPage(0)
     }
 
     render() {
@@ -95,12 +135,10 @@ class Sidebar extends Component {
                 <div className="slideshow-sidebar-toggle stepper-arrow" onClick={this.props.toggleSidebar}>
                     <img src="http://localhost:9000/data/images/chevron-right.svg" className={`svg-icon ${this.props.showSidebar ? 'mirror' : ''}`} alt="stepper left"></img>
                 </div>
-                <div className="slideshow-sidebar" ref={this.sidebarRef}>
-                    <PageSelect
-                        currentPage={this.props.currentPage} 
+                <div className="slideshow-sidebar" ref={this.state.sidebarRef}>
+                    <PageSelect currentPage={this.props.currentPage}
                         totalPages={this.props.pageCount}
-                        setPage={this.props.setPage}>
-                    </PageSelect>
+                        setPage={this.props.setPage}/>
                     <div className="slideshow-sidebar-stack slideshow-controls">
                         <span className="control-label">Interval</span>
                         <div className="interval-input">
@@ -120,29 +158,30 @@ class Sidebar extends Component {
                     {
                         this.props.viewMode === ViewMode.Slideshow ?
                             <div className="slideshow-sidebar-stack slideshow-controls">
-                                <button className="media-button play" onClick={this.props.emptySlideShow}>Clear</button>
-                                <button className="media-button reset" onClick={this.props.saveCurrentSlideshow}>Save</button>
+                                <button className="media-button play" onClick={this.props.emptySlideshow}>Clear</button>
+                                <button className="media-button reset" onClick={this.props.resetPage}>Save</button>
                             </div>
-                            : 
+                            :
                             <div className="slideshow-sidebar-stack slideshow-controls">
-                            <button className="media-button" onClick={this.hideCurrentPage}>Hide Page</button>
-                            <button className="media-button">TEST</button>
-                        </div>
+                                <button className="media-button" onClick={this.hideCurrentPage}>Hide Page</button>
+                                <button className="media-button">TEST</button>
+                            </div>
                     }
                     {
                         this.props.viewMode === ViewMode.Slideshow ?
-                            <div className="slideshow-covers"  ref={this.coversRef} style={this.state.listingHeight > 0 ? { height: this.state.listingHeight } : null}>
-                            {
-                                this.props.slideshow.books.map((book, index) => {
-                                    return <GalleryItem
-                                        book={book}
-                                        index={index}
-                                        addButtonHandler={this.props.addButtonHandler}
-                                        removeButtonHandler={this.props.removeButtonHandler}
-                                        bodyClickHandler={this.props.galleryItemClickHandler}>
-                                    </GalleryItem>
-                                })
-                            }
+                            <div className="slideshow-covers" ref={this.state.coversRef}>
+                                {
+                                    this.props.slideshow.books.map((book, index) => {
+                                        return <GalleryItem
+                                            index={index}
+                                            book={book}
+                                            coverUrl={GetCoverPath(book)}
+                                            subtitle=""
+                                            addButtonHandler={this.props.addButtonHandler}
+                                            removeButtonHandler={this.props.removeButtonHandler}
+                                            bodyClickHandler={this.props.galleryItemClickHandler}/>
+                                    })
+                                }
                             </div>
                             :
                             <BookInfo
@@ -151,8 +190,7 @@ class Sidebar extends Component {
                                 viewSearchResults={this.props.viewSearchResults}
                                 unhidePage={this.unhidePage}
                                 updateBook={this.props.updateBook}
-                                deleteBook={this.props.deleteBook}>
-                            </BookInfo>
+                                deleteBook={this.props.deleteBook}/>
 
                     }
 

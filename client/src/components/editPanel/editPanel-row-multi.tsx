@@ -1,19 +1,32 @@
 import React, { Component } from "react";
 import { scalarArrayCompare } from "../../util/helpers";
+import { EditField } from "../../util/enums";
 
-class EditPanelRowMulti extends Component {
-    constructor(props) {
+interface EditPanelRowProps {
+    editField: EditField,
+    tempValue: any[],
+    hideTextInput?: boolean,
+    updateTempValue(field: EditField, value: any): void,
+    valueClick?: (v: string) => void
+}
+
+interface EditPanelRowState {
+    editMode: boolean,
+    fieldValue: string,
+    collection: any[]
+}
+
+class EditPanelRowMulti extends Component<EditPanelRowProps, EditPanelRowState> {
+    constructor(props: EditPanelRowProps) {
         super(props);
         this.state = {
             editMode: false,
             fieldValue: '',
             collection: this.props.tempValue ?? []
         }
-        this.hideTextInput = this.props.hideTextInput ?? false
-        this.props.valueClick ? console.log('valueClick found') : console.log('valueClick not found')
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: EditPanelRowProps) {
         if (!scalarArrayCompare(prevProps.tempValue, this.props.tempValue)) {
             this.setState({
                 collection: this.props.tempValue ?? [],
@@ -22,11 +35,11 @@ class EditPanelRowMulti extends Component {
         }
     }
 
-    handleTextInputChange = (e) => {
+    handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({ fieldValue: e.target.value })
     }
 
-    handleTextInputKey = (e) => {
+    handleTextInputKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             this.addToCollection()
         }
@@ -58,7 +71,7 @@ class EditPanelRowMulti extends Component {
         this.setState({ editMode: !this.state.editMode })
     }
 
-    removeFromCollection = (index) => {
+    removeFromCollection = (index: number) => {
         console.log('remove item at index ' + index)
         if (this.state.collection.length > 0) {
             this.setState({ collection: this.state.collection.filter((_, i) => i !== index) })
@@ -75,13 +88,12 @@ class EditPanelRowMulti extends Component {
                         <div className="edit-panel-row-inner edit-mode">
                             <div className="edit-panel-row-value">
                                 {
-                                    this.hideTextInput ? null :
+                                    this.props.hideTextInput ? null :
                                         <div className="edit-panel-row-value-add">
                                             <input type="text"
                                                 value={this.state.fieldValue}
                                                 onChange={this.handleTextInputChange}
-                                                onKeyDown={this.handleTextInputKey}
-                                                ref={this.inputRef}>
+                                                onKeyDown={this.handleTextInputKey}>
                                             </input>
                                             <button type="button" onClick={this.addToCollection}>
                                                 <img className="svg-icon text-icon" src="http://localhost:9000/data/images/plus-symbol.svg" alt="remove collection item"></img>
@@ -122,7 +134,7 @@ class EditPanelRowMulti extends Component {
                                     <div className="click-items">
                                         {
                                             this.state.collection.map((item, i) => {
-                                                return <span className="click-item clickable" onClick={() => this.props.valueClick(item)} key={i}>
+                                                return <span className="click-item clickable" onClick={() => this.props.valueClick!(item)} key={i}>
                                                     {item}
                                                 </span>
                                             })

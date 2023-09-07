@@ -2,9 +2,38 @@ import React, { Component } from "react";
 import EditPanelRow from "./editPanel-row";
 import EditPanelRowMulti from "./editPanel-row-multi";
 import { EditField } from "../../util/enums";
+import IBook from "../../interfaces/book";
 
-class EditPanel extends Component {
-    constructor(props) {
+interface EditPanelProps {
+    book: IBook,
+    updateBook(book: IBook): void,
+    deleteBook(bookId: number): void,
+    toggleDisplay(): void
+
+    searchGroup(g: string): void,
+    searchArtist(a: string): void,
+    searchPrefix(p: string): void,
+    searchTag(t: string): void
+}
+
+interface EditFields {
+    title: string,
+    group: string,
+    artists: string[],
+    tags: string[],
+    prefix: string,
+    hiddenPages: number[]
+}
+
+interface EditPanelState {
+    tempFields: EditFields,
+    artistToAdd: string,
+    tagToAdd: string,
+    changesPending: boolean
+}
+
+class EditPanel extends Component<EditPanelProps, EditPanelState> {
+    constructor(props: EditPanelProps) {
         super(props);
 
         this.state = {
@@ -22,7 +51,7 @@ class EditPanel extends Component {
         }
     }
 
-    arrayChangesPending = (temp, original) => {
+    arrayChangesPending = (temp: any[], original: any[]) => {
         if (temp.length !== original.length) return true;
         if (temp.length > 0) {
             for (let i = 0; i < temp.length; i++) {
@@ -32,7 +61,7 @@ class EditPanel extends Component {
         return false;
     }
 
-    checkPendingChanges = (tempFields) => {
+    checkPendingChanges = (tempFields: EditFields) => {
         if (tempFields.title !== this.props.book.title) return true;
         if (tempFields.group !== this.props.book.artGroup) return true;
 
@@ -57,7 +86,7 @@ class EditPanel extends Component {
         })
     }
 
-    updateTempValue = (field, value) => {
+    updateTempValue = (field: EditField, value: any) => {
         let fieldValues = this.state.tempFields
         switch (field) {
             case EditField.Title:
@@ -93,7 +122,7 @@ class EditPanel extends Component {
         let tempBook = this.props.book
 
         tempBook.title = this.state.tempFields.title
-        tempBook.group = this.state.tempFields.group
+        tempBook.artGroup = this.state.tempFields.group
         tempBook.artists = this.state.tempFields.artists
         tempBook.tags = this.state.tempFields.tags
         tempBook.hiddenPages = this.state.tempFields.hiddenPages
@@ -116,23 +145,19 @@ class EditPanel extends Component {
                 <div className="edit-panel-inner">
                     <EditPanelRow editField={EditField.Title}
                         tempValue={this.state.tempFields.title}
-                        updateTempValue={this.updateTempValue}>
-                    </EditPanelRow>
+                        updateTempValue={this.updateTempValue}/>
                     <EditPanelRow editField={EditField.Group}
                         tempValue={this.state.tempFields.group}
                         updateTempValue={this.updateTempValue}
-                        valueClick={this.props.searchGroup}>
-                    </EditPanelRow>
+                        valueClick={this.props.searchGroup}/>
                     <EditPanelRowMulti editField={EditField.Artists}
                         tempValue={this.state.tempFields.artists}
                         updateTempValue={this.updateTempValue}
-                        valueClick={this.props.searchArtist}>
-                    </EditPanelRowMulti>
+                        valueClick={this.props.searchArtist}/>
                     <EditPanelRowMulti editField={EditField.Tags}
                         tempValue={this.state.tempFields.tags}
                         updateTempValue={this.updateTempValue}
-                        valueClick={this.props.searchTag}>
-                    </EditPanelRowMulti>
+                        valueClick={this.props.searchTag}/>
                     <EditPanelRow editField={EditField.Prefix}
                         tempValue={this.state.tempFields.prefix}
                         updateTempValue={this.updateTempValue}
@@ -141,8 +166,7 @@ class EditPanel extends Component {
                     <EditPanelRowMulti editField={EditField.HiddenPages}
                         tempValue={this.state.tempFields.hiddenPages}
                         updateTempValue={this.updateTempValue}
-                        hideTextInput={true}>
-                    </EditPanelRowMulti>
+                        hideTextInput={true}/>
                 </div>
                 <div className="edit-panel-controls">
                     <button className="delete-button" onClick={this.deleteBook} type="button">DELETE BOOK</button>

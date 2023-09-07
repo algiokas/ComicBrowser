@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import GalleryItem from "./galleryItem";
 import PageSelect from "../shared/pageSelect";
-import { getBookAuthor } from "../../util/helpers";
+import { GetCoverPath, getBookAuthor } from "../../util/helpers";
 import FilterInfo from "./filterInfo";
 import SortControls from "./sortControls";
 import { SortOrder } from "../../util/enums";
@@ -140,7 +140,7 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
         if (searchQuery.artist) {
             results = results.filter(book => {
                 if (book.artists) {
-                    return book.artists.some((a) => a.toLowerCase() === searchQuery.artist.toLowerCase())
+                    return book.artists.some((a) => a.toLowerCase() === searchQuery.artist!.toLowerCase())
                 }
                 return false
             })
@@ -158,7 +158,7 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
         if (searchQuery.tag) {
             results = results.filter(book => {
                 if (book.tags) {
-                    return book.tags.some((a) => a.toLowerCase() === searchQuery.tag.toLowerCase())
+                    return book.tags.some((a) => a.toLowerCase() === searchQuery.tag!.toLowerCase())
                 }
                 return false
             })
@@ -197,13 +197,17 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
         }
     }
 
-    setPage(pageNum: number) {
+    setPage = (pageNum: number) => {
         this.setState({ 
             galleryPage : pageNum
         })
     }
 
-    subTitleClick(book: IBook) {
+    bodyClick = (book: IBook, bookIndex: number) => {
+        this.props.viewBook(book)
+    }
+
+    subTitleClick = (book: IBook) => {
         let subtitle = this.getItemSubtitle(book)
         if (subtitle === book.artGroup) {
             this.props.viewSearchResults({ group: subtitle })
@@ -213,7 +217,7 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
         }      
     }
 
-    favoriteClick(book: IBook) {
+    favoriteClick = (book: IBook) => {
         console.log("toggle favorite for book: " + book.id)
         if (this.props.updateBook) {
             book.isFavorite = !book.isFavorite; //toggle value
@@ -233,26 +237,26 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
                     <PageSelect 
                         setPage={this.setPage} 
                         totalPages={this.state.totalPages} 
-                        currentPage={this.state.galleryPage}>            
-                    </PageSelect>
+                        currentPage={this.state.galleryPage}/>
                     {
                         this.props.sortOrder ? null :
                         <SortControls sortOrder={this.state.sortOrder}
                             bookList={this.state.bookList}
                             pageSize={this.props.pageSize}
                             sortBooks={this.sortBooks}
-                            setPage={this.setPage}>
-                        </SortControls>
+                            setPage={this.setPage}/>
                     }
                 </div>
                 <div className="gallery-container-inner">
-                    {this.getCurrentGalleryPage().map((object, i) => {
+                    {this.getCurrentGalleryPage().map((book, i) => {
+
                         return <GalleryItem 
-                            key={i}
-                            book={object} 
-                            bodyClickHandler={this.props.viewBook} 
+                            index={i}
+                            book={book}
+                            coverUrl={GetCoverPath(book)}
+                            subtitle={this.getItemSubtitle(book)}
                             addButtonHandler={this.props.addBookToSlideshow} 
-                            getSubtitle={this.getItemSubtitle}
+                            bodyClickHandler={this.bodyClick}
                             subTitleClickHandler={this.subTitleClick}
                             favoriteClickHandler={this.favoriteClick}
                         ></GalleryItem>

@@ -2,9 +2,23 @@ import React, { Component } from "react";
 import { getAlphabet } from "../../util/helpers";
 import { getBookAuthor } from "../../util/helpers";
 import { SortOrder } from "../../util/enums";
+import IBook from "../../interfaces/book";
 
-class SortControls extends Component {
-    constructor(props) {
+interface SortControlsProps {
+    sortOrder: SortOrder,
+    bookList: IBook[],
+    pageSize: number,
+    sortBooks(order: SortOrder): void,
+    setPage(pageNum: number): void
+}
+
+interface SortControlState {
+    sortIndex: string[] | null,
+    selectedIndex: string | null
+}
+
+class SortControls extends Component<SortControlsProps, SortControlState> {
+    constructor(props: SortControlsProps) {
         super(props)
 
         //props: sortOrder, bookList, pageSize, sortBooks(), setPage()
@@ -16,17 +30,17 @@ class SortControls extends Component {
 
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: SortControlsProps) {
         if (prevProps.sortOrder !== this.props.sortOrder) {
             this.setState({ sortIndex: this.getSortIndex(this.props.sortOrder) })
         }
     }
 
-    isAlphaSort = (sortOrder) => {
+    isAlphaSort = (sortOrder: SortOrder) => {
         return sortOrder === SortOrder.Artist || sortOrder === SortOrder.Author || sortOrder === SortOrder.Title
     }
 
-    getSortIndex = (sortOrder) => {
+    getSortIndex = (sortOrder: SortOrder) => {
         let sortIndex = null
         if (!sortOrder) return sortIndex
         if (this.isAlphaSort(sortOrder)) {
@@ -35,22 +49,26 @@ class SortControls extends Component {
         return sortIndex
     }
 
-    setPageFromIndex = (indexKey) => {
+    setPageFromIndex = (indexKey: string) => {
         let firstMatch = 0
-        let findFunction = null
+        let hasFindFunction = false
+        let findFunction = (b: IBook) => {}
         switch (this.props.sortOrder) {
             case SortOrder.Author:
-                findFunction = (b) => { return indexKey.toLowerCase() === getBookAuthor(b).substring(0,1).toLowerCase() }
+                findFunction = (b: IBook) => { return indexKey.toLowerCase() === getBookAuthor(b).substring(0,1).toLowerCase() }
+                hasFindFunction = true
                 break;
             case SortOrder.Artist:
-                findFunction = (b) => { return indexKey.toLowerCase() === b.artists[0].substring(0,1).toLowerCase() }
+                findFunction = (b: IBook) => { return indexKey.toLowerCase() === b.artists[0].substring(0,1).toLowerCase() }
+                hasFindFunction = true
                 break;
             case SortOrder.Title:
-                findFunction = (b) => { return indexKey.toLowerCase() === b.title.substring(0,1).toLowerCase() }
+                findFunction = (b: IBook) => { return indexKey.toLowerCase() === b.title.substring(0,1).toLowerCase() }
+                hasFindFunction = true
                 break;
 
         }
-        if (findFunction) {
+        if (hasFindFunction) {
             firstMatch = this.props.bookList.findIndex(b => findFunction(b))
         }
         let pageNum = Math.floor(firstMatch / this.props.pageSize)
@@ -63,9 +81,9 @@ class SortControls extends Component {
             <div className="sort-controls">
                 <div className="sort-select">
                     {
-                        Object.keys(SortOrder).map((key) => {
-                            return <div key={key} className={`sort-order ${this.props.sortOrder === SortOrder[key] ? "selected" : ""}`} 
-                                onClick={() => {this.props.sortBooks(key)}}>{key}</div>
+                        Object.keys(SortOrder).map((key, index) => {
+                            return <div key={key} className={`sort-order ${this.props.sortOrder === Object.values(SortOrder)[index] ? "selected" : ""}`} 
+                                onClick={() => {this.props.sortBooks(Object.values(SortOrder)[index])}}>{key}</div>
                         })
                     }
                 </div>
@@ -75,7 +93,7 @@ class SortControls extends Component {
                         {
                             this.state.sortIndex.map((key) => {
                                 return <div key={key} 
-                                        className={`sort-index-item ${key === this.state.sortIndex[key] ? "selected" : ""}`} 
+                                        className={`sort-index-item ${key === this.state.selectedIndex ? "selected" : ""}`} 
                                         onClick={() => {this.setPageFromIndex(key)}}>
                                             {key}
                                         </div>

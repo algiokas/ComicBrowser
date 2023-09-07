@@ -24,7 +24,7 @@ class Navigation extends Component<NavProps, NavState>  {
     return (
       <nav role="navigation">
         <div className="logo" onClick={this.props.viewListing}>
-          <Logo className="logo-pink"/>
+          {/* <Logo className="logo-pink"/> */}
         </div>
         <div className="nav-items">
           <div className="nav-item" onClick={this.props.viewListing}>

@@ -1,7 +1,20 @@
 import React, { Component } from "react";
+import { EditField } from "../../util/enums";
 
-class EditPanelRow extends Component {
-    constructor(props) {
+interface EditPanelRowProps {
+    editField: EditField,
+    tempValue: any,
+    updateTempValue(field: EditField, value: any): void,
+    valueClick?: (v: string) => void
+}
+
+interface EditPanelRowState {
+    editMode: boolean,
+    fieldValue: any
+}
+
+class EditPanelRow extends Component<EditPanelRowProps, EditPanelRowState> {
+    constructor(props: EditPanelRowProps) {
         super(props);
         this.state = {
             editMode: false,
@@ -9,11 +22,11 @@ class EditPanelRow extends Component {
         }
     }
 
-    handleTextInputChange = (e) => {
+    handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({ fieldValue: e.target.value })
     }
 
-    handleTextInputKey = (e) => {
+    handleTextInputKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             this.confirmInput()
         }
@@ -45,8 +58,7 @@ class EditPanelRow extends Component {
                                 <input type="text"
                                     value={this.state.fieldValue}
                                     onChange={this.handleTextInputChange}
-                                    onKeyDown={this.handleTextInputKey}
-                                    ref={this.inputRef}>
+                                    onKeyDown={this.handleTextInputKey}>
                                 </input>
                             </div>
                             <div className="edit-panel-row-buttons">
@@ -62,7 +74,7 @@ class EditPanelRow extends Component {
                             <span className="edit-panel-row-value">
                                 {
                                     this.props.valueClick ?
-                                    <span className="click-item clickable" onClick={() => this.props.valueClick(this.props.tempValue)}>
+                                    <span className="click-item clickable" onClick={() => this.props.valueClick!(this.props.tempValue)}>
                                         {this.props.tempValue}
                                     </span>
                                     : this.props.tempValue

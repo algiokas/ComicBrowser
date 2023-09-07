@@ -6,7 +6,7 @@ const LoadingView = (props: loadingViewProps) => {
     return (
         <div className="container dark-theme">
             <div className="loading-container">
-                <Logo className="logo-pink loading-logo" />
+                {/* <Logo className="logo-pink loading-logo" /> */}
             </div>           
         </div>
     )

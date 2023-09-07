@@ -9,11 +9,11 @@ interface PageSelectProps{
 interface PageSelectState{}
 
 class PageSelect extends Component<PageSelectProps, PageSelectState> {
-    isFirstPage() {
+    isFirstPage = () => {
         return this.props.currentPage <= 0;
     }
 
-    isLastPage() {
+    isLastPage = () => {
         return this.props.currentPage >= this.props.totalPages-1
     }
 
@@ -41,8 +41,9 @@ class PageSelect extends Component<PageSelectProps, PageSelectState> {
         }
     }
 
-    setPageNumber(e: Event) {
-        let pageNum = (e.target as HTMLInputElement).value
+    setPageNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let pageNum = parseInt(e.target.value)
+        if (Number.isNaN(pageNum)) return
         if (pageNum < 1) {
             this.props.setPage(0)
         } else if (pageNum > this.props.totalPages) {
@@ -53,7 +54,7 @@ class PageSelect extends Component<PageSelectProps, PageSelectState> {
     }
 
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: PageSelectProps) {
         if (this.props.currentPage !== prevProps.currentPage) {
           this.setState({ currentPage: this.props.currentPage })
         }
