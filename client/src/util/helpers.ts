@@ -6,6 +6,11 @@ export function GetCoverPath(book : IBook) : string {
     return imageBaseUrl + book.id + "/0"
 }
 
+
+export function GetPagePathByID(bookId: number, pageNum : number) : string {
+    return imageBaseUrl + bookId + "/" + pageNum;
+}
+
 export function GetPagePath(book : IBook, pageNum : number) : string {
     if (!book) {
         console.log("GetPagePath - book cannot be null")
@@ -16,7 +21,7 @@ export function GetPagePath(book : IBook, pageNum : number) : string {
     if (pageNum < 0 || pageNum >= book.pageCount) {
         console.log("GetPagePath - page number out of range (book id: " + book.id + ")")
     }
-    return imageBaseUrl + book.id + "/" + pageNum;
+    return GetPagePathByID(book.id, pageNum)
 }
 
 export function GetPagePathMulti(books : IBook[], pageNum : number) : string {
@@ -24,7 +29,7 @@ export function GetPagePathMulti(books : IBook[], pageNum : number) : string {
         return GetPagePath(books[0], pageNum)
     }
     let pageNumInternal = pageNum
-    for (let i =0; i < books.length; i++) {
+    for (let i = 0; i < books.length; i++) {
         if (pageNumInternal < books[i].pageCount){
             return GetPagePath(books[i], pageNumInternal)
         }
@@ -34,6 +39,15 @@ export function GetPagePathMulti(books : IBook[], pageNum : number) : string {
     }
     console.log(`GetPagePathMulti - page ${pageNum} not found in books`)
     return ""
+}
+
+export function GetRelativePage(books: IBook[], bookNum: number, pageNum: number) : number {
+    if (bookNum < 1) return pageNum
+    let prevBookPages = 0
+    for (let i = 0; i < bookNum && books.length; i++) {
+        prevBookPages += books[i].pageCount
+    }
+    return prevBookPages + pageNum
 }
 
 export function getBookAuthor(book: IBook) {

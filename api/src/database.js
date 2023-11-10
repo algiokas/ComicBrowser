@@ -17,15 +17,15 @@ function init() {
             pages TEXT,
             addedDate TEXT,
             hiddenPages TEXT,
-            isFavorite INTEGER)`).run()
+            isFavorite INTEGER,
+            originalTitle TEXT)`).run()
         console.log('created table: books')
     } catch (err) {
         if (err.message === 'table books already exists') {
             console.log(err.message)
         } else {
             console.error(err)
-        }
-        
+        }       
     }
     
     try {
@@ -83,7 +83,7 @@ function init() {
 
 init();
 
-const insertBook = db.prepare('INSERT INTO books (title, folderName, artGroup, prefix, language, pageCount, coverIndex, addedDate, pages, hiddenPages, isFavorite) VALUES (?,?,?,?,?,?,?,?,?,?,?)');
+const insertBook = db.prepare('INSERT INTO books (title, folderName, artGroup, prefix, language, pageCount, coverIndex, addedDate, pages, hiddenPages, isFavorite, originalTitle) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)');
 const insertArtist = db.prepare('INSERT INTO artists (name) VALUES (?)')
 const insertBookArtist = db.prepare('INSERT INTO bookArtists (bookId, artistId) VALUES (?, ?)')
 const insertTag = db.prepare('INSERT INTO tags (name) VALUES (?)')
@@ -121,7 +121,8 @@ function insertBookFromJson(bookJson) {
             bookJson.coverIndex,
             bookJson.addedDate.toString(),
             JSON.stringify(bookJson.pages),
-            JSON.stringify([]), 0)
+            JSON.stringify([]), 0,
+            bookJson.folderName)
     } catch (err) {
         console.error("Failed to insert book " + bookJson.title)
         console.log(err)

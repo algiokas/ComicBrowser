@@ -144,3 +144,32 @@
         }
     }
 }
+
+.pagegrid {
+    position: absolute;
+    display: flex;
+    flex-wrap: wrap;
+    overflow: auto;
+    max-height: 95%;
+    max-width: 100%;
+    background-color: $gray-4;
+
+    .show-sidebar & {
+        left: 300px;
+    }
+
+    &-page {
+        width: 20%;
+        &-image {
+            &.selected {
+                border: 3.5px solid $yellow-favorite;
+                border-radius: 1px;
+            }
+
+            width: 90%;
+            display: block;
+            margin-bottom: 5px;
+            border: 3.5px solid $gray-4;
+        }
+    }
+}

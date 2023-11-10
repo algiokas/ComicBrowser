@@ -78,14 +78,14 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
     }
 
     
-    getTotalPages(books: IBook[]): number {
+    getTotalPages = (books: IBook[]): number => {
         if (books) {
             return Math.max(1, Math.ceil(books.length / this.props.pageSize))
         }
         return 1
     }
 
-    getSortedBooks(books: IBook[], sortOrder: SortOrder): IBook[] {
+    getSortedBooks = (books: IBook[], sortOrder: SortOrder): IBook[] => {
         let sortedCopy = [...books]
         switch (sortOrder) {
             case SortOrder.Title:
@@ -135,12 +135,16 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
         return sortedCopy
     }
 
-    getFilteredBooks(books: IBook[], searchQuery: ISearchQuery): IBook[] {
+    getFilteredBooks = (books: IBook[], searchQuery: ISearchQuery): IBook[] => {
         let results = books
         if (searchQuery.artist) {
             results = results.filter(book => {
                 if (book.artists) {
-                    return book.artists.some((a) => a.toLowerCase() === searchQuery.artist!.toLowerCase())
+                    let match = book.artists.filter((a) => a.toLowerCase() === searchQuery.artist!.toLowerCase())
+                    if (match.length > 0) {
+                        return true
+                    }
+                    //return book.artists.some((a) => a.toLowerCase() === searchQuery.artist!.toLowerCase())
                 }
                 return false
             })
@@ -166,7 +170,7 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
         return results
     }
 
-    sortBooks(order: SortOrder)  {
+    sortBooks = (order: SortOrder) => {
         if (this.state.sortOrder !== order || order === SortOrder.Random || order === SortOrder.Favorite){
             this.setState({
                 galleryPage: 0,
@@ -176,20 +180,20 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
         }
     }
 
-    getItemSubtitle(book: IBook): string {
+    getItemSubtitle = (book: IBook): string => {
         if (this.state.sortOrder === SortOrder.Author) {
             return getBookAuthor(book)
         }
         return book.artists.join(',')
     }
 
-    getCurrentGalleryPage(): IBook[] {
+    getCurrentGalleryPage = (): IBook[] => {
         let pageStart = this.state.galleryPage * this.props.pageSize;
         let pageEnd = (this.state.galleryPage+1) * this.props.pageSize;
         return this.state.bookList.slice(pageStart, pageEnd)
     }
 
-    getPageSize(pageNum: number): number {
+    getPageSize = (pageNum: number): number => {
         if (pageNum < this.state.totalPages-1) {
             return this.props.pageSize
         } else {

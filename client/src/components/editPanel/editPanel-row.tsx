@@ -73,7 +73,7 @@ class EditPanelRow extends Component<EditPanelRowProps, EditPanelRowState> {
                         <div className="edit-panel-row-inner">
                             <span className="edit-panel-row-value">
                                 {
-                                    this.props.valueClick ?
+                                    this.props.valueClick && this.props.tempValue.toString() !== '' ?
                                     <span className="click-item clickable" onClick={() => this.props.valueClick!(this.props.tempValue)}>
                                         {this.props.tempValue}
                                     </span>

@@ -490,6 +490,32 @@ nav .logo-pink {
   font-weight: 400;
 }
 
+.pagegrid {
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  overflow: auto;
+  max-height: 95%;
+  max-width: 100%;
+  background-color: #0d0d0d;
+}
+.show-sidebar .pagegrid {
+  left: 300px;
+}
+.pagegrid-page {
+  width: 20%;
+}
+.pagegrid-page-image {
+  width: 90%;
+  display: block;
+  margin-bottom: 5px;
+  border: 3.5px solid #0d0d0d;
+}
+.pagegrid-page-image.selected {
+  border: 3.5px solid #ebcd21;
+  border-radius: 1px;
+}
+
 .book-info {
   display: flex;
   flex-direction: column;

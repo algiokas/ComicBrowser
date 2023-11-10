@@ -55,11 +55,24 @@ class App extends Component<AppProps, AppState> {
     })
   }
 
+  booksFromJson(bookJson: any): IBook[] {
+    let bookList: IBook[] = []
+    if (!bookJson || bookJson.length < 1) console.log("booksFromJson - no books in input")
+    bookJson.forEach((e: any): any => {
+      let newBook = e as IBook
+      if (e.addedDate) {
+        newBook.addedDate = new Date(e.addedDate)
+      }
+      bookList.push(newBook)
+    });
+    return bookList
+  } 
+
   fillBooks = () => {
     fetch(apiBaseUrl + "allbooks")
       .then(res => res.json())
       .then(data => {
-        this.setState({ allBooks: data })
+        this.setState({ allBooks: this.booksFromJson(data) })
       });
   }
 
@@ -138,7 +151,7 @@ class App extends Component<AppProps, AppState> {
     .then(data => {
       if (data) {
         this.setState({ 
-          allBooks: data.books,
+          allBooks: this.booksFromJson(data.books),
           currentBook: null,
           currentSlideshow: {
             pageCount: 0,

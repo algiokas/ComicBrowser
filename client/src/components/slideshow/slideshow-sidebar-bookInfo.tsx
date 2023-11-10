@@ -32,31 +32,31 @@ class BookInfo extends Component<BookInfoProps, BookInfoState> {
         }
     }
 
-    searchGroup(g: string): void {
+    searchGroup = (g: string): void => {
         this.props.viewSearchResults({
             group: g
         })
     }
 
-    searchArtist(a: string): void {
+    searchArtist = (a: string): void => {
         this.props.viewSearchResults({
             artist: a
         })
     }
 
-    searchPrefix(p: string): void {
+    searchPrefix = (p: string): void => {
         this.props.viewSearchResults({
             prefix: p
         })
     }
 
-    searchTag(t: string): void {
+    searchTag = (t: string): void => {
         this.props.viewSearchResults({
             tag: t
         })
     }
 
-    toggleEditModal(): void {
+    toggleEditModal = (): void => {
         this.setState((state) => {
             return ({ showEditModal: !state.showEditModal })
         })

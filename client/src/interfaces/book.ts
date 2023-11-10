@@ -1,6 +1,7 @@
 export default interface IBook{
     id: number,
     title: string,
+    originalTitle: string,
     folderName: string,
     artGroup: string,
     artists: string[],

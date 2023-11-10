@@ -16,9 +16,11 @@ interface SidebarProps {
     intervalLength: number,
     intervalCount: number,
     viewMode: ViewMode,
+    gridView: boolean,
     playing: boolean,
 
     toggleSidebar(): void,
+    toggleGrid(): void,
     previousPage(): void,
     nextPage(): void,
     handleIntervalChange(e: React.ChangeEvent<HTMLInputElement>) : void,
@@ -159,12 +161,12 @@ class Sidebar extends Component<SidebarProps, SidebarState> {
                         this.props.viewMode === ViewMode.Slideshow ?
                             <div className="slideshow-sidebar-stack slideshow-controls">
                                 <button className="media-button play" onClick={this.props.emptySlideshow}>Clear</button>
-                                <button className="media-button reset" onClick={this.props.resetPage}>Save</button>
+                                <button className="media-button" onClick={this.props.toggleGrid}>{`${this.props.gridView ? 'Hide' : 'Show'} Grid`}</button>
                             </div>
                             :
                             <div className="slideshow-sidebar-stack slideshow-controls">
                                 <button className="media-button" onClick={this.hideCurrentPage}>Hide Page</button>
-                                <button className="media-button">TEST</button>
+                                <button className="media-button" onClick={this.props.toggleGrid}>{`${this.props.gridView ? 'Hide' : 'Show'} Grid`}</button>
                             </div>
                     }
                     {

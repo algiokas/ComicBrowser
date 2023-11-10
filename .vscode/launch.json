@@ -8,6 +8,14 @@
         "skipFiles": ["<node_internals>/**"],
         "program": "${workspaceFolder}\\api\\bin\\www",
         "cwd": "${workspaceFolder}\\api"
+      },{
+        "type": "chrome",
+        "request": "launch",
+        "name": "Launch Client",
+        "port": 9001,
+        "url": "http://localhost:3000",
+        "webRoot": "${workspaceFolder}/dist",
+        "sourceMaps": true
       }
     ]
   }

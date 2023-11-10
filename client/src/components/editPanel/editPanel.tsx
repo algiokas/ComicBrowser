@@ -3,6 +3,7 @@ import EditPanelRow from "./editPanel-row";
 import EditPanelRowMulti from "./editPanel-row-multi";
 import { EditField } from "../../util/enums";
 import IBook from "../../interfaces/book";
+import EditPanelRowStatic from "./editPanel-row-static";
 
 interface EditPanelProps {
     book: IBook,
@@ -143,6 +144,8 @@ class EditPanel extends Component<EditPanelProps, EditPanelState> {
                 <h3>Edit Book</h3>
                 <h4>{"ID: " + this.props.book.id}</h4>
                 <div className="edit-panel-inner">
+                    <EditPanelRowStatic label={"Original Title"}
+                        value={this.props.book.originalTitle}/>
                     <EditPanelRow editField={EditField.Title}
                         tempValue={this.state.tempFields.title}
                         updateTempValue={this.updateTempValue}/>

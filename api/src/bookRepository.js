@@ -36,7 +36,7 @@ function folderToJSON(folderName, contents, fileStats) {
     }
     else {
         output.artGroup = artistGroupString.substring(0, artistStart).trim()
-        output.artists = artistGroupString.substring(artistStart + 1, artistGroupString.indexOf(')')).split(',')
+        output.artists = artistGroupString.substring(artistStart + 1, artistGroupString.indexOf(')')).split(',').map(s => s.trim())
     }
 
     let titleStart = artistGroupEnd + 1
@@ -49,7 +49,7 @@ function folderToJSON(folderName, contents, fileStats) {
             if (languages.includes(itemValue)) {
                 output.language = itemValue
             } else {
-                tagsTemp.push(itemValue)
+                tagsTemp.push(itemValue.trim())
             }
         })
         output.tags = tagsTemp

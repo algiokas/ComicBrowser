@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { GetPagePathMulti } from "../../util/helpers"
+import { GetPagePathByID, GetPagePathMulti } from "../../util/helpers"
 import Sidebar from "./slideshow-sidebar";
 import ISlideshow from "../../interfaces/slideshow";
 import { ViewMode } from "../../util/enums";
@@ -10,7 +10,7 @@ interface SlideshowProps {
     slideshow: ISlideshow,
     currentPage: number,
     viewMode: ViewMode,
-    
+
     setCurrentPage(n: number): void,
     addButtonHandler(book: IBook): void,
     removeButtonHandler(index: number): void,
@@ -22,22 +22,42 @@ interface SlideshowProps {
 
 interface SlideshowState {
     showSidebar: boolean,
+    gridView: boolean,
     playing: boolean,
     intervalId: number,
     intervalCounter: number,
     intervalLength: number,
+    gridPages: GridPage[]
+}
+
+interface GridPage {
+    bookId: number,
+    bookPageNum: number,
+    slideNum: number
+    
 }
 
 class Slideshow extends Component<SlideshowProps, SlideshowState> {
     constructor(props: SlideshowProps) {
         super(props)
 
+        let gPages: GridPage[] = []
+        let ssIndex = 0
+        this.props.slideshow.books.forEach((book) => {
+            for (let i = 0; i < book.pageCount; i++) {
+                gPages.push({ bookId: book.id, bookPageNum: i, slideNum: ssIndex })
+                ssIndex++
+            }
+        })
+
         this.state = {
             showSidebar: true,
+            gridView: false,
             playing: false,
             intervalId: 0,
             intervalCounter: 0,
             intervalLength: 5,
+            gridPages: gPages
         }
     }
 
@@ -48,7 +68,7 @@ class Slideshow extends Component<SlideshowProps, SlideshowState> {
             if (ssOld !== ssNew && prevState.playing) {
                 if (prevState.intervalId > 0) {
                     clearInterval(this.state.intervalId);
-                    this.setState({ 
+                    this.setState({
                         intervalId: 0,
                         intervalCounter: 0
                     })
@@ -77,19 +97,19 @@ class Slideshow extends Component<SlideshowProps, SlideshowState> {
 
     previousPage = () => {
         if (this.props.currentPage > 0) {
-            this.setCurrentPage(this.props.currentPage-1)
+            this.setCurrentPage(this.props.currentPage - 1)
         }
     }
 
     nextPage = () => {
         if (this.props.currentPage < this.props.slideshow.pageCount - 1) {
-            this.setCurrentPage(this.props.currentPage+1)
+            this.setCurrentPage(this.props.currentPage + 1)
         }
     }
 
     firstPageOfBook = (book: IBook, bookIndex: number) => {
         let pageIndex = 0;
-        for (let i=0; i<bookIndex; i++) {
+        for (let i = 0; i < bookIndex; i++) {
             pageIndex += this.props.slideshow.books[i].pageCount
         }
         this.setCurrentPage(pageIndex)
@@ -97,6 +117,17 @@ class Slideshow extends Component<SlideshowProps, SlideshowState> {
 
     resetPage = () => {
         this.props.setCurrentPage(0)
+    }
+
+    toggleGrid = () => {
+        this.setState((prevState: SlideshowState) => {
+            return { ...prevState, gridView: !prevState.gridView }
+        })
+    }
+
+    gridClick = (pageNum: number) => {
+        this.setCurrentPage(pageNum)
+        this.toggleGrid()
     }
 
     handleIntervalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,12 +180,13 @@ class Slideshow extends Component<SlideshowProps, SlideshowState> {
         let sidebarProps = {
             toggleSidebar: this.toggleSidebar,
             previousPage: this.previousPage,
-            nextPage: this.nextPage,         
+            nextPage: this.nextPage,
             handleIntervalChange: this.handleIntervalChange,
             playPause: this.playPause,
             setPage: this.setCurrentPage,
             resetPage: this.resetPage,
-            
+            toggleGrid: this.toggleGrid,
+
             galleryItemClickHandler: this.firstPageOfBook,
             addButtonHandler: this.props.addButtonHandler,
             removeButtonHandler: this.props.removeButtonHandler,
@@ -170,21 +202,38 @@ class Slideshow extends Component<SlideshowProps, SlideshowState> {
             intervalLength: this.state.intervalLength,
             intervalCount: this.state.intervalCounter,
             viewMode: this.props.viewMode,
+            gridView: this.state.gridView,
             playing: this.state.playing
         }
 
         return (
             <div className={`slideshow-container ${this.state.showSidebar ? "show-sidebar" : ""}`}>
-                <div className="slideshow">
-                    <img className={ `slideshow-image` }
-                        src={GetPagePathMulti(this.props.slideshow.books, this.props.currentPage)}
-                        alt={" page " + this.props.currentPage + 1}>
-                    </img>
-                    <div className="slideshow-overlay">
-                        <div className="overlay-left" onClick={this.previousPage}></div>
-                        <div className="overlay-right" onClick={this.nextPage}></div>
-                    </div>
-                </div>
+                {
+                    this.state.gridView ?
+                        <div className="pagegrid">
+                            {
+                                this.state.gridPages.map((page: GridPage) => {
+                                    return <div className="pagegrid-page" onClick={() => this.gridClick(page.slideNum)}>
+                                        <img className={`pagegrid-page-image ${page.slideNum == this.props.currentPage ? "selected" : ""}`}
+                                            src={GetPagePathByID(page.bookId, page.bookPageNum)}
+                                            alt={" page " + (page.slideNum + 1)}>
+                                        </img>
+                                    </div>
+                                })}
+                        </div>
+                        :
+                        <div className="slideshow">
+                            <img className={`slideshow-image`}
+                                src={GetPagePathMulti(this.props.slideshow.books, this.props.currentPage)}
+                                alt={" page " + this.props.currentPage + 1}>
+                            </img>
+                            <div className="slideshow-overlay">
+                                <div className="overlay-left" onClick={this.previousPage}></div>
+                                <div className="overlay-right" onClick={this.nextPage}></div>
+                            </div>
+                        </div>
+
+                }
                 <Sidebar {...sidebarProps}></Sidebar>
             </div>
         )
