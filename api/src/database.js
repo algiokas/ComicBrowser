@@ -93,8 +93,10 @@ const getBookByID = db.prepare('SELECT * FROM books WHERE id = ?')
 const getBookByTitle = db.prepare('SELECT * FROM books WHERE title = ?')
 const getArtistById = db.prepare('SELECT name FROM artists WHERE id = ?')
 const getArtistByName = db.prepare('SELECT * FROM artists WHERE name = ?')
+const getArtistsByBookId = db.prepare('SELECT artists.name FROM bookArtists JOIN artists ON bookArtists.artistId = artists.id WHERE bookArtists.bookId = ?');
 const getTagById = db.prepare('SELECT name FROM tags WHERE id = ?')
 const getTagByName = db.prepare('SELECT * FROM tags WHERE name = ?')
+const getTagsByBookId = db.prepare('SELECT tags.name FROM bookTags JOIN tags ON bookTags.tagId = tags.id WHERE bookTags.bookId = ?');
 const selectBookArtistIds = db.prepare('SELECT * FROM bookArtists WHERE bookId = ?')
 const selectBookArtistsByArtist = db.prepare('SELECT * FROM bookArtists WHERE artistId = ?')
 const selectBookTagIds = db.prepare('SELECT * FROM bookTags WHERE bookId = ?')
@@ -322,29 +324,11 @@ exports.deleteBook = function(bookId) {
 }
 
 exports.getBookArtists = function(bookId) {
-    if (!bookId) console.err('invalid book ID')
-    let artistIds = selectBookArtistIds.all(bookId)
-    let artists = []
-    if (artistIds && artistIds.length > 0) {
-        artistIds.forEach((idRow) => {
-            let artist = getArtistById.get(idRow.artistId)
-            artists.push(artist.name)
-        })
-    }
-    return artists
+    return getArtistsByBookId.all(bookId).map(a => a.name)
 }
 
 exports.getBookTags = function(bookId) {
-    if (!bookId) console.err('invalid book ID')
-    let tagIds = selectBookTagIds.all(bookId)
-    let tags = []
-    if (tagIds && tagIds.length > 0) {
-        tagIds.forEach((idRow) => {
-            let tag = getTagById.get(idRow.tagId)
-            tags.push(tag.name)
-        })
-    }
-    return tags
+    return getTagsByBookId.all(bookId).map(t => t.name)
 }
 
 exports.getBooks = function() {
