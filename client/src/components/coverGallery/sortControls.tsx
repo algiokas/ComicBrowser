@@ -40,7 +40,7 @@ class SortControls extends Component<SortControlsProps, SortControlState> {
         return sortOrder === SortOrder.Artist || sortOrder === SortOrder.Author || sortOrder === SortOrder.Title
     }
 
-    getSortIndex = (sortOrder: SortOrder) => {
+    getSortIndex = (sortOrder: SortOrder): string[] | null => {
         let sortIndex = null
         if (!sortOrder) return sortIndex
         if (this.isAlphaSort(sortOrder)) {
@@ -49,27 +49,45 @@ class SortControls extends Component<SortControlsProps, SortControlState> {
         return sortIndex
     }
 
-    setPageFromIndex = (indexKey: string) => {
+    firstGalleryMatchForIndex = (indexKey: string): number => {
         let firstMatch = 0
         let hasFindFunction = false
         let findFunction = (b: IBook) => {}
         switch (this.props.sortOrder) {
             case SortOrder.Author:
-                findFunction = (b: IBook) => { return indexKey.toLowerCase() === getBookAuthor(b).substring(0,1).toLowerCase() }
+                findFunction = (b: IBook) => { 
+                    return indexKey.toLowerCase() === getBookAuthor(b).substring(0,1).toLowerCase() 
+                }
                 hasFindFunction = true
                 break;
             case SortOrder.Artist:
-                findFunction = (b: IBook) => { return indexKey.toLowerCase() === b.artists[0].substring(0,1).toLowerCase() }
+                findFunction = (b: IBook) => { 
+                    if (b.artists.length < 1 || !b.artists[0]) {
+                        return false 
+                    }
+                    return indexKey.toLowerCase() === b.artists[0].substring(0,1).toLowerCase() 
+                }
                 hasFindFunction = true
                 break;
             case SortOrder.Title:
-                findFunction = (b: IBook) => { return indexKey.toLowerCase() === b.title.substring(0,1).toLowerCase() }
+                findFunction = (b: IBook) => { 
+                    return indexKey.toLowerCase() === b.title.substring(0,1).toLowerCase() 
+                }
                 hasFindFunction = true
                 break;
 
         }
         if (hasFindFunction) {
             firstMatch = this.props.bookList.findIndex(b => findFunction(b))
+        }
+        return firstMatch
+    }
+
+    setPageFromIndex = (indexKey: string) => {
+        let firstMatch = this.firstGalleryMatchForIndex(indexKey)
+        if (firstMatch < 0) {
+            console.log('no match found')
+            firstMatch = 0
         }
         let pageNum = Math.floor(firstMatch / this.props.pageSize)
         this.props.setPage(pageNum)
