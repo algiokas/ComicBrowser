@@ -41,6 +41,18 @@ class Slideshow extends Component<SlideshowProps, SlideshowState> {
     constructor(props: SlideshowProps) {
         super(props)
 
+        this.state = {
+            showSidebar: true,
+            gridView: false,
+            playing: false,
+            intervalId: 0,
+            intervalCounter: 0,
+            intervalLength: 5,
+            gridPages: this.getGridPages()
+        }
+    }
+
+    getGridPages = (): GridPage[] => {
         let gPages: GridPage[] = []
         let ssIndex = 0
         this.props.slideshow.books.forEach((book) => {
@@ -49,31 +61,26 @@ class Slideshow extends Component<SlideshowProps, SlideshowState> {
                 ssIndex++
             }
         })
-
-        this.state = {
-            showSidebar: true,
-            gridView: false,
-            playing: false,
-            intervalId: 0,
-            intervalCounter: 0,
-            intervalLength: 5,
-            gridPages: gPages
-        }
+        return gPages
     }
 
     componentDidUpdate(prevProps: SlideshowProps, prevState: SlideshowState) {
         if (this.props.slideshow && prevProps.slideshow) {
-            let ssOld = JSON.stringify(prevProps.slideshow)
-            let ssNew = JSON.stringify(this.props.slideshow)
-            if (ssOld !== ssNew && prevState.playing) {
+            let ssOld = prevProps.slideshow.id !== null ? prevProps.slideshow.id : JSON.stringify(prevProps.slideshow.books.map(b => b.id))
+            let ssNew = this.props.slideshow.id !== null ? this.props.slideshow.id : JSON.stringify(this.props.slideshow.books.map(b => b.id))
+            if (ssOld !== ssNew) {
                 if (prevState.intervalId > 0) {
                     clearInterval(this.state.intervalId);
                     this.setState({
+                        playing: false,
                         intervalId: 0,
-                        intervalCounter: 0
+                        intervalCounter: 0,
                     })
                 }
-                this.setState({ playing: false })
+                this.setState({ 
+                    gridView: false,
+                    gridPages: this.getGridPages()
+                })
             }
         }
 
@@ -214,7 +221,7 @@ class Slideshow extends Component<SlideshowProps, SlideshowState> {
                             {
                                 this.state.gridPages.map((page: GridPage) => {
                                     return <div className="pagegrid-page" onClick={() => this.gridClick(page.slideNum)}>
-                                        <img className={`pagegrid-page-image ${page.slideNum == this.props.currentPage ? "selected" : ""}`}
+                                        <img className={`pagegrid-page-image ${page.slideNum === this.props.currentPage ? "selected" : ""}`}
                                             src={GetPagePathByID(page.bookId, page.bookPageNum)}
                                             alt={" page " + (page.slideNum + 1)}>
                                         </img>
