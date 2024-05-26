@@ -64,6 +64,8 @@ class MultiView extends Component<MultiViewProps, MultiViewState> {
                 )
             case ViewMode.SingleBook:
                 let singleBook = {
+                    id: null,
+                    name: "",
                     pageCount: this.props.currentBook?.pageCount ?? 0,
                     books: [ this.props.currentBook! ],
                 }

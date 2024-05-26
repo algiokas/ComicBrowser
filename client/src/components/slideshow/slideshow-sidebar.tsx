@@ -7,6 +7,8 @@ import ISlideshow from "../../interfaces/slideshow";
 import IBook from "../../interfaces/book";
 import ISearchQuery from "../../interfaces/searchQuery";
 import { GetCoverPath } from "../../util/helpers";
+import Modal from "../shared/modal";
+import SavePanel from "./slideshow-save-panel";
 
 interface SidebarProps {
     showSidebar: boolean,
@@ -23,7 +25,7 @@ interface SidebarProps {
     toggleGrid(): void,
     previousPage(): void,
     nextPage(): void,
-    handleIntervalChange(e: React.ChangeEvent<HTMLInputElement>) : void,
+    handleIntervalChange(e: React.ChangeEvent<HTMLInputElement>): void,
     playPause(): void,
     setPage(n: number): void,
     resetPage(): void,
@@ -40,7 +42,8 @@ interface SidebarProps {
 interface SidebarState {
     sidebarRef: React.RefObject<HTMLDivElement>,
     coversRef: React.RefObject<HTMLDivElement>,
-    listingHeight: number
+    listingHeight: number,
+    showSaveModal: boolean
 }
 
 class Sidebar extends Component<SidebarProps, SidebarState> {
@@ -50,7 +53,8 @@ class Sidebar extends Component<SidebarProps, SidebarState> {
         this.state = {
             sidebarRef: React.createRef<HTMLDivElement>(),
             coversRef: React.createRef<HTMLDivElement>(),
-            listingHeight: 0
+            listingHeight: 0,
+            showSaveModal: false
         };
     }
 
@@ -117,15 +121,11 @@ class Sidebar extends Component<SidebarProps, SidebarState> {
         }
     }
 
-    // componentDidMount() {
-    //     this.updateListingHeight()
-    // }
-
-    // componentDidUpdate(prevProps) {
-    //     if (prevProps.viewMode !== this.props.viewMode) {
-    //         this.updateListingHeight()
-    //     }
-    // }
+    toggleSaveModal = (): void => {
+        this.setState((state) => {
+            return ({ showSaveModal: !state.showSaveModal })
+        })
+    }
 
     resetSlideshow = () => {
         this.props.setPage(0)
@@ -140,7 +140,7 @@ class Sidebar extends Component<SidebarProps, SidebarState> {
                 <div className="slideshow-sidebar" ref={this.state.sidebarRef}>
                     <PageSelect currentPage={this.props.currentPage}
                         totalPages={this.props.pageCount}
-                        setPage={this.props.setPage}/>
+                        setPage={this.props.setPage} />
                     <div className="slideshow-sidebar-stack slideshow-controls">
                         <span className="control-label">Interval</span>
                         <div className="interval-input">
@@ -171,19 +171,32 @@ class Sidebar extends Component<SidebarProps, SidebarState> {
                     }
                     {
                         this.props.viewMode === ViewMode.Slideshow ?
-                            <div className="slideshow-covers" ref={this.state.coversRef}>
-                                {
-                                    this.props.slideshow.books.map((book, index) => {
-                                        return <GalleryItem
-                                            index={index}
-                                            book={book}
-                                            coverUrl={GetCoverPath(book)}
-                                            subtitle=""
-                                            addButtonHandler={this.props.addButtonHandler}
-                                            removeButtonHandler={this.props.removeButtonHandler}
-                                            bodyClickHandler={this.props.galleryItemClickHandler}/>
-                                    })
-                                }
+                            <div className="slideshow-covers-container">
+                                <div className="slideshow-info">
+                                    {
+                                        this.props.slideshow.id !== 0 && this.props.slideshow.id ?
+                                            <button className="saveupdate-button" onClick={() => {this.toggleSaveModal()}}>Update Slideshow</button> :
+                                            <button className="saveupdate-button" onClick={() => {this.toggleSaveModal()}}>Save Slideshow</button>
+                                    }
+                                    <Modal modalId={"saveUpdate-modal"} displayModal={this.state.showSaveModal} toggleModal={this.toggleSaveModal}>
+                                        <SavePanel currentSlideshow={this.props.slideshow} toggleDisplay={this.toggleSaveModal}/>
+                                    </Modal>
+                                    {"Slideshow: " + this.props.slideshow.name + " ID: " + this.props.slideshow.id}
+                                </div>
+                                <div className="slideshow-covers" ref={this.state.coversRef}>
+                                    {
+                                        this.props.slideshow.books.map((book, index) => {
+                                            return <GalleryItem
+                                                index={index}
+                                                book={book}
+                                                coverUrl={GetCoverPath(book)}
+                                                subtitle=""
+                                                addButtonHandler={this.props.addButtonHandler}
+                                                removeButtonHandler={this.props.removeButtonHandler}
+                                                bodyClickHandler={this.props.galleryItemClickHandler} />
+                                        })
+                                    }
+                                </div>
                             </div>
                             :
                             <BookInfo
@@ -192,7 +205,7 @@ class Sidebar extends Component<SidebarProps, SidebarState> {
                                 viewSearchResults={this.props.viewSearchResults}
                                 unhidePage={this.unhidePage}
                                 updateBook={this.props.updateBook}
-                                deleteBook={this.props.deleteBook}/>
+                                deleteBook={this.props.deleteBook} />
 
                     }
 

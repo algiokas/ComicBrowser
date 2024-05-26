@@ -489,6 +489,24 @@ nav .logo-pink {
   font-size: 15px;
   font-weight: 400;
 }
+.slideshow-info {
+  width: 100%;
+}
+.slideshow-info .saveupdate-button {
+  width: 90%;
+  padding: 3px;
+  margin: 2px auto;
+  display: block;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  background-color: #404040;
+  color: #d9d9d9;
+  font-family: "Noto Sans", sans-serif;
+  color: #e619c3;
+  font-size: 14px;
+  font-weight: 450;
+}
 
 .pagegrid {
   position: absolute;
@@ -816,6 +834,26 @@ nav .logo-pink {
 }
 .edit-panel-controls button:enabled {
   border-color: #e619c3;
+}
+
+.savepanel {
+  margin: 0 20px;
+  font-size: 18px;
+}
+.savepanel h3 {
+  font-size: 1.2em;
+  margin-bottom: 0;
+}
+.savepanel h4 {
+  margin-top: 0.2em;
+}
+.savepanel-inner {
+  display: flex;
+  flex-direction: column;
+  width: 700px;
+  height: 500px;
+  overflow: auto;
+  padding: 10px;
 }
 
 @keyframes loadingpulse {

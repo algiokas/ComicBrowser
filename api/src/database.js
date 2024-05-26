@@ -44,7 +44,9 @@ function init() {
     try {
         db.prepare(`CREATE TABLE bookArtists (
         bookId INTEGER,
-        artistId INTEGER)`).run()
+        artistId INTEGER,
+        FOREIGN KEY(bookId) REFERENCES books(id),
+        FOREIGN KEY(artistId) REFERENCES artists(id))`).run()
         console.log('created table: bookArtists')
     } catch (err) {
         if (err.message === 'table bookArtists already exists') {
@@ -70,10 +72,40 @@ function init() {
     try {
         db.prepare(`CREATE TABLE bookTags (
         bookId INTEGER,
-        tagId INTEGER)`).run()
+        tagId INTEGER,
+        FOREIGN KEY(bookId) REFERENCES books(id),
+        FOREIGN KEY(tagId) REFERENCES tags(id))`).run()
         console.log('created table: bookTags')
     } catch (err) {
         if (err.message === 'table bookTags already exists') {
+            console.log(err.message)
+        } else {
+            console.error(err)
+        }
+    }
+
+    try {
+        db.prepare(`CREATE TABLE collections (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE)`).run()
+        console.log('created table: collections')
+    } catch (err) {
+        if (err.message === 'table collections already exists') {
+            console.log(err.message)
+        } else {
+            console.error(err)
+        }
+    }
+
+    try {
+        db.prepare(`CREATE TABLE collectionBooks (
+            collectionId INTEGER,
+            bookId INTEGER,
+            FOREIGN KEY(collectionId) REFERENCES collections(id),
+            FOREIGN KEY(bookId) REFERENCES books(id))`).run()
+        console.log('created table: collectionBooks')
+    } catch (err) {
+        if (err.message === 'table collectionBooks already exists') {
             console.log(err.message)
         } else {
             console.error(err)
@@ -88,7 +120,11 @@ const insertArtist = db.prepare('INSERT INTO artists (name) VALUES (?)')
 const insertBookArtist = db.prepare('INSERT INTO bookArtists (bookId, artistId) VALUES (?, ?)')
 const insertTag = db.prepare('INSERT INTO tags (name) VALUES (?)')
 const insertBookTag = db.prepare('INSERT INTO bookTags (bookId, tagId) VALUES (?, ?)')
+const insertCollection = db.prepare('INSERT INTO collections (name) VALUES (?)')
+const insertCollectionBook = db.prepare('INSERT INTO collectionBooks (collectionId, bookId) VALUES (?, ?)')
 const selectBooks = db.prepare('SELECT * FROM books')
+const selectCollections = db.prepare('SELECT * FROM collections')
+const selectCollectionBooks = db.prepare('SELECT * FROM collectionBooks')
 const getBookByID = db.prepare('SELECT * FROM books WHERE id = ?')
 const getBookByTitle = db.prepare('SELECT * FROM books WHERE title = ?')
 const getArtistById = db.prepare('SELECT name FROM artists WHERE id = ?')
@@ -372,4 +408,12 @@ exports.setFavoriteValue = function(bookId, value) {
         throw new Error("TypeError - Favorite value must be boolean")    
     }
     return updateFavoriteValue.run(value ? 1 : 0, bookId)
+}
+
+exports.getAllCollections = function() {
+
+}
+
+exports.createCollection = function(cName, books) {
+
 }

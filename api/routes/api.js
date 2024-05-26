@@ -6,9 +6,6 @@ const bookRepo = require('../src/bookRepository');
 
 const dataDirectory = path.join(__dirname, '../data');
 const imageDirectory = path.join(__dirname, '../../../Images');
-const booksDirectory = path.join(dataDirectory, "books")
-const slideshowDirectory = path.join(dataDirectory, 'slideshows')
-const slideshowFileBaseName = "ss_"
 
 function getErrorObject(msg, err = null) {
   console.log(msg)
@@ -72,8 +69,24 @@ router.delete('/deletebook/:bookId', function (req, res) {
   res.json(bookRepo.deleteBook(req.params.bookId))
 })
 
-router.post('/saveslideshow', function (req, res, next) {
-});
+router.get('/collections/all', function(req, res) {
+  console.log('get all collections')
+})
+
+router.put('/collections/create', function (req, res) {
+  console.log('new collection: ' + req.body.name)
+
+})
+
+router.post('/collections/update/:collectionId', function (req, res) {
+  console.log('update collection: ' + req.params.collectionId)
+
+})
+
+router.delete('/collections/delete/:collectionId', function (req, res) {
+  console.log('delete collection: ' + req.params.collectionId)
+
+})
 
 module.exports = router;
 

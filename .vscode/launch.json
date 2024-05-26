@@ -2,20 +2,53 @@
     "version": "0.2.0",
     "configurations": [
       {
+        "name": "API",
         "type": "node",
         "request": "launch",
-        "name": "Debug API",
         "skipFiles": ["<node_internals>/**"],
         "program": "${workspaceFolder}\\api\\bin\\www",
-        "cwd": "${workspaceFolder}\\api"
-      },{
+        "cwd": "${workspaceFolder}\\api", 
+        "presentation": {
+          "hidden": true,
+          "group": "",
+          "order": 1
+        }
+      },
+      {
+        "name": "Client",
+        "type": "node",
+        "request": "launch",
+        "cwd": "${workspaceFolder}\\client",
+        "runtimeExecutable": "npm",
+        "runtimeArgs": [
+            "run-script", "start"
+        ], 
+        "presentation": {
+          "hidden": true,
+          "group": "",
+          "order": 1
+        }
+      },
+      {
+        "name": "WebBrowser",
         "type": "chrome",
         "request": "launch",
-        "name": "Launch Client",
-        "port": 9001,
         "url": "http://localhost:3000",
         "webRoot": "${workspaceFolder}/dist",
-        "sourceMaps": true
+        "sourceMaps": true, 
+        "presentation": {
+          "hidden": true,
+          "group": "",
+          "order": 1
+        },
+        "preLaunchTask": "Sleepdelay"
+      }
+    ],
+    "compounds": [
+      {
+        "name": "Start All",
+        "configurations": ["API", "Client", "WebBrowser"],
+        "stopAll": true
       }
     ]
   }

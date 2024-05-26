@@ -129,6 +129,7 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
                 sortedCopy.sort((a, b) => {
                     return b.addedDate.getTime() - a.addedDate.getTime()
                 })
+                break
             default:
                 console.log("getSortedBooks - Invalid Sort Order")
         }
@@ -253,7 +254,6 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
                 </div>
                 <div className="gallery-container-inner">
                     {this.getCurrentGalleryPage().map((book, i) => {
-
                         return <GalleryItem 
                             index={i}
                             book={book}

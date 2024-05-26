@@ -34,6 +34,8 @@ class App extends Component<AppProps, AppState> {
       slideshowPage: 0,
       currentBook: null,
       currentSlideshow: {
+        id: null,
+        name: "",
         pageCount: 0,
         books: [],
       },
@@ -76,13 +78,19 @@ class App extends Component<AppProps, AppState> {
       });
   }
 
+  getEmptySlideshow = (): ISlideshow => {
+    return {
+      id: null,
+      name: "",
+      pageCount: 0,
+      books: []
+    }
+  }
+
   resetSlideshow = () => {
     this.setState({
       viewMode: ViewMode.Listing,
-      currentSlideshow: {
-        pageCount: 0,
-        books: []
-      }
+      currentSlideshow: this.getEmptySlideshow()
     })
   }
 
@@ -130,6 +138,8 @@ class App extends Component<AppProps, AppState> {
           this.setState((state) => {
             return ({
               currentSlideshow: {
+                id: state.currentSlideshow.id,
+                name: state.currentSlideshow.name,
                 pageCount: state.currentSlideshow.pageCount - bookInSlideshow!.pageCount,
                 books: state.currentSlideshow.books.filter((b) => b.id !== bookId)
               }
@@ -153,10 +163,7 @@ class App extends Component<AppProps, AppState> {
         this.setState({ 
           allBooks: this.booksFromJson(data.books),
           currentBook: null,
-          currentSlideshow: {
-            pageCount: 0,
-            books: [],
-          },
+          currentSlideshow: this.getEmptySlideshow(),
           viewMode: ViewMode.Listing
         })
       }
@@ -222,6 +229,8 @@ class App extends Component<AppProps, AppState> {
     this.setState((state) => {
       return {
         currentSlideshow: {
+          id: state.currentSlideshow.id,
+          name: state.currentSlideshow.name,
           pageCount: state.currentSlideshow.pageCount + book.pageCount,
           books: [...state.currentSlideshow.books, book]
         }
