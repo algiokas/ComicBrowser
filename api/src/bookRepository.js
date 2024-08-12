@@ -1,13 +1,9 @@
 const languages = ["Japanese", "English", "Chinese", "Translated"]
-const db = require('../src/database')
+const db = require('../src/bookDatabase')
 const fs = require('fs');
 const path = require('path');
 
-const dataDirectory = path.join(__dirname, '../data');
 const imageDirectory = path.join(__dirname, '../../../Images');
-const booksDirectory = path.join(dataDirectory, "books")
-const slideshowDirectory = path.join(dataDirectory, 'slideshows')
-const slideshowFileBaseName = "ss_"
 
 exports.getFileName = function (id, book) {
     return String(id).padStart(4, '0') + ' - ' + book.title

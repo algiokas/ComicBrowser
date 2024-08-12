@@ -7,12 +7,7 @@
         "request": "launch",
         "skipFiles": ["<node_internals>/**"],
         "program": "${workspaceFolder}\\api\\bin\\www",
-        "cwd": "${workspaceFolder}\\api", 
-        "presentation": {
-          "hidden": true,
-          "group": "",
-          "order": 1
-        }
+        "cwd": "${workspaceFolder}\\api"
       },
       {
         "name": "Client",
@@ -22,12 +17,7 @@
         "runtimeExecutable": "npm",
         "runtimeArgs": [
             "run-script", "start"
-        ], 
-        "presentation": {
-          "hidden": true,
-          "group": "",
-          "order": 1
-        }
+        ]
       },
       {
         "name": "WebBrowser",
