@@ -1,0 +1,29 @@
+@use 'vars' as *;
+
+.actordetail {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 20px;
+    padding: 15px 25px 25px 25px;
+    background-color: $gray-3;
+    border-radius: 0.3em;
+
+    &-header {
+        margin: 0  auto 0 30px;
+    }
+
+    &-inner {
+        display: flex;
+    }
+
+    &-image {
+        margin-right: auto;
+        margin-left: 25px;
+
+        & img {
+            border: 5px solid $gray-2;
+            border-radius: 0.3em;
+            width: 500px;
+        }
+    }
+}

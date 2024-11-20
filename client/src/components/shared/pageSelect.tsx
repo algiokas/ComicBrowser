@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import DoubleStepperImg from "../../img/chevron-double-right.svg";
+import SingleStepperImg from "../../img/chevron-right.svg";
 
 interface PageSelectProps{
     totalPages: number,
@@ -64,10 +66,10 @@ class PageSelect extends Component<PageSelectProps, PageSelectState> {
         return (
             <div className="page-select">
                 <div className="stepper-arrow mirror" onClick={this.firstPage}>
-                    <img className={`svg-icon ${this.isFirstPage() ? 'hidden' : ''}`} src="http://localhost:9000/data/images/chevron-double-right.svg" alt="stepper left"></img>
+                    <img className={`svg-icon ${this.isFirstPage() ? 'hidden' : ''}`} src={DoubleStepperImg.toString()} alt="stepper left"></img>
                 </div>
                 <div className="stepper-arrow mirror" onClick={this.previousPage}>
-                    <img className={`svg-icon ${this.isFirstPage() ? 'hidden' : ''}`} src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper left"></img>
+                    <img className={`svg-icon ${this.isFirstPage() ? 'hidden' : ''}`} src={SingleStepperImg.toString()} alt="stepper left"></img>
                 </div>
                 <div className="page-number">
                     <input
@@ -81,10 +83,10 @@ class PageSelect extends Component<PageSelectProps, PageSelectState> {
                     <div>{this.props.totalPages}</div>
                 </div>
                 <div className="stepper-arrow" onClick={this.nextPage}>
-                    <img className={`svg-icon ${this.isLastPage() ? 'hidden' : ''}`} src="http://localhost:9000/data/images/chevron-right.svg" alt="stepper right"></img>
+                    <img className={`svg-icon ${this.isLastPage() ? 'hidden' : ''}`} src={SingleStepperImg.toString()} alt="stepper right"></img>
                 </div>
                 <div className="stepper-arrow" onClick={this.lastPage}>
-                    <img className={`svg-icon ${this.isLastPage() ? 'hidden' : ''}`} src="http://localhost:9000/data/images/chevron-double-right.svg" alt="stepper right"></img>
+                    <img className={`svg-icon ${this.isLastPage() ? 'hidden' : ''}`} src={DoubleStepperImg.toString()} alt="stepper right"></img>
                 </div>
             </div>
         )

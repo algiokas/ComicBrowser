@@ -1,8 +1,9 @@
 @use 'vars' as *;
 
 nav {
+    display: flex;
     position: relative;
-    min-height: 50px;
+    height: 50px;
     background: $gray-2;
     padding-left: 76px;
 
@@ -12,6 +13,14 @@ nav {
             height: 30px;
             padding: 10px;
             align-items: center;
+
+            &.left {
+                margin-right: auto
+            }
+
+            &.right {
+                margin-left: auto
+            }
         }
     
         &-item {
@@ -31,6 +40,10 @@ nav {
                     background-color: $gray-1;
                     border-radius: 3px;
                 }
+            }
+
+            &.right {
+                margin-left: auto;
             }
         }
     }

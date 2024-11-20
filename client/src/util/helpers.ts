@@ -1,17 +1,24 @@
+import IActor from "../interfaces/actor";
 import IBook from "../interfaces/book"
+import IVideo from "../interfaces/video";
 
-const imageBaseUrl = "http://localhost:9000/api/page/"
-
-export function GetCoverPath(book : IBook) : string {
-    return imageBaseUrl + book.id + "/0"
+export function GetCoverPath(book: IBook): string {
+    return process.env.REACT_APP_BOOKS_API_BASE_URL + "page/" + book.id + "/0"
 }
 
-
-export function GetPagePathByID(bookId: number, pageNum : number) : string {
-    return imageBaseUrl + bookId + "/" + pageNum;
+export function GetPagePathByID(bookId: number, pageNum: number): string {
+    return process.env.REACT_APP_BOOKS_API_BASE_URL + "page/" + bookId + "/" + pageNum;
 }
 
-export function GetPagePath(book : IBook, pageNum : number) : string {
+export function getVideoThumbnailUrl(video: IVideo): string {
+    return process.env.REACT_APP_VIDEOS_API_BASE_URL + "videos/thumbnail/" + video.id
+}
+
+export function getActorImageUrl(actor: IActor): string {
+    return process.env.REACT_APP_VIDEOS_API_BASE_URL + "actors/" + actor.id + "/image"
+}
+
+export function GetPagePath(book: IBook, pageNum: number): string {
     if (!book) {
         console.log("GetPagePath - book cannot be null")
     }
@@ -24,13 +31,13 @@ export function GetPagePath(book : IBook, pageNum : number) : string {
     return GetPagePathByID(book.id, pageNum)
 }
 
-export function GetPagePathMulti(books : IBook[], pageNum : number) : string {
+export function GetPagePathMulti(books: IBook[], pageNum: number): string {
     if (books.length < 2) {
         return GetPagePath(books[0], pageNum)
     }
     let pageNumInternal = pageNum
     for (let i = 0; i < books.length; i++) {
-        if (pageNumInternal < books[i].pageCount){
+        if (pageNumInternal < books[i].pageCount) {
             return GetPagePath(books[i], pageNumInternal)
         }
         else {
@@ -41,7 +48,7 @@ export function GetPagePathMulti(books : IBook[], pageNum : number) : string {
     return ""
 }
 
-export function GetRelativePage(books: IBook[], bookNum: number, pageNum: number) : number {
+export function GetRelativePage(books: IBook[], bookNum: number, pageNum: number): number {
     if (bookNum < 1) return pageNum
     let prevBookPages = 0
     for (let i = 0; i < bookNum && books.length; i++) {
@@ -51,9 +58,9 @@ export function GetRelativePage(books: IBook[], bookNum: number, pageNum: number
 }
 
 export function getBookAuthor(book: IBook) {
-    if (book.artGroup) 
+    if (book.artGroup)
         return book.artGroup
-    if (book.artists && book.artists.length > 0) 
+    if (book.artists && book.artists.length > 0)
         return book.artists[0]
     return ""
 }
@@ -64,7 +71,7 @@ export function getBookAuthor(book: IBook) {
 export function scalarArrayCompare(array1: any[], array2: any[]) {
     if (!array1 && !array2) return true
     if (!array1 || !array2) return false
-    return array1.length === array2.length && array1.every(function(value, index) { return value === array2[index]})
+    return array1.length === array2.length && array1.every(function (value, index) { return value === array2[index] })
 }
 
 export function getAlphabet(lowerCase = false) {

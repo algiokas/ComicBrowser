@@ -160,22 +160,22 @@ h2 {
   margin: auto 0;
 }
 
-.gallery {
+.BooksApp .gallery {
   flex: 0 0 19%;
   position: relative;
   margin: 3px;
   margin-bottom: 2em;
 }
-.gallery-inner {
+.BooksApp .gallery-inner {
   cursor: pointer;
 }
-.gallery-image {
+.BooksApp .gallery-image {
   display: block;
   border-top-left-radius: 0.3em;
   border-top-right-radius: 0.3em;
   width: 294px;
 }
-.gallery-container {
+.BooksApp .gallery-container {
   clear: both;
   margin: 10px auto;
   padding: 10px;
@@ -184,17 +184,17 @@ h2 {
   max-width: 1200px;
   background-color: #1f1f1f;
 }
-.gallery-container-inner {
+.BooksApp .gallery-container-inner {
   display: flex;
   flex-wrap: wrap;
 }
-.gallery-container .sort-select {
+.BooksApp .gallery-container .sort-select {
   display: flex;
   justify-content: center;
   font-size: large;
   padding-bottom: 10px;
 }
-.gallery-container .sort-order {
+.BooksApp .gallery-container .sort-order {
   cursor: pointer;
   background-color: #404040;
   padding: 5px 20px;
@@ -202,10 +202,10 @@ h2 {
   border: 2px solid black;
   border-radius: 3px;
 }
-.gallery-container .sort-order.selected {
+.BooksApp .gallery-container .sort-order.selected {
   border: 2px solid #e6e3aa;
 }
-.gallery-container .sort-index {
+.BooksApp .gallery-container .sort-index {
   display: flex;
   flex-direction: row;
   padding: 0 40px;
@@ -213,7 +213,7 @@ h2 {
   padding-bottom: 10px;
   font-size: large;
 }
-.gallery-container .sort-index-item {
+.BooksApp .gallery-container .sort-index-item {
   cursor: pointer;
   background-color: #404040;
   padding: 3px 10px;
@@ -221,16 +221,16 @@ h2 {
   border: 2px solid black;
   border-radius: 3px;
 }
-.gallery-container .sort-index-item.selected {
+.BooksApp .gallery-container .sort-index-item.selected {
   border: 2px solid #e6e3aa;
 }
-.gallery-container .sort-select {
+.BooksApp .gallery-container .sort-select {
   display: flex;
   justify-content: center;
   font-size: large;
   padding-bottom: 10px;
 }
-.gallery-container .sort-select .sort-order {
+.BooksApp .gallery-container .sort-select .sort-order {
   cursor: pointer;
   background-color: #404040;
   padding: 5px 20px;
@@ -238,9 +238,181 @@ h2 {
   border: 2px solid black;
   border-radius: 3px;
 }
-.gallery-container .sort-select .sort-order.selected {
+.BooksApp .gallery-container .sort-select .sort-order.selected {
   border: 2px solid #e6e3aa;
 }
+
+.VideosApp .videogallery {
+  flex: 0 0 19%;
+  position: relative;
+  margin: auto;
+  margin-bottom: 2em;
+}
+.VideosApp .videogallery-inner {
+  cursor: pointer;
+}
+.VideosApp .videogallery-image {
+  background-color: black;
+  border-top-left-radius: 0.3em;
+  border-top-right-radius: 0.3em;
+  width: 480px;
+  overflow: hidden;
+}
+.VideosApp .videogallery-image img {
+  display: block;
+  max-width: 480px;
+  max-height: 270px;
+  width: auto;
+  height: auto;
+  margin: auto;
+}
+.VideosApp .videogallery-container {
+  clear: both;
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 5px;
+  width: 90%;
+  background-color: #1f1f1f;
+}
+.VideosApp .videogallery-container-inner {
+  display: flex;
+  flex-wrap: wrap;
+}
+.VideosApp .videogallery-container .sort-select {
+  display: flex;
+  justify-content: center;
+  font-size: large;
+  padding-bottom: 10px;
+}
+.VideosApp .videogallery-container .sort-order {
+  cursor: pointer;
+  background-color: #404040;
+  padding: 5px 20px;
+  margin: 3px 15px;
+  border: 2px solid black;
+  border-radius: 3px;
+}
+.VideosApp .videogallery-container .sort-order.selected {
+  border: 2px solid #e6e3aa;
+}
+.VideosApp .videogallery-container .sort-index {
+  display: flex;
+  flex-direction: row;
+  padding: 0 40px;
+  flex-wrap: wrap;
+  padding-bottom: 10px;
+  font-size: large;
+}
+.VideosApp .videogallery-container .sort-index-item {
+  cursor: pointer;
+  background-color: #404040;
+  padding: 3px 10px;
+  margin: auto;
+  border: 2px solid black;
+  border-radius: 3px;
+}
+.VideosApp .videogallery-container .sort-index-item.selected {
+  border: 2px solid #e6e3aa;
+}
+.VideosApp .videogallery-container .sort-select {
+  display: flex;
+  justify-content: center;
+  font-size: large;
+  padding-bottom: 10px;
+}
+.VideosApp .videogallery-container .sort-select .sort-order {
+  cursor: pointer;
+  background-color: #404040;
+  padding: 5px 20px;
+  margin: 3px 15px;
+  border: 2px solid black;
+  border-radius: 3px;
+}
+.VideosApp .videogallery-container .sort-select .sort-order.selected {
+  border: 2px solid #e6e3aa;
+}
+
+.VideosApp .actorgallery {
+  flex: 0 0 19%;
+  position: relative;
+  margin: auto;
+  margin-bottom: 2em;
+}
+.VideosApp .actorgallery-inner {
+  cursor: pointer;
+}
+.VideosApp .actorgallery-image {
+  display: block;
+  border-top-left-radius: 0.3em;
+  border-top-right-radius: 0.3em;
+  width: 480px;
+}
+.VideosApp .actorgallery-container {
+  clear: both;
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 5px;
+  width: 90%;
+  background-color: #1f1f1f;
+}
+.VideosApp .actorgallery-container-inner {
+  display: flex;
+  flex-wrap: wrap;
+}
+.VideosApp .actorgallery-container .sort-select {
+  display: flex;
+  justify-content: center;
+  font-size: large;
+  padding-bottom: 10px;
+}
+.VideosApp .actorgallery-container .sort-order {
+  cursor: pointer;
+  background-color: #404040;
+  padding: 5px 20px;
+  margin: 3px 15px;
+  border: 2px solid black;
+  border-radius: 3px;
+}
+.VideosApp .actorgallery-container .sort-order.selected {
+  border: 2px solid #e6e3aa;
+}
+.VideosApp .actorgallery-container .sort-index {
+  display: flex;
+  flex-direction: row;
+  padding: 0 40px;
+  flex-wrap: wrap;
+  padding-bottom: 10px;
+  font-size: large;
+}
+.VideosApp .actorgallery-container .sort-index-item {
+  cursor: pointer;
+  background-color: #404040;
+  padding: 3px 10px;
+  margin: auto;
+  border: 2px solid black;
+  border-radius: 3px;
+}
+.VideosApp .actorgallery-container .sort-index-item.selected {
+  border: 2px solid #e6e3aa;
+}
+.VideosApp .actorgallery-container .sort-select {
+  display: flex;
+  justify-content: center;
+  font-size: large;
+  padding-bottom: 10px;
+}
+.VideosApp .actorgallery-container .sort-select .sort-order {
+  cursor: pointer;
+  background-color: #404040;
+  padding: 5px 20px;
+  margin: 3px 15px;
+  border: 2px solid black;
+  border-radius: 3px;
+}
+.VideosApp .actorgallery-container .sort-select .sort-order.selected {
+  border: 2px solid #e6e3aa;
+}
+
 .caption {
   line-height: 15px;
   left: 0;
@@ -275,9 +447,20 @@ h2 {
   box-shadow: inset 0 -3px 7px 0 rgba(235, 205, 33, 0.6784313725);
 }
 
+.videogallery .caption .subtitle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.videogallery .caption .subtitle span {
+  flex: 1 0 30%;
+  white-space: pre;
+}
+
 nav {
+  display: flex;
   position: relative;
-  min-height: 50px;
+  height: 50px;
   background: #1f1f1f;
   padding-left: 76px;
 }
@@ -286,6 +469,12 @@ nav .nav-items {
   height: 30px;
   padding: 10px;
   align-items: center;
+}
+nav .nav-items.left {
+  margin-right: auto;
+}
+nav .nav-items.right {
+  margin-left: auto;
 }
 nav .nav-item {
   cursor: pointer;
@@ -302,6 +491,9 @@ nav .nav-item-inner {
 nav .nav-item-inner.selected {
   background-color: #404040;
   border-radius: 3px;
+}
+nav .nav-item.right {
+  margin-left: auto;
 }
 nav .logo {
   float: left;
@@ -875,6 +1067,172 @@ nav .logo-pink {
   animation-name: loadingpulse;
   animation-duration: 1.2s;
   animation-iteration-count: infinite;
+}
+
+.player-container {
+  display: flex;
+}
+.player-inner {
+  clear: both;
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 5px;
+  width: 90%;
+  background-color: #1f1f1f;
+  display: flex;
+  flex-direction: row-reverse;
+}
+.player-video {
+  margin: auto;
+  width: 1920px;
+  height: 1080px;
+}
+.player-video-container {
+  display: flex;
+  padding: 25px;
+}
+.player-video-info {
+  margin: 0 auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  max-width: 310px;
+  max-height: 1130px;
+}
+.player-video-info-title {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+.player-video-info-id {
+  color: rgba(211, 211, 211, 0.616);
+  font-weight: bold;
+}
+.player-video-info .info-item {
+  margin: 5px;
+  padding: 4px 10px;
+  overflow-wrap: break-word;
+  min-width: 0px;
+}
+.player-video-info .clickable {
+  background-color: #404040;
+  color: #e619c3;
+  border-radius: 4px;
+}
+.player-video-info-actors {
+  margin-top: 0.6em;
+  display: flex;
+  flex-wrap: wrap;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.player-video-info-actors > .player-actor {
+  margin: 0.6em auto;
+  cursor: pointer;
+}
+.player-video-info-actors > .player-actor .actorgallery-image {
+  width: 290px;
+}
+.player-video-info-actors > .player-actor span {
+  margin: auto;
+}
+.player-video-info-actors > .player-actor-screenshot {
+  padding: 5px;
+  margin: auto 0;
+}
+.player-video-controls {
+  display: flex;
+  margin-top: auto;
+  padding: 0 10px;
+  flex-direction: column;
+}
+.player-video-controls-row {
+  margin: 10px;
+  display: flex;
+  flex-direction: row;
+}
+.player-video-controls button {
+  width: 100%;
+  padding: 5px 15px;
+  margin: 0 auto;
+  display: block;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  background-color: #404040;
+  color: #d9d9d9;
+  font-family: "Noto Sans", sans-serif;
+  color: #e619c3;
+  font-size: 16px;
+  font-weight: 600;
+}
+.player-favorite-icon {
+  padding: 5px;
+  margin: auto 0;
+}
+.player-actorimagegen-icon {
+  padding: 5px;
+  margin: auto 0;
+}
+
+.actordetail {
+  display: flex;
+  flex-direction: column;
+  margin: 10px 20px;
+  padding: 15px 25px 25px 25px;
+  background-color: #292929;
+  border-radius: 0.3em;
+}
+.actordetail-header {
+  margin: 0 auto 0 30px;
+}
+.actordetail-inner {
+  display: flex;
+}
+.actordetail-image {
+  margin-right: auto;
+  margin-left: 25px;
+}
+.actordetail-image img {
+  border: 5px solid #1f1f1f;
+  border-radius: 0.3em;
+  width: 500px;
+}
+
+.lds-dual-ring {
+  /* change color here */
+  color: #1f1f1f;
+}
+
+.lds-dual-ring,
+.lds-dual-ring:after {
+  box-sizing: border-box;
+}
+
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6.4px solid currentColor;
+  border-color: currentColor transparent currentColor transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /*# sourceMappingURL=stylesheet.css.map */
