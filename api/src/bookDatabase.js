@@ -1,4 +1,4 @@
-const db = require('../src/database').db
+const db = require('../src/database').books_db
 
 const insertBook = db.prepare('INSERT INTO books (title, folderName, artGroup, prefix, language, pageCount, coverIndex, addedDate, pages, hiddenPages, isFavorite, originalTitle) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)');
 const insertArtist = db.prepare('INSERT INTO artists (name) VALUES (?)')

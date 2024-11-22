@@ -3,3 +3,4 @@ node_modules/
 api/data/books/
 newClient/
 db.sqlite
+*/.env

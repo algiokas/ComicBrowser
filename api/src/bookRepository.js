@@ -3,7 +3,7 @@ const db = require('../src/bookDatabase')
 const fs = require('fs');
 const path = require('path');
 
-const imageDirectory = path.join(__dirname, '../../../Images');
+const imageDirectory = "D:\\Videos\\Hentai\\Images" //path.join(__dirname, '../../../Images');
 
 exports.getFileName = function (id, book) {
     return String(id).padStart(4, '0') + ' - ' + book.title

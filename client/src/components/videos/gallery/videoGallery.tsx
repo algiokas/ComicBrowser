@@ -133,7 +133,7 @@ class VideoGallery extends BaseGallery<IVideo, VideoGalleryProps, VideoGallerySt
         }
         if (searchQuery.source) {
             results = results.filter(video => {
-                return video.source.name.localeCompare(searchQuery.source!)
+                return video.source.name.toLowerCase() == searchQuery.source!.toLowerCase()
             })
         }
         if (searchQuery.tag) {

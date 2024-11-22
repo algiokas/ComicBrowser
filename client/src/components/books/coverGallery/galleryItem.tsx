@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { GetCoverPath } from "../../../util/helpers";
 import IBook from "../../../interfaces/book";
 import StarsImage from "../../../img/stars.svg"
+import PlusImg from "../../../img/plus-symbol.svg"
+import MinusImg from "../../../img/minus-symbol.svg"
 
 interface GalleryItemProps {
   index: number,
@@ -66,23 +68,23 @@ class GalleryItem extends Component<GalleryItemProps, GalleryItemState> {
             <div className="favorite-icon" onClick={this.props.favoriteClickHandler ? this.favoriteClick : undefined}>
               {
                 this.props.book.isFavorite ?
-                <img className="svg-icon-favorite" src="http://localhost:9000/data/images/stars.svg" alt="remove from favorites"></img>
+                <img className="svg-icon-favorite" src={StarsImage.toString()} alt="remove from favorites"></img>
                 :
-                <img className="svg-icon-disabled test" src="http://localhost:9000/data/images/stars.svg" alt="add to favorites"></img>
+                <img className="svg-icon-disabled test" src={StarsImage.toString()} alt="add to favorites"></img>
               }
             </div>
           </div>
           {
             this.props.addButtonHandler ? (
               <button className="add-button" onClick={this.addButtonClick}>
-                <img className="svg-icon" src="http://localhost:9000/data/images/plus-symbol.svg" alt="add to slideshow"></img>
+                <img className="svg-icon" src={PlusImg.toString()} alt="add to slideshow"></img>
               </button>
             ) : null
           }
           {
             this.props.removeButtonHandler ? (
               <button className="add-button" onClick={this.removeButtonClick}>
-                <img className="svg-icon" src="http://localhost:9000/data/images/minus-symbol.svg" alt="remove from slideshow"></img>
+                <img className="svg-icon" src={MinusImg.toString()} alt="remove from slideshow"></img>
               </button>
             ) : null
           }

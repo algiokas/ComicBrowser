@@ -74,7 +74,7 @@ class BooksApp extends Component<BooksAppProps, BooksAppState> {
   } 
 
   fillBooks = () => {
-    fetch(apiBaseUrl + "allbooks")
+    fetch(apiBaseUrl + "books")
       .then(res => res.json())
       .then(data => {
         this.setState({ allBooks: this.booksFromJson(data) })
@@ -98,7 +98,7 @@ class BooksApp extends Component<BooksAppProps, BooksAppState> {
   }
 
   updateBook = (book : IBook) => {
-    fetch(apiBaseUrl + 'updatebook/' + book.id, {
+    fetch(apiBaseUrl + 'books/update/' + book.id, {
       method: 'post',
       headers: { 'Content-Type': 'BooksApplication/json' },
       body: JSON.stringify(book)
@@ -122,7 +122,7 @@ class BooksApp extends Component<BooksAppProps, BooksAppState> {
 
   deleteBook = (bookId : number) => {
     console.log('delete book with id: ' + bookId)
-    fetch(apiBaseUrl + 'deletebook/' + bookId, {
+    fetch(apiBaseUrl + 'books/' + bookId, {
       method: 'delete'
     })
     .then(res => res.json())
@@ -156,7 +156,7 @@ class BooksApp extends Component<BooksAppProps, BooksAppState> {
   importBooks = () => {
     console.log("Importing Books")
     this.setState({ viewMode: BooksViewMode.Loading })
-    fetch(apiBaseUrl + 'importbooks', {
+    fetch(apiBaseUrl + 'books/import', {
       method: 'get',
       headers: { 'Content-Type': 'BooksApplication/json' }
     })

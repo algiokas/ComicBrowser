@@ -3,11 +3,11 @@ import IBook from "../interfaces/book"
 import IVideo from "../interfaces/video";
 
 export function GetCoverPath(book: IBook): string {
-    return process.env.REACT_APP_BOOKS_API_BASE_URL + "page/" + book.id + "/0"
+    return process.env.REACT_APP_BOOKS_API_BASE_URL + "books/page/" + book.id + "/0"
 }
 
 export function GetPagePathByID(bookId: number, pageNum: number): string {
-    return process.env.REACT_APP_BOOKS_API_BASE_URL + "page/" + bookId + "/" + pageNum;
+    return process.env.REACT_APP_BOOKS_API_BASE_URL + "books/page/" + bookId + "/" + pageNum;
 }
 
 export function getVideoThumbnailUrl(video: IVideo): string {
