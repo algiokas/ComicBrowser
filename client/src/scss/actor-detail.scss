@@ -8,8 +8,19 @@
     background-color: $gray-3;
     border-radius: 0.3em;
 
+    &.favorite {
+        box-shadow:  inset -22px 22px 28px -24px $yellow-favorite-glow;
+    }
+
     &-header {
-        margin: 0  auto 0 30px;
+        display: flex;
+        flex-direction: row;
+        margin: 0 30px;
+
+        & .favorite-icon {
+            cursor: pointer;
+            margin-left: auto;
+        }
     }
 
     &-inner {
@@ -25,5 +36,10 @@
             border-radius: 0.3em;
             width: 500px;
         }
+    }
+
+    & .svg-icon-disabled {
+        
+        filter: brightness(0);
     }
 }

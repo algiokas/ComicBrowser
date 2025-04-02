@@ -2,20 +2,12 @@
     "version": "0.2.0",
     "configurations": [
       {
-        "name": "Books API",
+        "name": "API",
         "type": "node",
         "request": "launch",
         "skipFiles": ["<node_internals>/**"],
         "program": "${workspaceFolder}\\api\\bin\\www",
         "cwd": "${workspaceFolder}\\api"
-      },
-      {
-        "name": "Videos API",
-        "type": "node",
-        "request": "launch",
-        "skipFiles": ["<node_internals>/**"],
-        "program": "D:\\Videos\\Porn\\api\\bin\\www",
-        "cwd": "D:\\Videos\\Porn\\api"
       },
       {
         "name": "Client",
@@ -44,13 +36,8 @@
     ],
     "compounds": [
       {
-        "name": "Start All - No Videos",
-        "configurations": ["Books API", "Client", "WebBrowser"],
-        "stopAll": true
-      },
-      {
         "name": "Start All",
-        "configurations": ["Books API", "Videos API", "Client", "WebBrowser"],
+        "configurations": ["API", "Client", "WebBrowser"],
         "stopAll": true
       }
     ]

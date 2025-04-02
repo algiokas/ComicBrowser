@@ -26,9 +26,10 @@ router.post('/:actorId/imagefromvideo', function (req, res) {
 })
 
 router.post('/:actorId/update', function (req, res) {
-    videoRepo.generateImageForActor(req.params.actorId, req.body.videoId, req.body.timeMs, (imgResult) => {
-        console.log("Generated image for actor " + req.params.actorId + " from video " + req.body.videoId + " @" + req.body.timeMs + "ms")
-        res.json(imgResult)
+    console.log('update actor id: ' + req.params.actorId)
+    videoRepo.updateActor(req.params.actorId, req.body, (updateResult) => {
+        console.log("Updated actor ID:" + req.params.actorId + " made " + updateResult.changes + " changes")
+        res.json(updateResult)
     })
 })
 

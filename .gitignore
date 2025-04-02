@@ -4,3 +4,6 @@ api/data/books/
 newClient/
 db.sqlite
 */.env
+api/data/backup
+api/data/*.sqlite
+api/data/**/*.sqlite

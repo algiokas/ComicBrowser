@@ -16,6 +16,40 @@ router.get('/import', function (req, res, next) {
     })
 });
 
+router.get('/sources', (req, res) => {
+    res.json(videoRepo.getSources())
+})
+
+router.get('/thumbnail/:videoId', function (req, res) {
+    let fpath = videoRepo.getThumbnailFilePath(req.params.videoId)
+    if (fpath) res.sendFile(fpath, {});
+    else {
+        res.sendStatus(404).end();
+    }
+})
+
+router.post('/thumbnail/:videoId/generate/:timeMs', function (req, res) {
+    videoRepo.generateThumbnailExisting(req.params.videoId, req.params.timeMs, (thumbResult) => {
+        console.log("Generated thumbnail for video " + req.params.videoId + " at " + req.params.timeMs + "ms")
+        res.json(thumbResult)
+    })
+})
+
+router.get('/audit/renamethumbnails', function (req, res) {
+    videoRepo.renameThumbnails()
+    res.sendStatus(200).end()
+})
+
+router.get('/audit/removeduplicates', (req, res) => {
+    videoRepo.removeDuplicates()
+    res.sendStatus(200).end()
+})
+
+router.get('/audit/removenoactorvideos', (req, res) => {
+    let removedVideos = videoRepo.removeNoActorVideos()
+    res.json(removedVideos)
+})
+
 router.delete('/:videoId', function (req, res) {
     console.log('delete video id: ' + req.params.videoId)
     var deleteResponse = videoRepo.deleteVideo(req.params.videoId)
@@ -23,9 +57,10 @@ router.delete('/:videoId', function (req, res) {
 })
 
 router.post('/:videoId/update', function (req, res, next) {
-    console.log('update video id: ' + req.params.videoId)
-    videoRepo.updateVideo(req.params.videoId, req.body, (updateResult) => {
-        console.log("Updated video ID:" + req.params.videoId + " made " + updateResult.changes + " changes")
+    let videoId = parseInt(req.params.videoId)
+    console.log('update video id: ' + videoId)
+    videoRepo.updateVideo(videoId, req.body, (updateResult) => {
+        console.log("Updated video ID:" + videoId + " made " + updateResult.changes + " changes")
         res.json(updateResult)
     })
 })
@@ -65,31 +100,6 @@ router.get('/:videoId', function (req, res) {
     else {
         res.sendStatus(404).end();
     }
-})
-
-router.get('/thumbnail/:videoId', function (req, res) {
-    let fpath = videoRepo.getThumbnailFilePath(req.params.videoId)
-    if (fpath) res.sendFile(fpath, {});
-    else {
-        res.sendStatus(404).end();
-    }
-})
-
-router.post('/thumbnail/:videoId/generate/:timeMs', function (req, res) {
-    videoRepo.generateThumbnailExisting(req.params.videoId, req.params.timeMs, (thumbResult) => {
-        console.log("Generated thumbnail for video " + req.params.videoId + " at " + req.params.timeMs + "ms")
-        res.json(thumbResult)
-    })
-})
-
-router.get('/audit/renamethumbnails', function (req, res) {
-    videoRepo.renameThumbnails()
-    res.sendStatus(200).end()
-})
-
-router.get('/audit/removeduplicates', (req, res) => {
-    videoRepo.removeDuplicates()
-    res.sendStatus(200).end()
 })
 
 module.exports = router

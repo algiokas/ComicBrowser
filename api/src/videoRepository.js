@@ -4,12 +4,9 @@ const path = require('path');
 const ffmpeg = require('fluent-ffmpeg')
 
 const dataDir = process.env.VIDEOS_DATA_DIR
-console.log("Videos Data Dir: " + dataDir)
 const videosDir = path.join(dataDir, '/videos');
 const thumbnailDir = path.join(dataDir, '/images/thumbnails');
 const actorImageDir = path.join(dataDir, '/images/actors')
-
-
 
 function fileToJson(parentDir, fileName, fileStats) {
     let output = {}
@@ -83,8 +80,6 @@ function generateThumbnailFileName(videoId, index) {
 function getNewThumbnailFileName(videoId) {
     var thumbIndex = 0
     var thumbFileName = generateThumbnailFileName(videoId, thumbIndex)
-    var test = path.join(thumbnailDir, thumbFileName + ".png")
-    var test2 = fs.existsSync(path.join(thumbnailDir, thumbFileName + ".png"))
     while (fs.existsSync(path.join(thumbnailDir, thumbFileName + ".png"))) {
         thumbIndex++
         thumbFileName = generateThumbnailFileName(videoId, thumbIndex)
@@ -94,15 +89,7 @@ function getNewThumbnailFileName(videoId) {
 
 exports.getThumbnailFilePath = function (videoId) {
     var thumbFile = db.getVideoThumbnailById(videoId)
-    if (thumbFile.thumbnailId == null) {
-        let defaultThumbnailName = generateThumbnailFileName(videoId, 0)
-        let fullPath = path.join(thumbnailDir, defaultThumbnailName + ".png")
-        if (fs.existsSync(fullPath)) {
-            db.updateThumbnail(videoId, defaultThumbnailName)
-            console.log("updated thumbnail for video " + videoId + " to " + defaultThumbnailName)
-            return fullPath
-        }
-    }
+    if (!thumbFile) return null
     return path.join(thumbnailDir, thumbFile.thumbnailId + ".png")
 }
 
@@ -190,6 +177,31 @@ exports.generateImageForActor = function (actorId, videoId, timeMs, callback) {
     }
 }
 
+exports.updateActor = function (actorId, newActorData, callback) {
+    console.log("updating video with id " + actorId)
+    let updateResult = { success: false, errors: "", changes: []}
+    let currentActorData = db.getActorById(actorId);
+    if (newActorData.name !== currentActorData.name) {
+        let result = db.setActorName(actorId, newActorData.name)
+        if (result.changes > 0) {
+            updateResult.changes.push("name")
+        } else {
+            updateResult.errors = updateResult.errors + "Updating name failed"
+        }
+    }
+    if (newActorData.isFavorite != currentActorData.isFavorite) {
+        let result = db.setFavorite(actorId, newActorData.isFavorite)
+        if (result.changes > 0) {
+            updateResult.changes.push("favorite")
+        } else {
+            updateResult.errors = updateResult.errors + "Updating favorite value failed"
+        }
+    }
+    updateResult.success = !updateResult.errors && updateResult.changes.length > 0
+    updateResult.actor = db.getActorById(actorId)
+    callback(updateResult)
+}
+
 exports.importVideos = function (res, callback) {
     let count = 0;
     fs.readdir(videosDir, function (err, subDirs) {
@@ -221,7 +233,13 @@ exports.importVideos = function (res, callback) {
             if (addResult) {
                 if (addResult.lastInsertRowid) {
                     video.id = addResult.lastInsertRowid
-                    generateThumbnail(video)
+                    let possibleThumbFile = generateThumbnailFileName(video.id, 0)
+                    let thumbFilePath = path.join(thumbnailDir, possibleThumbFile + ".png")
+                    if (!fs.existsSync(thumbFilePath)) {
+                        generateThumbnail(video)
+                    } else {
+                        db.updateThumbnail(video.id, possibleThumbFile)
+                    }
                     dbRows.push(video)
                     count++
                 }
@@ -231,7 +249,7 @@ exports.importVideos = function (res, callback) {
                         generateThumbnail(video)
                     } else {
                         let thumbFilePath = exports.getThumbnailFilePath(video.id)
-                        if (!fs.existsSync(thumbFilePath)) {
+                        if (thumbFilePath && !fs.existsSync(thumbFilePath)) {
                             generateThumbnail(video, { thumbFileName: addResult.existingRow.thumbnailId })
                         }
                     }
@@ -397,6 +415,20 @@ exports.removeDuplicates = function () {
     })
 }
 
+exports.removeNoActorVideos = function() {
+    let rows = db.getVideos()
+    let videos = rows.map(fillVideo)
+
+    let videosWithNoActors = videos.filter(v => v.actors.length < 1)
+
+    let removed = []
+    videosWithNoActors.forEach(v => {
+        db.deleteVideo(v.id)
+        removed.push(v)
+    })
+    return removed  
+}
+
 exports.updateVideo = function(id, newVideoData, callback) {
     console.log("updating video with id " + id)
     let updateResult = { success: false, errors: "", changes: []}
@@ -414,7 +446,7 @@ exports.updateVideo = function(id, newVideoData, callback) {
         let actorsToRemove = currentVideoData.actors.filter(t => !newVideoData.actors.some(a => a.id === t.id))
 
         if (actorsToAdd.length) {
-            let addResult = db.addActors(id, actorsToAdd)
+            let addResult = db.addActors(id, actorsToAdd.map(a => a.name))
             if (addResult.length === actorsToAdd.length) {
                 updateResult.changes.push("added actors")
             } else {
@@ -422,7 +454,7 @@ exports.updateVideo = function(id, newVideoData, callback) {
             }
         } 
         if (actorsToRemove.length) {
-            let removeResult = db.removeActors(id, actorsToRemove)
+            let removeResult = db.removeActors(id, actorsToRemove.map(a => a.name))
             if (removeResult.length === actorsToRemove.length) {
                 updateResult.changes.push("removed actors")
             } else {
@@ -462,6 +494,10 @@ exports.updateVideo = function(id, newVideoData, callback) {
     updateResult.success = !updateResult.errors && updateResult.changes.length > 0
     updateResult.video = fillVideo(db.getVideoById(id))
     callback(updateResult)
+}
+
+exports.getSources = function () {
+    return db.getAllSources()
 }
 
 

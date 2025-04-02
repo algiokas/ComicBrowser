@@ -1,13 +1,19 @@
 import React from "react";
 import { Component } from "react";
-import IVideo from "../../interfaces/video";
-import { IVideoSearchQuery } from "../../interfaces/searchQuery";
-import IActor from "../../interfaces/actor";
-import StarsIcon from "../../img/stars.svg"
-import CameraIcon from "../../img/camera.svg"
+import IVideo from "../../../interfaces/video";
+import { IVideoSearchQuery } from "../../../interfaces/searchQuery";
+import IActor from "../../../interfaces/actor";
+import StarsIcon from "../../../img/stars.svg"
+import CameraIcon from "../../../img/camera.svg"
+import Modal from "../../shared/modal";
+import EditPanel from "../editPanel/editPanel";
+import IVideoSource from "../../../interfaces/videoSource";
 
 interface PlayerProps {
-    video: IVideo | null
+    video: IVideo | null,
+    allActors: IActor[],
+    allSources: IVideoSource[],
+
     updateVideo(video: IVideo): void,
     deleteVideo(videoId: number): void,
     viewSearchResults(query?: IVideoSearchQuery): void,
@@ -19,6 +25,7 @@ interface PlayerProps {
 }
 
 interface PlayerState {
+    showEditModal: boolean
 }
 
 class Player extends Component<PlayerProps, PlayerState> {
@@ -26,6 +33,10 @@ class Player extends Component<PlayerProps, PlayerState> {
 
     constructor(props: PlayerProps) {
         super(props)
+
+        this.state = {
+            showEditModal: false
+        }
 
         this.videoRef = React.createRef<HTMLVideoElement>()
     }
@@ -35,15 +46,16 @@ class Player extends Component<PlayerProps, PlayerState> {
         return process.env.REACT_APP_VIDEOS_API_BASE_URL + "videos/" + this.props.video.id
     }
 
-    searchGroup = (g: string): void => {
-        this.props.viewSearchResults({
-            source: g
-        })
-    }
 
     searchActor = (a: string): void => {
         this.props.viewSearchResults({
             actor: a
+        })
+    }
+
+    searchSource = (g: string): void => {
+        this.props.viewSearchResults({
+            source: g
         })
     }
 
@@ -70,10 +82,10 @@ class Player extends Component<PlayerProps, PlayerState> {
         }
     }
 
-    deleteVideo = (): void => {
-        if (this.props.video) {
-            this.props.deleteVideo(this.props.video.id)
-        }
+    toggleEditModal = (): void => {
+        this.setState((state) => {
+            return ({ showEditModal: !state.showEditModal })
+        })
     }
 
     generateActorImage = (e: React.MouseEvent, actor: IActor): void => {
@@ -86,6 +98,11 @@ class Player extends Component<PlayerProps, PlayerState> {
     }
 
     render() {
+        const searchHandlers = {
+            searchActor: this.searchActor,
+            searchSource: this.searchSource,
+            searchTag: this.searchTag
+        }
         return (
             <div className="player-container">
                 <div className="player-inner">
@@ -152,11 +169,25 @@ class Player extends Component<PlayerProps, PlayerState> {
                                     Set Thumbnail To Current Time
                                 </button>
                             </div>
-                            <div className="player-video-controls-row">
-                                <button type="button" onClick={() => { this.deleteVideo() }}>
-                                    Delete Video
-                                </button>
-                            </div>
+                            {
+                                this.props.video !== null ?
+                                    <div className="player-video-controls-row">
+                                        <button type="button" onClick={() => { this.toggleEditModal() }}>
+                                            Edit Video
+                                        </button>
+                                        <Modal modalId={"bookinfo-edit-modal"} displayModal={this.state.showEditModal} toggleModal={this.toggleEditModal}>
+                                            <EditPanel
+                                                video={this.props.video}
+                                                allActors={this.props.allActors}
+                                                allSources={this.props.allSources}
+                                                updateVideo={this.props.updateVideo}
+                                                deleteVideo={this.props.deleteVideo}
+                                                toggleDisplay={this.toggleEditModal}
+                                                {...searchHandlers} />
+                                        </Modal>
+                                    </div>
+                                     : null
+                            }
                         </div>
                     </div>
                 </div>

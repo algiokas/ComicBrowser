@@ -14,6 +14,7 @@ export interface VideoGalleryProps extends BaseGalleryProps<IVideo> {
     watchVideo(Video: IVideo): void,
     viewSearchResults(query?: IVideoSearchQuery): void,
     updateVideo?: (Video: IVideo) => void,
+    updateActor?: (actor: IActor) => void,
     getActorImageUrl(actor: IActor): string
 }
 
@@ -222,7 +223,8 @@ class VideoGallery extends BaseGallery<IVideo, VideoGalleryProps, VideoGallerySt
                 {
                     actorListingActor ?
                         <ActorDetail actor={actorListingActor}
-                            getActorImageUrl={this.props.getActorImageUrl} />
+                            getActorImageUrl={this.props.getActorImageUrl}
+                            updateActor={this.props.updateActor} />
                         : null
                 }
                 <div className="videogallery-container-header">

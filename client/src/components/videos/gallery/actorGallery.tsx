@@ -9,7 +9,7 @@ import BaseGallery, { BaseGalleryProps, BaseGalleryState } from "./baseGallery"
 
 interface ActorGalleryProps extends BaseGalleryProps<IActor> {
     sortOrder?: ActorsSortOrder,
-
+    updateActor(actor: IActor): void,
     getActorImageUrl(actor: IActor): string,
     viewSearchResults(query?: IVideoSearchQuery): void,
 }
@@ -22,7 +22,7 @@ class ActorGallery extends BaseGallery<IActor, ActorGalleryProps, ActorGallerySt
     constructor(props: ActorGalleryProps) {
         super(props)
 
-        let initialSortOrder = props.sortOrder ?? ActorsSortOrder.NumVideos
+        let initialSortOrder = props.sortOrder ?? ActorsSortOrder.Favorite
 
         let initialState: ActorGalleryState = {
             galleryPage: 0,
@@ -39,9 +39,9 @@ class ActorGallery extends BaseGallery<IActor, ActorGalleryProps, ActorGallerySt
         if (prevProps.allItems !== this.props.allItems) {
             this.setState({
                 galleryPage: 0,
-                items: this.getSortedActors(this.props.allItems, ActorsSortOrder.NumVideos),
+                items: this.getSortedActors(this.props.allItems, ActorsSortOrder.Favorite),
                 totalPages: this.getTotalPages(this.props.allItems),
-                sortOrder: ActorsSortOrder.NumVideos
+                sortOrder: ActorsSortOrder.Favorite
             })
         }
     }
@@ -119,6 +119,12 @@ class ActorGallery extends BaseGallery<IActor, ActorGalleryProps, ActorGallerySt
         this.props.viewSearchResults({ actor: a.name })
     }
 
+    favoriteClick = (a: IActor) => {
+        console.log("toggle favorite for actor: " + a.id)
+        a.isFavorite = !a.isFavorite; //toggle value
+        this.props.updateActor(a)
+    }
+
     render() {
         return (
             <div className="actorgallery-container dark-theme">
@@ -141,6 +147,7 @@ class ActorGallery extends BaseGallery<IActor, ActorGalleryProps, ActorGallerySt
                             data={actor}
                             imageUrl={this.props.getActorImageUrl(actor)}
                             bodyClickHandler={this.bodyClick}
+                            favoriteClickHandler={this.favoriteClick}
                         ></ActorGalleryItem>
                     })
 

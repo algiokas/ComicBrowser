@@ -1,13 +1,13 @@
 import React, { Component } from "react";
-import { EditField } from "../../../util/enums";
+import { BooksEditField } from "../../../util/enums";
 import XImg from "../../../img/x.svg"
 import Check2Img from "../../../img/check2.svg"
 import PencilSquareImg from "../../../img/pencil-square.svg"
 
 interface EditPanelRowProps {
-    editField: EditField,
+    editField: BooksEditField,
     tempValue: any,
-    updateTempValue(field: EditField, value: any): void,
+    updateTempValue(field: BooksEditField, value: any): void,
     valueClick?: (v: string) => void
 }
 

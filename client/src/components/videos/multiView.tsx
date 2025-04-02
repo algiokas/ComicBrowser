@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import LoadingView from "./loadingView";
-import Player from "./player";
+import Player from "./player/player";
 import { ActorsSortOrder, VideosSortOrder, VideosViewMode } from "../../util/enums";
 import { IVideoSearchQuery }from "../../interfaces/searchQuery";
 import { VideosAppState } from "./videosApp";
@@ -18,6 +18,7 @@ interface MultiViewProps extends VideosAppState {
     deleteVideo(VideoId : number) : void,
     importVideos(): void,
     setThumbnailToTime(videoId: number, timeMs: number): void,
+    updateActor(actor: IActor): void,
     getActorImageUrl(actor: IActor): string,
     generateImageForActor(videoId: number, actorId: number, timeMs: number): void
 }
@@ -29,13 +30,15 @@ class MultiView extends Component<MultiViewProps, MultiViewState> {
         const videoGalleryHandlers = {
             watchVideo: this.props.watchVideo,
             updateVideo: this.props.updateVideo,
+            updateActor: this.props.updateActor,
             viewSearchResults: this.props.viewSearchResults,
             getActorImageUrl: this.props.getActorImageUrl
         }
 
         const actorGalleryHandlers = {
             viewSearchResults: this.props.viewSearchResults,
-            getActorImageUrl: this.props.getActorImageUrl
+            getActorImageUrl: this.props.getActorImageUrl,
+            updateActor: this.props.updateActor
         }
 
         const playerHandlers = {
@@ -68,7 +71,7 @@ class MultiView extends Component<MultiViewProps, MultiViewState> {
             case VideosViewMode.Actors:
                 return (
                     <ActorGallery
-                        sortOrder={ActorsSortOrder.NumVideos}
+                        sortOrder={ActorsSortOrder.Favorite}
                         pageSize={this.props.galleryPageSize}
                         allItems={this.props.allActors}
                         {...actorGalleryHandlers}
@@ -76,7 +79,11 @@ class MultiView extends Component<MultiViewProps, MultiViewState> {
                 )
             case VideosViewMode.Player: 
                 return (
-                    <Player video={this.props.currentVideo} {...playerHandlers}></Player>
+                    <Player 
+                        video={this.props.currentVideo} 
+                        allActors={this.props.allActors}
+                        allSources={this.props.allSources}
+                        {...playerHandlers}/>
                 )
             case VideosViewMode.Loading:
                 return (

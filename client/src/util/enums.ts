@@ -48,11 +48,18 @@ export enum ActorsSortOrder {
     NumVideos = "NumVideos"
 }
 
-export enum EditField {
+export enum BooksEditField {
     Title = "Title",
     Group = "Group",
     Artists = "Artists",
     Tags = "Tags",
     Prefix = "Prefix",
     HiddenPages = "HiddenPages"
+}
+
+export enum VideosEditField {
+    Title = "Title",
+    Source = "Source",
+    Actors = "Actors",
+    Tags = "Tags",
 }

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import EditPanelRow from "./editPanel-row";
 import EditPanelRowMulti from "./editPanel-row-multi";
-import { EditField } from "../../../util/enums";
+import { BooksEditField } from "../../../util/enums";
 import IBook from "../../../interfaces/book";
 import EditPanelRowStatic from "./editPanel-row-static";
 
@@ -87,25 +87,25 @@ class EditPanel extends Component<EditPanelProps, EditPanelState> {
         })
     }
 
-    updateTempValue = (field: EditField, value: any) => {
+    updateTempValue = (field: BooksEditField, value: any) => {
         let fieldValues = this.state.tempFields
         switch (field) {
-            case EditField.Title:
+            case BooksEditField.Title:
                 fieldValues.title = value
                 break
-            case EditField.Group:
+            case BooksEditField.Group:
                 fieldValues.group = value
                 break
-            case EditField.Artists:
+            case BooksEditField.Artists:
                 fieldValues.artists = value
                 break
-            case EditField.Tags:
+            case BooksEditField.Tags:
                 fieldValues.tags = value
                 break
-            case EditField.Prefix:
+            case BooksEditField.Prefix:
                 fieldValues.prefix = value
                 break
-            case EditField.HiddenPages:
+            case BooksEditField.HiddenPages:
                 fieldValues.hiddenPages = value
                 break
             default:
@@ -146,27 +146,27 @@ class EditPanel extends Component<EditPanelProps, EditPanelState> {
                 <div className="edit-panel-inner">
                     <EditPanelRowStatic label={"Original Title"}
                         value={this.props.book.originalTitle}/>
-                    <EditPanelRow editField={EditField.Title}
+                    <EditPanelRow editField={BooksEditField.Title}
                         tempValue={this.state.tempFields.title}
                         updateTempValue={this.updateTempValue}/>
-                    <EditPanelRow editField={EditField.Group}
+                    <EditPanelRow editField={BooksEditField.Group}
                         tempValue={this.state.tempFields.group}
                         updateTempValue={this.updateTempValue}
                         valueClick={this.props.searchGroup}/>
-                    <EditPanelRowMulti editField={EditField.Artists}
+                    <EditPanelRowMulti editField={BooksEditField.Artists}
                         tempValue={this.state.tempFields.artists}
                         updateTempValue={this.updateTempValue}
                         valueClick={this.props.searchArtist}/>
-                    <EditPanelRowMulti editField={EditField.Tags}
+                    <EditPanelRowMulti editField={BooksEditField.Tags}
                         tempValue={this.state.tempFields.tags}
                         updateTempValue={this.updateTempValue}
                         valueClick={this.props.searchTag}/>
-                    <EditPanelRow editField={EditField.Prefix}
+                    <EditPanelRow editField={BooksEditField.Prefix}
                         tempValue={this.state.tempFields.prefix}
                         updateTempValue={this.updateTempValue}
                         valueClick={this.props.searchPrefix}
                     ></EditPanelRow>
-                    <EditPanelRowMulti editField={EditField.HiddenPages}
+                    <EditPanelRowMulti editField={BooksEditField.HiddenPages}
                         tempValue={this.state.tempFields.hiddenPages}
                         updateTempValue={this.updateTempValue}
                         hideTextInput={true}/>

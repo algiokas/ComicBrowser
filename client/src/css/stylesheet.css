@@ -1182,8 +1182,17 @@ nav .logo-pink {
   background-color: #292929;
   border-radius: 0.3em;
 }
+.actordetail.favorite {
+  box-shadow: inset -22px 22px 28px -24px rgba(235, 205, 33, 0.6784313725);
+}
 .actordetail-header {
-  margin: 0 auto 0 30px;
+  display: flex;
+  flex-direction: row;
+  margin: 0 30px;
+}
+.actordetail-header .favorite-icon {
+  cursor: pointer;
+  margin-left: auto;
 }
 .actordetail-inner {
   display: flex;
@@ -1197,42 +1206,8 @@ nav .logo-pink {
   border-radius: 0.3em;
   width: 500px;
 }
-
-.lds-dual-ring {
-  /* change color here */
-  color: #1f1f1f;
-}
-
-.lds-dual-ring,
-.lds-dual-ring:after {
-  box-sizing: border-box;
-}
-
-.lds-dual-ring {
-  display: inline-block;
-  width: 80px;
-  height: 80px;
-}
-
-.lds-dual-ring:after {
-  content: " ";
-  display: block;
-  width: 64px;
-  height: 64px;
-  margin: 8px;
-  border-radius: 50%;
-  border: 6.4px solid currentColor;
-  border-color: currentColor transparent currentColor transparent;
-  animation: lds-dual-ring 1.2s linear infinite;
-}
-
-@keyframes lds-dual-ring {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+.actordetail .svg-icon-disabled {
+  filter: brightness(0);
 }
 
 /*# sourceMappingURL=stylesheet.css.map */

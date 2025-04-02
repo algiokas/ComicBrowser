@@ -9,6 +9,7 @@ import IActor from "../../interfaces/actor";
 import { getActorImageUrl, getVideoThumbnailUrl } from "../../util/helpers";
 import INavItem from "../../interfaces/navItem";
 import Modal from "../shared/modal";
+import IVideoSource from "../../interfaces/videoSource";
 
 const apiBaseUrl = process.env.REACT_APP_VIDEOS_API_BASE_URL
 
@@ -20,6 +21,7 @@ export interface VideosAppState {
   galleryPageSize: number,
   allVideos: IVideo[],
   allActors: IActor[],
+  allSources: IVideoSource[],
   viewMode: VideosViewMode,
   currentVideo: IVideo | null,
   currentSearchQuery: IVideoSearchQuery,
@@ -35,6 +37,7 @@ class VideosApp extends Component<VideosAppProps, VideosAppState> {
       galleryPageSize: 16,
       allVideos: [],
       allActors: [],
+      allSources: [],
       viewMode: VideosViewMode.Loading,
       currentVideo: null,
       currentSearchQuery: this.getEmptyQuery(),
@@ -96,6 +99,16 @@ class VideosApp extends Component<VideosAppProps, VideosAppState> {
       });
   }
 
+  fillSources = () => {
+    fetch(apiBaseUrl + "/videos/sources")
+      .then(res => res.json())
+      .then(data => {
+        console.log('fetch sources')
+        let sources = data.map((s: any) => s as IVideoSource)
+        this.setState({ allSources: sources })
+      });
+  }
+
   updateVideo = (video: IVideo) => {
     fetch(apiBaseUrl + 'videos/' + video.id + "/update", {
       method: 'post',
@@ -133,7 +146,10 @@ class VideosApp extends Component<VideosAppProps, VideosAppState> {
             if (this.state.allActors[i] && this.state.allActors[i].id === data.actor.id) {
               this.setState((state) => {
                 let actors = state.allActors
-                actors[i] = data.actor
+                let newActor = data.actor as IActor
+                newActor.isFavorite = data.actor.isFavorite != null && data.actor.isFavorite > 0
+                newActor.videos = this.state.allVideos.filter((v : any) => v.actors.some((a : any) => a.id === newActor.id)).map((v : any) => v.id)
+                actors[i] = newActor
                 return { allActors: actors }
               })
             }
@@ -365,6 +381,7 @@ class VideosApp extends Component<VideosAppProps, VideosAppState> {
       deleteVideo: this.deleteVideo,
       importVideos: this.importVideos,
       setThumbnailToTime: this.setThumbnailToTime,
+      updateActor: this.updateActor,
       getActorImageUrl: this.getActorImageUrlWithFallback,
       generateImageForActor: this.generateImageForActor
     }

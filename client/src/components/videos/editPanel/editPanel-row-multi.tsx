@@ -1,46 +1,53 @@
 import React, { Component } from "react";
 import { scalarArrayCompare } from "../../../util/helpers";
-import { BooksEditField } from "../../../util/enums";
+import { VideosEditField } from "../../../util/enums";
 import XImg from "../../../img/x.svg"
 import PlusImg from "../../../img/plus-symbol.svg"
 import Check2Img from "../../../img/check2.svg"
 import PencilSquareImg from "../../../img/pencil-square.svg"
 
-interface EditPanelRowProps {
-    editField: BooksEditField,
-    tempValue: any[],
+interface EditPanelRowProps<T> {
+    editField: VideosEditField,
+    tempValue: T[],
+    valueRange?: T[],
     hideTextInput?: boolean,
-    updateTempValue(field: BooksEditField, value: any): void,
+    getDisplayString: (x: T | null) => string,
+    getValueFromDisplayString: (str: string) => T | null,
+    updateTempValue(field: VideosEditField, value: any): void,
     valueClick?: (v: string) => void
 }
 
-interface EditPanelRowState {
+interface EditPanelRowState<T> {
     editMode: boolean,
-    fieldValue: string,
-    collection: any[]
+    fieldValue: T | null,
+    collection: T[]
 }
 
-class EditPanelRowMulti extends Component<EditPanelRowProps, EditPanelRowState> {
-    constructor(props: EditPanelRowProps) {
+class EditPanelRowMulti<T> extends Component<EditPanelRowProps<T>, EditPanelRowState<T>> {
+    constructor(props: EditPanelRowProps<T>) {
         super(props);
         this.state = {
             editMode: false,
-            fieldValue: '',
+            fieldValue: null,
             collection: this.props.tempValue ?? []
         }
     }
 
-    componentDidUpdate(prevProps: EditPanelRowProps) {
+    componentDidUpdate(prevProps: EditPanelRowProps<T>) {
         if (!scalarArrayCompare(prevProps.tempValue, this.props.tempValue)) {
             this.setState({
                 collection: this.props.tempValue ?? [],
-                fieldValue: ''
+                fieldValue: null
             })
         }
     }
 
+    handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        this.setState({ fieldValue: this.props.getValueFromDisplayString(e.target.value) })
+    }
+
     handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        this.setState({ fieldValue: e.target.value })
+        this.setState({ fieldValue: this.props.getValueFromDisplayString(e.target.value) })
     }
 
     handleTextInputKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -53,7 +60,7 @@ class EditPanelRowMulti extends Component<EditPanelRowProps, EditPanelRowState> 
         if (this.state.fieldValue) {
             this.setState({
                 collection: [...this.state.collection, this.state.fieldValue],
-                fieldValue: ''
+                fieldValue: null
             })
         }
     }
@@ -66,7 +73,7 @@ class EditPanelRowMulti extends Component<EditPanelRowProps, EditPanelRowState> 
     cancelInput = () => {
         this.setState({
             collection: this.props.tempValue ?? [],
-            fieldValue: ''
+            fieldValue: null
         })
         this.toggleEditMode()
     }
@@ -93,16 +100,32 @@ class EditPanelRowMulti extends Component<EditPanelRowProps, EditPanelRowState> 
                             <div className="edit-panel-row-value">
                                 {
                                     this.props.hideTextInput ? null :
-                                        <div className="edit-panel-row-value-add">
-                                            <input type="text"
-                                                value={this.state.fieldValue}
-                                                onChange={this.handleTextInputChange}
-                                                onKeyDown={this.handleTextInputKey}>
-                                            </input>
-                                            <button type="button" onClick={this.addToCollection}>
-                                                <img className="svg-icon text-icon" src={PlusImg.toString()} alt="remove collection item"></img>
-                                            </button>
-                                        </div>
+
+                                    this.props.valueRange ?
+                                    <div>
+                                        <select className="edit-panel-row-dropdown" onChange={this.handleDropdownChange}>
+                                            {
+                                                this.props.valueRange.map((v, i) => {
+                                                    return (<option key={i} value={this.props.getDisplayString(v)}>{this.props.getDisplayString(v)}</option>)
+                                                })
+                                            }
+                                        </select>
+                                        <button type="button" onClick={this.addToCollection}>
+                                            <img className="svg-icon text-icon" src={PlusImg.toString()} alt="remove collection item"></img>
+                                        </button>
+                                    </div>
+                                    :
+                                    <div className="edit-panel-row-value-add">
+                                    <input type="text"
+                                        value={this.props.getDisplayString(this.state.fieldValue)}
+                                        onChange={this.handleTextInputChange}
+                                        onKeyDown={this.handleTextInputKey}>
+                                    </input>
+                                    <button type="button" onClick={this.addToCollection}>
+                                        <img className="svg-icon text-icon" src={PlusImg.toString()} alt="remove collection item"></img>
+                                    </button>
+                                </div>
+
                                 }
                                 <div className="edit-panel-row-collection">
                                     {
@@ -110,7 +133,7 @@ class EditPanelRowMulti extends Component<EditPanelRowProps, EditPanelRowState> 
                                         this.state.collection.map((item, i) => {
                                             return <div className="edit-panel-row-collection-item" key={i}>
                                                 <span className="item-value">
-                                                    {item}
+                                                    {this.props.getDisplayString(item)}
                                                 </span>
                                                 <span className="remove-button" onClick={() => this.removeFromCollection(i)} >
                                                     <img className="svg-icon text-icon" src={XImg.toString()} alt="remove collection item"></img>
@@ -138,8 +161,8 @@ class EditPanelRowMulti extends Component<EditPanelRowProps, EditPanelRowState> 
                                     <div className="click-items">
                                         {
                                             this.state.collection.map((item, i) => {
-                                                return <span className="click-item clickable" onClick={() => this.props.valueClick!(item)} key={i}>
-                                                    {item}
+                                                return <span className="click-item clickable" onClick={() => this.props.valueClick!(this.props.getDisplayString(item))} key={i}>
+                                                    {this.props.getDisplayString(item)}
                                                 </span>
                                             })
                                         }
@@ -149,8 +172,8 @@ class EditPanelRowMulti extends Component<EditPanelRowProps, EditPanelRowState> 
                                         return <span key={i}>
                                             {
                                                 i + 1 < this.state.collection.length ?
-                                                    item + ", " :
-                                                    item
+                                                    this.props.getDisplayString(item) + ", " :
+                                                    this.props.getDisplayString(item)
                                             }
                                         </span>
                                     })

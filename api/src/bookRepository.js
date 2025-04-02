@@ -3,7 +3,7 @@ const db = require('../src/bookDatabase')
 const fs = require('fs');
 const path = require('path');
 
-const imageDirectory = "D:\\Videos\\Hentai\\Images" //path.join(__dirname, '../../../Images');
+const imageDirectory = process.env.BOOKS_IMAGE_DIR
 
 exports.getFileName = function (id, book) {
     return String(id).padStart(4, '0') + ' - ' + book.title
@@ -74,6 +74,7 @@ function folderToJSON(folderName, contents, fileStats) {
 exports.importBooks = function (res, callback) {
     let count = 0;
     
+    console.log(`Checking for books in Directory: ${imageDirectory}`)
     fs.readdir(imageDirectory, function (err, files) {
         if (err) {
             return console.log('Unable to scan directory: ' + err);

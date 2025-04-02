@@ -22,7 +22,9 @@ const _ACTORS = Object.freeze({
     selectById: db.prepare('SELECT * FROM actors WHERE id = ?'),
     selectByName: db.prepare('SELECT * FROM actors WHERE name = ?'),
     selectByVideoId: db.prepare('SELECT * FROM videoActors JOIN actors ON videoActors.actorId = actors.id WHERE videoActors.videoId = ?'),
-    updateImage: db.prepare('UPDATE actors SET imageFile = ? WHERE id = ?')
+    updateImage: db.prepare('UPDATE actors SET imageFile = ? WHERE id = ?'),
+    updateName: db.prepare('UPDATE actors SET name = ? WHERE id = ?'),
+    updateFavorite: db.prepare('UPDATE actors SET isFavorite = ? WHERE id = ?')
 })
 
 const _VIDEOACTORS = Object.freeze({
@@ -35,6 +37,7 @@ const _VIDEOACTORS = Object.freeze({
 
 const _SOURCES = Object.freeze({
     insert: db.prepare('INSERT INTO sources (name, imageFileSmall, imageFileLarge, siteUrl) VALUES (?,?,?,?)'),
+    selectAll: db.prepare('SELECT * FROM sources'),
     selectById: db.prepare('SELECT * FROM sources WHERE id = ?'),
     selectByName: db.prepare('SELECT * FROM sources WHERE name = ?')
 })
@@ -72,15 +75,15 @@ function insertActorIfMissing(actorName) {
     return _ACTORS.insert.run(actorName)
 }
 
-function insertActorsForVideo(videoId, actors) {
-    if (!actors) {
+function insertActorsForVideo(videoId, actorNames) {
+    if (!actorNames) {
         console.log('Video ID ' + videoId + 'actor list empty')
         return []
     }
 
     let actorIds = []
-    actors.forEach((actor) => {
-        let insertResult = insertActorIfMissing(actor)
+    actorNames.forEach((actorName) => {
+        let insertResult = insertActorIfMissing(actorName)
         if (insertResult) {
             let actorId = insertResult.lastInsertRowid 
                         ?? insertResult.existingRowId
@@ -114,21 +117,21 @@ function removeAllActorsForVideo(videoId) {
     return removedActors
 }
 
-function removeActorsFromVideo(videoId, actors) {
-    if (!actors) {
+function removeActorsFromVideo(videoId, actorNames) {
+    if (!actorNames) {
         console.log('Video ID ' + videoId + 'actor list empty')
         return []
     }
 
     let actorIds = []
-    actors.forEach((actor) => {
-        let actorRow = getActorByName.get(actor)
+    actorNames.forEach((actorName) => {
+        let actorRow = _ACTORS.selectByName.get(actorName)
         if (actorRow) {
             actorIds.push(actorRow.id)
-            deleteVideoActor.run(videoId, actorRow.id)
-            let otherVideoActors = selectVideoActorsByActor.all(actorRow.id)
+            let vaDeleteResult = _VIDEOACTORS.delete.run(actorRow.id, videoId)
+            let otherVideoActors = _VIDEOACTORS.selectByActorId.all(actorRow.id)
             if (otherVideoActors.length < 1) {
-                deleteActor.run(actorRow.id)
+                _ACTORS.delete.run(actorRow.id)
             }
         }
     })
@@ -244,6 +247,10 @@ exports.setVideoFavoriteValue = function(id, value) {
     return _VIDEOS.updateFavorite.run(value ? 1 : 0, id)
 }
 
+exports.getAllSources = function() {
+    return _SOURCES.selectAll.all()
+}
+
 exports.getSourceById = function(id) {
     if (!id) return null
     return _SOURCES.selectById.get(id)
@@ -252,3 +259,15 @@ exports.getSourceById = function(id) {
 exports.setVideoSourceId = function(videoId, sourceId) {
     return _VIDEOS.updateSource.run(sourceId, videoId)
 }
+
+exports.setActorName = function(id, name) {
+    return _ACTORS.updateName.run(name, id)
+}
+
+exports.setFavorite = function(id, value) {
+    if (typeof value !== "boolean") {
+        throw new Error("TypeError - Favorite value must be boolean")    
+    }
+    return _ACTORS.updateFavorite.run(value ? 1 : 0, id)
+}
+
