@@ -28,7 +28,6 @@ class App extends Component<AppProps, AppState> {
     })
   }
   render(): React.ReactNode {
-    console.log('render main app')
     const appProps = {
       toggleAppMode: this.toggleAppMode
     }

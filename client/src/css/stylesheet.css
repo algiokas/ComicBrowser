@@ -158,6 +158,7 @@ h2 {
 .favorite-icon {
   padding: 10px;
   margin: auto 0;
+  cursor: pointer;
 }
 
 .BooksApp .gallery {
@@ -494,6 +495,22 @@ nav .nav-item-inner.selected {
 }
 nav .nav-item.right {
   margin-left: auto;
+}
+nav .nav-search-container {
+  display: flex;
+  flex-direction: row;
+}
+nav .nav-search-container input {
+  color: white;
+  background-color: #404040;
+  border-radius: 3px 0 0 3px;
+  border: 0;
+}
+nav .nav-search-container button {
+  background-color: #404040;
+  border-radius: 0 3px 3px 0;
+  border: 0;
+  border-left: 2px solid #292929;
 }
 nav .logo {
   float: left;
@@ -857,6 +874,7 @@ nav .logo-pink {
   border-radius: 10px;
   font-size: 1.2em;
   font-weight: 600;
+  margin-right: 8px;
 }
 .filter-info-label {
   background-color: #404040;

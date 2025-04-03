@@ -1,13 +1,24 @@
+import path from "path";
 import IActor from "../interfaces/actor";
 import IBook from "../interfaces/book"
 import IVideo from "../interfaces/video";
 
 export function GetCoverPath(book: IBook): string {
-    return process.env.REACT_APP_BOOKS_API_BASE_URL + "books/page/" + book.id + "/0"
+    const basePath = process.env.REACT_APP_BOOKS_API_BASE_URL
+    if (basePath) {
+        return basePath + `/books/${book.id}/page/0`
+    }
+    console.error(`Books base path env var not set`)
+    return ''
 }
 
 export function GetPagePathByID(bookId: number, pageNum: number): string {
-    return process.env.REACT_APP_BOOKS_API_BASE_URL + "books/page/" + bookId + "/" + pageNum;
+    const basePath = process.env.REACT_APP_BOOKS_API_BASE_URL
+    if (basePath) {
+        return basePath + `/books/${bookId}/page/${pageNum}`
+    }
+    console.error(`Books base path env var not set`)
+    return ''
 }
 
 export function getVideoThumbnailUrl(video: IVideo): string {
@@ -77,4 +88,12 @@ export function scalarArrayCompare(array1: any[], array2: any[]) {
 export function getAlphabet(lowerCase = false) {
     let startChar = lowerCase ? 97 : 65
     return [...Array(26).keys()].map((n) => String.fromCharCode(startChar + n))
+}
+
+export function isAlphanumeric(str: string): boolean {
+    return !(/\W/.test(str));
+}
+
+export function filterAlphanumeric(str: string): string {
+    return str.replace(/\W/g, '')
 }

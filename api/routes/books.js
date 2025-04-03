@@ -16,7 +16,7 @@ router.get('/import', function (req, res, next) {
 });
 
 
-router.get('/page/:bookId/:pageNum', function (req, res, next) {
+router.get('/:bookId/page/:pageNum', function (req, res, next) {
     let fpath = bookRepo.getBookPage(req.params.bookId, req.params.pageNum);
     if (fpath) res.sendFile(fpath, { root: process.env.BOOKS_IMAGE_DIR });
     else {
@@ -25,14 +25,16 @@ router.get('/page/:bookId/:pageNum', function (req, res, next) {
 });
 
 
-router.post('/updatebook/:bookId', function (req, res, next) {
-    if (!req.body) console.log("invalid book data")
+router.post('/:bookId/update', function (req, res, next) {
+    if (!req.body) {
+        console.log("invalid book data")
+    } 
     if (req.body.id.toString() === req.params.bookId) {
         res.json(bookRepo.updateBook(req.params.bookId, req.body))
     }
 })
 
-router.delete('/deletebook/:bookId', function (req, res) {
+router.delete('/:bookId', function (req, res) {
     console.log('delete book id: ' + req.params.bookId)
     res.json(bookRepo.deleteBook(req.params.bookId))
 })

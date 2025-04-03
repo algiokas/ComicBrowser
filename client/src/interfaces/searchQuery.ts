@@ -1,9 +1,10 @@
 export interface IBookSearchQuery {
     filled?: boolean,
-    artist?: string,
-    group?: string,
+    artists?: string,
+    groups?: string,
     prefix?: string,
-    tag?: string,
+    tags?: string,
+    text?: string
 }
 
 export interface IVideoSearchQuery {

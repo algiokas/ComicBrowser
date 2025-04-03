@@ -13,5 +13,6 @@ export default interface IBook{
     pages: string[],
     addedDate: Date,
     hiddenPages: number[]
-    isFavorite: boolean
+    isFavorite: boolean,
+    searchTerms: string[]
 }

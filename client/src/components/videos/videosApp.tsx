@@ -368,7 +368,9 @@ class VideosApp extends Component<VideosAppProps, VideosAppState> {
       viewMode: this.state.viewMode,
       leftNavItems: this.getLeftNavItems(),
       rightNavItems: this.getRightNavItems(),
+      showSearch: true,
       logoClick: this.viewListing,
+      viewSearchResults: this.viewSearchResults
     }
 
     const handlers = {

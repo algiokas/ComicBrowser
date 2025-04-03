@@ -34,13 +34,13 @@ class BookInfo extends Component<BookInfoProps, BookInfoState> {
 
     searchGroup = (g: string): void => {
         this.props.viewSearchResults({
-            group: g
+            groups: g
         })
     }
 
     searchArtist = (a: string): void => {
         this.props.viewSearchResults({
-            artist: a
+            artists: a
         })
     }
 
@@ -52,7 +52,7 @@ class BookInfo extends Component<BookInfoProps, BookInfoState> {
 
     searchTag = (t: string): void => {
         this.props.viewSearchResults({
-            tag: t
+            tags: t
         })
     }
 
@@ -60,6 +60,14 @@ class BookInfo extends Component<BookInfoProps, BookInfoState> {
         this.setState((state) => {
             return ({ showEditModal: !state.showEditModal })
         })
+    }
+
+    favoriteClick = (book: IBook) => {
+        console.log("toggle favorite for book: " + book.id)
+        if (this.props.updateBook) {
+            book.isFavorite = !book.isFavorite; //toggle value
+            this.props.updateBook(book)
+        }
     }
 
     render() {
@@ -76,7 +84,8 @@ class BookInfo extends Component<BookInfoProps, BookInfoState> {
                     book={this.props.book}
                     coverUrl={GetCoverPath(this.props.book)}
                     subtitle={""}
-                    addButtonHandler={this.props.addButtonHandler}/>
+                    addButtonHandler={this.props.addButtonHandler}
+                    favoriteClickHandler={this.favoriteClick}/>
                 <div className="edit-container">
                     <button type="button" className="edit-button" onClick={() => { this.toggleEditModal() }}>
                         Edit Book

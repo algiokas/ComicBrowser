@@ -138,10 +138,11 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
 
     getFilteredBooks = (books: IBook[], searchQuery: IBookSearchQuery): IBook[] => {
         let results = books
-        if (searchQuery.artist) {
+        if (searchQuery.artists) {
+            let queryArtists = searchQuery.artists.split(',').map(s => s.toLowerCase())
             results = results.filter(book => {
                 if (book.artists) {
-                    let match = book.artists.filter((a) => a.toLowerCase() === searchQuery.artist!.toLowerCase())
+                    let match = book.artists.filter((a) => queryArtists.includes(a.toLowerCase()))
                     if (match.length > 0) {
                         return true
                     }
@@ -150,9 +151,9 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
                 return false
             })
         }
-        if (searchQuery.group) {
+        if (searchQuery.groups) {
             results = results.filter(book => {
-                return book.artGroup === searchQuery.group
+                return book.artGroup === searchQuery.groups
             })
         }
         if (searchQuery.prefix) {
@@ -160,10 +161,18 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
                 return book.prefix === searchQuery.prefix
             })
         }
-        if (searchQuery.tag) {
+        if (searchQuery.tags) {
             results = results.filter(book => {
                 if (book.tags) {
-                    return book.tags.some((a) => a.toLowerCase() === searchQuery.tag!.toLowerCase())
+                    return book.tags.some((a) => a.toLowerCase() === searchQuery.tags!.toLowerCase())
+                }
+                return false
+            })
+        }
+        if (searchQuery.text) {
+            results = results.filter(book => {
+                if (book.searchTerms) {
+                    return book.searchTerms.some((a) => a.toLowerCase() === searchQuery.text?.toLowerCase())
                 }
                 return false
             })
@@ -185,7 +194,7 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
         if (this.state.sortOrder === BooksSortOrder.Author) {
             return getBookAuthor(book)
         }
-        return book.artists.join(',')
+        return book.artists.join(', ')
     }
 
     getCurrentGalleryPage = (): IBook[] => {
@@ -214,11 +223,14 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
 
     subTitleClick = (book: IBook) => {
         let subtitle = this.getItemSubtitle(book)
+        
         if (subtitle === book.artGroup) {
-            this.props.viewSearchResults({ group: subtitle })
+            console.log(`subtitle search - Group: ${subtitle}`)
+            this.props.viewSearchResults({ groups: subtitle })
         }
         else {
-            this.props.viewSearchResults({ artist: subtitle })
+            console.log(`subtitle search - Artist: ${subtitle}`)
+            this.props.viewSearchResults({ artists: subtitle })
         }      
     }
 
@@ -254,7 +266,8 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
                 </div>
                 <div className="gallery-container-inner">
                     {this.getCurrentGalleryPage().map((book, i) => {
-                        return <GalleryItem 
+                        return <GalleryItem
+                            key={i}
                             index={i}
                             book={book}
                             coverUrl={GetCoverPath(book)}
