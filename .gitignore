@@ -3,7 +3,10 @@ node_modules/
 api/data/books/
 newClient/
 db.sqlite
+.env
 */.env
 api/data/backup
 api/data/*.sqlite
 api/data/**/*.sqlite
+stylesheet.css
+stylesheet.css.map

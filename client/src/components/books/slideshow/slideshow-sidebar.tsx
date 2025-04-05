@@ -37,7 +37,8 @@ interface SidebarProps {
     emptySlideshow(): void,
     updateBook(book: IBook): void,
     deleteBook(bookId: number): void,
-    viewSearchResults(query?: IBookSearchQuery): void
+    viewSearchResults(query?: IBookSearchQuery): void,
+    createCollection(collectionName: string, coverBookId: number): void
 }
 
 interface SidebarState {
@@ -180,7 +181,10 @@ class Sidebar extends Component<SidebarProps, SidebarState> {
                                             <button className="saveupdate-button" onClick={() => {this.toggleSaveModal()}}>Save Slideshow</button>
                                     }
                                     <Modal modalId={"saveUpdate-modal"} displayModal={this.state.showSaveModal} toggleModal={this.toggleSaveModal}>
-                                        <SavePanel currentSlideshow={this.props.slideshow} toggleDisplay={this.toggleSaveModal}/>
+                                        <SavePanel 
+                                        currentSlideshow={this.props.slideshow} 
+                                        toggleDisplay={this.toggleSaveModal}
+                                        createCollection={this.props.createCollection}/>
                                     </Modal>
                                     {"Slideshow: " + this.props.slideshow.name + " ID: " + this.props.slideshow.id}
                                 </div>
@@ -188,6 +192,7 @@ class Sidebar extends Component<SidebarProps, SidebarState> {
                                     {
                                         this.props.slideshow.books.map((book, index) => {
                                             return <GalleryItem
+                                                key={index}
                                                 index={index}
                                                 book={book}
                                                 coverUrl={GetCoverPath(book)}

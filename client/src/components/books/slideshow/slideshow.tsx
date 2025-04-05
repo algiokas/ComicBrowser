@@ -17,7 +17,8 @@ interface SlideshowProps {
     emptySlideshow(): void,
     updateBook(book: IBook): void,
     deleteBook(bookId: number): void,
-    viewSearchResults(query?: IBookSearchQuery): void
+    viewSearchResults(query?: IBookSearchQuery): void,
+    createCollection(collectionName: string, coverBookId: number): void
 }
 
 interface SlideshowState {
@@ -201,6 +202,7 @@ class Slideshow extends Component<SlideshowProps, SlideshowState> {
             updateBook: this.props.updateBook,
             deleteBook: this.props.deleteBook,
             viewSearchResults: this.props.viewSearchResults,
+            createCollection: this.props.createCollection,
 
             slideshow: this.props.slideshow,
             showSidebar: this.state.showSidebar,

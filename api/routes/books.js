@@ -41,11 +41,12 @@ router.delete('/:bookId', function (req, res) {
 
 router.get('/collections/all', function (req, res) {
     console.log('get all collections')
+    res.json(bookRepo.getCollections())
 })
 
-router.put('/collections/create', function (req, res) {
+router.post('/collections/create', function (req, res) {
     console.log('new collection: ' + req.body.name)
-
+    res.json(bookRepo.createCollection(req.body))
 })
 
 router.post('/collections/update/:collectionId', function (req, res) {

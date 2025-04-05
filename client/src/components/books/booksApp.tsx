@@ -3,7 +3,7 @@ import Navigation from "../shared/navigation";
 import MultiView from "./multiView";
 import { BooksViewMode } from "../../util/enums";
 import IBook from "../../interfaces/book";
-import ISlideshow from "../../interfaces/slideshow";
+import ISlideshow, { ICollection } from "../../interfaces/slideshow";
 import { IBookSearchQuery } from "../../interfaces/searchQuery";
 import { SubAppProps } from "../../App";
 import INavItem from "../../interfaces/navItem";
@@ -17,6 +17,7 @@ interface BooksAppProps extends SubAppProps  {
 export interface BooksAppState {
   galleryPageSize: number,
   allBooks: IBook[],
+  allCollections: ICollection[],
   viewMode: BooksViewMode,
   singleBookPage: number,
   slideshowPage: number,
@@ -33,23 +34,13 @@ class BooksApp extends Component<BooksAppProps, BooksAppState> {
     this.state = {
       galleryPageSize: 12,
       allBooks: [],
+      allCollections: [],
       viewMode: BooksViewMode.Loading,
       singleBookPage: 0,
       slideshowPage: 0,
       currentBook: null,
-      currentSlideshow: {
-        id: null,
-        name: "",
-        pageCount: 0,
-        books: [],
-      },
-      currentSearchQuery: {
-        filled: false,
-        artists: '',
-        groups: '',
-        prefix: '',
-        tags: '',
-      },
+      currentSlideshow: this.getEmptySlideshow(),
+      currentSearchQuery: this.getEmptyQuery(),
       slideshowInterval: 5,
     }
   }
@@ -61,6 +52,146 @@ class BooksApp extends Component<BooksAppProps, BooksAppState> {
     })
   }
 
+  //#region API
+  fillBooks = () => {
+    fetch(`${apiBaseUrl}/books`)
+      .then(res => res.json())
+      .then(data => {
+        this.setState({ allBooks: this.booksFromJson(data) })
+      })
+      .then(() => this.getCollections())
+  }
+
+  collectionFromJson = (c: any): ICollection => {
+    const newCollection: ICollection = {
+      id: c.id,
+      name: c.name,
+      coverImage: c.coverImage,
+      coverBookId: c.coverBook,
+      coverPageId: c.coverPage,
+      books: [],
+      pageCount: 0
+    }
+    c.books.forEach((b: any) => {
+      const matchingBook = this.state.allBooks.find(book => book.id === b.bookId)
+      if (matchingBook) {
+        newCollection.books.push(matchingBook)
+        newCollection.pageCount += matchingBook.pageCount
+      } else {
+        console.error(`Slideshow book with ID: ${b.bookId} not found`)
+      }
+    })
+    return newCollection
+  }
+
+  getCollections = () => {
+    fetch(`${apiBaseUrl}/books/collections/all`, { method: 'get' })
+    .then(res => res.json())
+    .then(data => {
+      this.setState({ allCollections: data.map(this.collectionFromJson) })
+    })
+  }
+
+  createCollection = (collectionName: string, coverBookId: number) => {
+    const createCollectionRequest = {
+      name: collectionName,
+      books: this.state.currentSlideshow.books,
+      coverBookId: coverBookId
+    }
+    fetch(`${apiBaseUrl}/books/collections/create`, {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(createCollectionRequest)
+    })
+    .then(res => res.json())
+    .then(data => {
+      const newCollection = this.collectionFromJson(data)
+      this.setState({ 
+        allCollections: [...this.state.allCollections, newCollection],
+        viewMode: BooksViewMode.Collections,
+        currentSlideshow: this.getEmptySlideshow()
+      })
+    })
+  }
+
+  updateBook = (book : IBook) => {
+    fetch(`${apiBaseUrl}/books/${book.id}/update`, {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(book)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        console.log("Book " + book.id + " Updated")
+        for (let i = 0; i < this.state.allBooks.length;  i++) {
+          if (this.state.allBooks[i] && this.state.allBooks[i].id === data.book.id) {
+            this.setState((state) => {
+              let books = state.allBooks
+              books[i] = this.bookFromJson(data.book) 
+              return { allBooks: books}
+            })
+          } 
+        }
+      }
+    });
+  }
+
+  deleteBook = (bookId : number) => {
+    console.log('delete book with id: ' + bookId)
+    fetch(`${apiBaseUrl}/books/${bookId}`, {
+      method: 'delete'
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.changes > 0) {
+        console.log('removed book ID: ' + bookId)
+        this.setState((state : BooksAppState) : object | null => {
+          return ({
+            allBooks: state.allBooks.filter((b) => b.id !== bookId),
+            currentBook: {},
+            viewMode: BooksViewMode.Listing
+          })
+        })
+        let bookInSlideshow = this.state.currentSlideshow.books.find((b) => b.id === bookId)
+        if (bookInSlideshow !== undefined) {
+          this.setState((state) => {
+            return ({
+              currentSlideshow: {
+                id: state.currentSlideshow.id,
+                name: state.currentSlideshow.name,
+                pageCount: state.currentSlideshow.pageCount - bookInSlideshow!.pageCount,
+                books: state.currentSlideshow.books.filter((b) => b.id !== bookId)
+              }
+            })
+          })
+        }
+      }
+    });
+  }
+
+  importBooks = () => {
+    console.log("Importing Books")
+    this.setState({ viewMode: BooksViewMode.Loading })
+    fetch(`${apiBaseUrl}/books/import`, {
+      method: 'get',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data) {
+        this.setState({ 
+          allBooks: this.booksFromJson(data.books),
+          currentBook: null,
+          currentSlideshow: this.getEmptySlideshow(),
+          viewMode: BooksViewMode.Listing
+        })
+      }
+    });
+  }
+  //#endregion
+
+  //#region initialization
   generateBookSearchTerms = (book: IBook): string[] => {
     const terms = new Set<string>();
 
@@ -141,14 +272,6 @@ class BooksApp extends Component<BooksAppProps, BooksAppState> {
     return bookList
   }
 
-  fillBooks = () => {
-    fetch(`${apiBaseUrl}/books`)
-      .then(res => res.json())
-      .then(data => {
-        this.setState({ allBooks: this.booksFromJson(data) })
-      });
-  }
-
   getEmptySlideshow = (): ISlideshow => {
     return {
       id: null,
@@ -158,91 +281,18 @@ class BooksApp extends Component<BooksAppProps, BooksAppState> {
     }
   }
 
-  resetSlideshow = () => {
-    this.setState({
-      viewMode: BooksViewMode.Listing,
-      currentSlideshow: this.getEmptySlideshow()
-    })
+  getEmptyQuery() : IBookSearchQuery {
+    return {
+      filled: false,
+      artists: '',
+      groups: '',
+      prefix: '',
+      tags: '',
+    }
   }
+  //#endregion
 
-  updateBook = (book : IBook) => {
-    console.log(`API Base URL: ${apiBaseUrl}`)
-    console.log(`${apiBaseUrl}/books/${book.id}/update`)
-    fetch(`${apiBaseUrl}/books/${book.id}/update`, {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(book)
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        console.log("Book " + book.id + " Updated")
-        for (let i = 0; i < this.state.allBooks.length;  i++) {
-          if (this.state.allBooks[i] && this.state.allBooks[i].id === data.book.id) {
-            this.setState((state) => {
-              let books = state.allBooks
-              books[i] = this.bookFromJson(data.book) 
-              return { allBooks: books}
-            })
-          } 
-        }
-      }
-    });
-  }
-
-  deleteBook = (bookId : number) => {
-    console.log('delete book with id: ' + bookId)
-    fetch(`${apiBaseUrl}/books/${bookId}`, {
-      method: 'delete'
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.changes > 0) {
-        console.log('removed book ID: ' + bookId)
-        this.setState((state : BooksAppState) : object | null => {
-          return ({
-            allBooks: state.allBooks.filter((b) => b.id !== bookId),
-            currentBook: {},
-            viewMode: BooksViewMode.Listing
-          })
-        })
-        let bookInSlideshow = this.state.currentSlideshow.books.find((b) => b.id === bookId)
-        if (bookInSlideshow !== undefined) {
-          this.setState((state) => {
-            return ({
-              currentSlideshow: {
-                id: state.currentSlideshow.id,
-                name: state.currentSlideshow.name,
-                pageCount: state.currentSlideshow.pageCount - bookInSlideshow!.pageCount,
-                books: state.currentSlideshow.books.filter((b) => b.id !== bookId)
-              }
-            })
-          })
-        }
-      }
-    });
-  }
-
-  importBooks = () => {
-    console.log("Importing Books")
-    this.setState({ viewMode: BooksViewMode.Loading })
-    fetch(`${apiBaseUrl}/books/import`, {
-      method: 'get',
-      headers: { 'Content-Type': 'application/json' }
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data) {
-        this.setState({ 
-          allBooks: this.booksFromJson(data.books),
-          currentBook: null,
-          currentSlideshow: this.getEmptySlideshow(),
-          viewMode: BooksViewMode.Listing
-        })
-      }
-    });
-  }
-
+  //#region navigation
   viewBook = (book : IBook) => {
     this.setState({
       viewMode: BooksViewMode.SingleBook,
@@ -261,16 +311,6 @@ class BooksApp extends Component<BooksAppProps, BooksAppState> {
 
   displayCurrentBookCheck = () => {
     return this.state.currentBook ? true : false
-  }
-
-  getEmptyQuery() : IBookSearchQuery {
-    return {
-      filled: false,
-      artists: '',
-      groups: '',
-      prefix: '',
-      tags: '',
-    }
   }
   
   viewSearchResults = (query?: IBookSearchQuery) => {
@@ -310,60 +350,17 @@ class BooksApp extends Component<BooksAppProps, BooksAppState> {
     })
   }
 
-  addBookToSlideshow = (book : IBook) => {
-    this.setState((state) => {
-      return {
-        currentSlideshow: {
-          id: state.currentSlideshow.id,
-          name: state.currentSlideshow.name,
-          pageCount: state.currentSlideshow.pageCount + book.pageCount,
-          books: [...state.currentSlideshow.books, book]
-        }
-      }
+  viewCollections = () => {
+    this.setState({
+      viewMode: BooksViewMode.Collections
     })
   }
 
-  removeBookFromSlideshow = (index : number) => {
-    this.setState((state : BooksAppState) : object => {
-      let matchingBook = state.currentSlideshow.books[index]
-      let remainingBooks = state.currentSlideshow.books.filter((_, i) => i !== index)
-      if (matchingBook) {
-        if (remainingBooks.length > 0) {
-          return {
-            currentSlideshow: {
-              pageCount: state.currentSlideshow.pageCount - matchingBook.pageCount,
-              books: remainingBooks
-            }
-          }
-        }
-        return {
-          viewMode: BooksViewMode.Listing,
-          currentSlideshow: {
-            pageCount: state.currentSlideshow.pageCount - matchingBook.pageCount,
-            books: remainingBooks
-          }
-        }
-      }
-      console.log('Remove failed - book not found at index ' + index)
-      return {}
+  viewCollection = (col: ICollection) => {
+    this.setState({
+      viewMode: BooksViewMode.Slideshow,
+      currentSlideshow: col
     })
-  }
-
-  setSlideshowInterval = (interval : number) => {
-    this.setState({ slideshowInterval: interval })
-  }
-
-  setSlideshowPage = (n : number) => {
-    if (this.state.viewMode === BooksViewMode.SingleBook) {   
-      this.setState({
-        singleBookPage: n
-      })
-    }
-    else if (this.state.viewMode === BooksViewMode.Slideshow) {
-      this.setState({
-        slideshowPage: n
-      })
-    }
   }
 
   getLeftNavItems(): INavItem[] {
@@ -372,6 +369,11 @@ class BooksApp extends Component<BooksAppProps, BooksAppState> {
         text: "Listing",
         viewMode: BooksViewMode.Listing,
         clickHandler: this.viewListing
+      },
+      {
+        text: "Collections",
+        viewMode: BooksViewMode.Collections,
+        clickHandler: this.viewCollections
       },
       {
         text: "Current book",
@@ -407,6 +409,70 @@ class BooksApp extends Component<BooksAppProps, BooksAppState> {
       }]
   }
 
+  //#endregion
+
+  //#region slideshow
+  addBookToSlideshow = (book : IBook) => {
+    this.setState((state) => {
+      return {
+        currentSlideshow: {
+          id: state.currentSlideshow.id,
+          name: state.currentSlideshow.name,
+          pageCount: state.currentSlideshow.pageCount + book.pageCount,
+          books: [...state.currentSlideshow.books, book]
+        }
+      }
+    })
+  }
+
+  removeBookFromSlideshow = (index : number) => {
+    this.setState((state : BooksAppState) : object => {
+      let matchingBook = state.currentSlideshow.books[index]
+      let remainingBooks = state.currentSlideshow.books.filter((_, i) => i !== index)
+      if (matchingBook) {
+        if (remainingBooks.length > 0) {
+          const currentSlideshow = this.state.currentSlideshow
+          currentSlideshow.pageCount = currentSlideshow.pageCount - matchingBook.pageCount
+          currentSlideshow.books = remainingBooks
+          return {
+            currentSlideshow: currentSlideshow
+          }
+        }
+        return {
+          viewMode: BooksViewMode.Listing,
+          currentSlideshow: this.getEmptySlideshow()
+        }
+      }
+      console.log('Remove failed - book not found at index ' + index)
+      return {}
+    })
+  }
+
+  resetSlideshow = () => {
+    this.setState({
+      viewMode: BooksViewMode.Listing,
+      currentSlideshow: this.getEmptySlideshow()
+    })
+  }
+
+  setSlideshowInterval = (interval : number) => {
+    this.setState({ slideshowInterval: interval })
+  }
+
+  setSlideshowPage = (n : number) => {
+    if (this.state.viewMode === BooksViewMode.SingleBook) {   
+      this.setState({
+        singleBookPage: n
+      })
+    }
+    else if (this.state.viewMode === BooksViewMode.Slideshow) {
+      this.setState({
+        slideshowPage: n
+      })
+    }
+  }
+  //#endregion
+  
   render() {
     const navProps = {
       viewMode: this.state.viewMode,
@@ -430,7 +496,9 @@ class BooksApp extends Component<BooksAppProps, BooksAppState> {
       resetSlideshow: this.resetSlideshow,
       updateBook: this.updateBook,
       deleteBook: this.deleteBook,
-      importBooks: this.importBooks
+      importBooks: this.importBooks,
+      createCollection: this.createCollection,
+      viewCollection: this.viewCollection
     }
 
     return (

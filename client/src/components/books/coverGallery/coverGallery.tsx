@@ -30,13 +30,15 @@ interface CoverGalleryState {
     sortOrder: BooksSortOrder
 }
 
+const DEFAULTSORTORDER = BooksSortOrder.Title
+
 class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
     constructor(props: CoverGalleryProps) {
         super(props)
 
         // this.totalPages = this.getTotalPages(props.allBooks)
 
-        let initialSortOrder = props.sortOrder ?? BooksSortOrder.Favorite
+        let initialSortOrder = props.sortOrder ?? DEFAULTSORTORDER
 
         let initialState: CoverGalleryState = {
             galleryPage: 0,
@@ -69,9 +71,9 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
             } else {
                 this.setState({
                     galleryPage: 0,
-                    bookList: this.getSortedBooks(this.props.allBooks, BooksSortOrder.Favorite),
+                    bookList: this.getSortedBooks(this.props.allBooks, DEFAULTSORTORDER),
                     totalPages: this.getTotalPages(this.props.allBooks),
-                    sortOrder: BooksSortOrder.Favorite
+                    sortOrder: DEFAULTSORTORDER
                 })
             }
         }

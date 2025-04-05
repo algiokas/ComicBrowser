@@ -101,9 +101,15 @@ function initBooks() {
     }
 
     try {
+        // books_db.prepare(`DROP TABLE collectionBooks`).run()
+        // books_db.prepare(`DROP TABLE collections`).run()
         books_db.prepare(`CREATE TABLE collections (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT UNIQUE)`).run()
+            name TEXT UNIQUE,
+            coverImage TEXT,
+            coverBook INTEGER,
+            coverPage INTEGER,
+            FOREIGN KEY(coverBook) REFERENCES books(id))`).run()
         console.log('created table: collections')
     } catch (err) {
         if (err.message === 'table collections already exists') {
@@ -117,6 +123,7 @@ function initBooks() {
         books_db.prepare(`CREATE TABLE collectionBooks (
             collectionId INTEGER,
             bookId INTEGER,
+            sortOrder INTEGER,
             FOREIGN KEY(collectionId) REFERENCES collections(id),
             FOREIGN KEY(bookId) REFERENCES books(id))`).run()
         console.log('created table: collectionBooks')

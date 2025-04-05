@@ -8,6 +8,7 @@ export enum BooksViewMode {
     Listing = "Listing",
     SingleBook = "SingleBook",
     Slideshow = "Slideshow",
+    Collections = "Collections",
     SearchResults = "SearchResults"
 }
 

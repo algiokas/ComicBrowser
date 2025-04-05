@@ -6,3 +6,9 @@ export default interface ISlideshow {
     pageCount: number,
     books: IBook[]
 }
+
+export interface ICollection extends ISlideshow {
+    coverBookId: number,
+    coverPageId: number,
+    coverImage: string
+}

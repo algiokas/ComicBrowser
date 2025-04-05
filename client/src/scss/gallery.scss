@@ -15,6 +15,10 @@
         border-top-left-radius: .3em;
         border-top-right-radius: .3em;
         width: 294px;
+
+        &.small {
+            width: 140px;
+        }
     }
 
     &-container {

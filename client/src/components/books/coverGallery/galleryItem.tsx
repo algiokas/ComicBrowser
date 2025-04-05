@@ -4,6 +4,7 @@ import IBook from "../../../interfaces/book";
 import StarsImage from "../../../img/stars.svg"
 import PlusImg from "../../../img/plus-symbol.svg"
 import MinusImg from "../../../img/minus-symbol.svg"
+import GalleryItemOverlay from "./galleryItemOverlay";
 
 interface GalleryItemProps {
   index: number,
@@ -15,9 +16,11 @@ interface GalleryItemProps {
   removeButtonHandler?: (index: number) => void,
   subTitleClickHandler?: (book: IBook) => void,
   favoriteClickHandler?: (book: IBook) => void,
+  hideFavorites?: boolean
+  overlayIcon?: React.FunctionComponent<React.SVGAttributes<SVGElement>>
 }
 
-interface GalleryItemState {}
+interface GalleryItemState { }
 
 class GalleryItem extends Component<GalleryItemProps, GalleryItemState> {
   bodyClick = (e: React.MouseEvent) => {
@@ -56,21 +59,27 @@ class GalleryItem extends Component<GalleryItemProps, GalleryItemState> {
   render() {
     return (
       <div className="gallery" key={this.props.book.title}>
+        {
+          this.props.overlayIcon ?
+            <div className="gallery-overlay">
+              <img className="svg-icon" src={this.props.overlayIcon.toString()}></img>
+            </div> : null
+        }
         <div className="gallery-inner" onClick={this.props.bodyClickHandler ? this.bodyClick : undefined}>
           <img className="gallery-image" src={this.props.coverUrl} alt={`${this.props.book.title} cover`}></img>
-          <div className={ this.props.book.isFavorite ? "caption favorite" : "caption"}>
+          <div className={this.props.book.isFavorite ? "caption favorite" : "caption"}>
             <div className="caption-text">
               <span className="subtitle" onClick={this.props.subTitleClickHandler ? this.subtitleClick : undefined}>
                 {this.props.subtitle}
               </span>
               <span className="title">{this.props.book.title}</span>
             </div>
-            <div className="favorite-icon" onClick={this.props.favoriteClickHandler ? this.favoriteClick : undefined}>
+            <div className="favorite-icon" onClick={this.props.favoriteClickHandler ? this.favoriteClick : undefined} hidden={this.props.hideFavorites}>
               {
                 this.props.book.isFavorite ?
-                <img className="svg-icon-favorite" src={StarsImage.toString()} alt="remove from favorites"></img>
-                :
-                <img className="svg-icon-disabled test" src={StarsImage.toString()} alt="add to favorites"></img>
+                  <img className="svg-icon-favorite" src={StarsImage.toString()} alt="remove from favorites"></img>
+                  :
+                  <img className="svg-icon-disabled test" src={StarsImage.toString()} alt="add to favorites"></img>
               }
             </div>
           </div>

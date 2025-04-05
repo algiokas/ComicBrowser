@@ -256,3 +256,15 @@ exports.updateBook = function(id, newBookData) {
 exports.deleteBook = function(id) {
     return db.deleteBook(id)
 }
+
+exports.createCollection = function(createCollectionRequest) {
+    return db.createCollection(
+        createCollectionRequest.name, 
+        createCollectionRequest.books, 
+        createCollectionRequest.coverBookId
+    )
+}
+
+exports.getCollections = function() {
+    return db.getAllCollections()
+}

@@ -4,7 +4,7 @@ import { ActorsSortOrder } from "../../../util/enums"
 import PageSelect from "../../shared/pageSelect"
 import ActorGalleryItem from "./actorGalleryItem"
 import ActorSortControls from "./actorSortControls"
-import BaseGallery, { BaseGalleryProps, BaseGalleryState } from "./baseGallery"
+import BaseGallery, { BaseGalleryProps, BaseGalleryState } from "../../shared/baseGallery"
 
 
 interface ActorGalleryProps extends BaseGalleryProps<IActor> {

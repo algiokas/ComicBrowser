@@ -176,6 +176,9 @@ h2 {
   border-top-right-radius: 0.3em;
   width: 294px;
 }
+.BooksApp .gallery-image.small {
+  width: 140px;
+}
 .BooksApp .gallery-container {
   clear: both;
   margin: 10px auto;
@@ -681,7 +684,7 @@ nav .logo-pink {
 .slideshow-covers {
   flex-direction: column;
   overflow-y: auto;
-  max-height: 1020px;
+  max-height: 907px;
   background-color: #0d0d0d;
 }
 .slideshow-covers .gallery {
@@ -1062,8 +1065,74 @@ nav .logo-pink {
   flex-direction: column;
   width: 700px;
   height: 500px;
-  overflow: auto;
   padding: 10px;
+}
+.savepanel-row {
+  display: flex;
+  flex-direction: row;
+}
+.savepanel-row input {
+  margin-left: 15px;
+  margin-right: auto;
+  width: 60%;
+}
+.savepanel-covers {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  overflow: auto;
+  margin-top: 10px;
+}
+.savepanel-covers .gallery {
+  width: 140px;
+  margin: 6px;
+  flex: 1 1 auto;
+  position: relative;
+}
+.savepanel-covers .gallery-inner {
+  cursor: default;
+}
+.savepanel-covers .gallery-overlay {
+  position: absolute;
+  width: 140px;
+  height: 200px;
+  background-color: rgba(40, 40, 40, 0.4);
+  border-radius: 0.3em 0.3em 0 0;
+}
+.savepanel-covers .gallery-overlay .svg-icon {
+  margin-top: 75px;
+  opacity: 100%;
+  width: 50px;
+}
+.savepanel-covers .gallery-image {
+  width: 140px;
+}
+.savepanel-covers .gallery .caption {
+  width: 140px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 400;
+}
+.savepanel-covers .gallery .caption .favorite-icon {
+  display: none;
+}
+.savepanel-covers .gallery .caption-text {
+  padding-left: 0;
+}
+.savepanel-controls {
+  margin-top: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin: auto 10px 0 10px;
+}
+.savepanel-controls button {
+  padding: 8px 10px;
+  margin: 5px;
+  font-size: large;
+}
+.savepanel-controls button:enabled {
+  border-color: #e619c3;
 }
 
 @keyframes loadingpulse {

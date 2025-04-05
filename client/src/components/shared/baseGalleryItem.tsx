@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import IVideo from "../../../interfaces/video";
+import IVideo from "../../interfaces/video";
 
 export interface BaseGalleryItemProps<T> {
   index: number,

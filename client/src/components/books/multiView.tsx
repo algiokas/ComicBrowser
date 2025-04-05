@@ -8,6 +8,8 @@ import { AppState } from "../../App";
 import IBook from "../../interfaces/book";
 import { IBookSearchQuery }from "../../interfaces/searchQuery";
 import { BooksAppState } from "./booksApp";
+import CollectionGallery from "./coverGallery/collectionGallery";
+import { ICollection } from "../../interfaces/slideshow";
 
 interface MultiViewProps extends BooksAppState {
     viewBook(book: IBook): void,
@@ -15,6 +17,7 @@ interface MultiViewProps extends BooksAppState {
     viewListing(): void,
     viewCurrentBook(): void,
     viewSearchResults(query?: IBookSearchQuery): void,
+    viewCollection(col: ICollection): void,
     addBookToSlideshow(book : IBook): void,
     removeBookFromSlideshow(index : number): void,
     setSlideshowInterval(interval : number): void,
@@ -23,6 +26,7 @@ interface MultiViewProps extends BooksAppState {
     updateBook(book : IBook): void,
     deleteBook(bookId : number) : void,
     importBooks(): void,
+    createCollection(collectionName: string, coverBookId: number): void
 }
 
 interface MultiViewState{}
@@ -43,7 +47,8 @@ class MultiView extends Component<MultiViewProps, MultiViewState> {
             emptySlideshow: this.props.resetSlideshow,
             updateBook: this.props.updateBook,
             deleteBook: this.props.deleteBook,
-            viewSearchResults: this.props.viewSearchResults
+            viewSearchResults: this.props.viewSearchResults,
+            createCollection: this.props.createCollection
         }
         switch(this.props.viewMode) {
             case BooksViewMode.Listing:
@@ -84,6 +89,13 @@ class MultiView extends Component<MultiViewProps, MultiViewState> {
                         currentPage={this.props.slideshowPage}
                         viewMode={this.props.viewMode}
                         {...slideshowHandlers}/>
+                )
+            case BooksViewMode.Collections:
+                return(
+                    <CollectionGallery 
+                        allItems={this.props.allCollections} 
+                        pageSize={this.props.galleryPageSize} 
+                        viewCollection={this.props.viewCollection}/>
                 )
             case BooksViewMode.Loading:
                 return (

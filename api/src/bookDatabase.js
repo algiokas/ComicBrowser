@@ -5,11 +5,13 @@ const insertArtist = db.prepare('INSERT INTO artists (name) VALUES (?)')
 const insertBookArtist = db.prepare('INSERT INTO bookArtists (bookId, artistId) VALUES (?, ?)')
 const insertTag = db.prepare('INSERT INTO tags (name) VALUES (?)')
 const insertBookTag = db.prepare('INSERT INTO bookTags (bookId, tagId) VALUES (?, ?)')
-const insertCollection = db.prepare('INSERT INTO collections (name) VALUES (?)')
-const insertCollectionBook = db.prepare('INSERT INTO collectionBooks (collectionId, bookId) VALUES (?, ?)')
+const insertCollection = db.prepare('INSERT INTO collections (name, coverImage, coverBook, coverPage) VALUES (?, ?, ?, ?)')
+const insertCollectionBook = db.prepare('INSERT INTO collectionBooks (collectionId, bookId, sortOrder) VALUES (?, ?, ?)')
 const selectBooks = db.prepare('SELECT * FROM books')
 const selectCollections = db.prepare('SELECT * FROM collections')
-const selectCollectionBooks = db.prepare('SELECT * FROM collectionBooks')
+const selectCollectionById = db.prepare('SELECT * FROM collections WHERE id = ?')
+const selectCollectionByRow = db.prepare('SELECT * FROM collections WHERE rowid = ?')
+const selectCollectionBooks = db.prepare('SELECT bookId FROM collectionBooks WHERE collectionID = ? ORDER BY sortOrder')
 const getBookByID = db.prepare('SELECT * FROM books WHERE id = ?')
 const getBookByTitle = db.prepare('SELECT * FROM books WHERE title = ?')
 const getArtistById = db.prepare('SELECT name FROM artists WHERE id = ?')
@@ -296,9 +298,28 @@ exports.setFavoriteValue = function(bookId, value) {
 }
 
 exports.getAllCollections = function() {
-
+    const collectionRows = selectCollections.all()
+    return collectionRows.map(row => fillCollection(row))
 }
 
-exports.createCollection = function(cName, books) {
+exports.getCollectionById = function(id) {
+    const collectionRow = selectCollectionById.get(id)
+    return fillCollection(collectionRow)
+}
 
+fillCollection = function(collectionRow) {
+    const collectionId = collectionRow.id
+    const books = selectCollectionBooks.all(collectionId)
+    collectionRow.books = books
+    return collectionRow
+}
+
+exports.createCollection = function(cName, books, coverBookId) {
+    const collectionInsertResult = insertCollection.run(cName, '', coverBookId, 0)
+    const collectionRowId = collectionInsertResult.lastInsertRowid ?? collectionInsertResult.existingRowId
+    const collectionRow = selectCollectionByRow.get(collectionRowId)
+    for (let i = 0; i < books.length; i++) {
+        insertCollectionBook.run(collectionRow.id, books[i].id, i)
+    }
+    return fillCollection(collectionRow)
 }
