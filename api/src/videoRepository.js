@@ -8,6 +8,8 @@ const videosDir = path.join(dataDir, '/videos');
 const thumbnailDir = path.join(dataDir, '/images/thumbnails');
 const actorImageDir = path.join(dataDir, '/images/actors')
 
+//Import video file with the format:
+// ActorName1, ActorName2 - VideoTitle
 function fileToJson(parentDir, fileName, fileStats) {
     let output = {}
     if (!parentDir || !fileName) {

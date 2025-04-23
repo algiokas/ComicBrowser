@@ -1,4 +1,4 @@
-const languages = ["Japanese", "English", "Chinese", "Translated"]
+const languages = ["Japanese", "English", "Chinese"]
 const db = require('../src/bookDatabase')
 const fs = require('fs');
 const path = require('path');
@@ -9,7 +9,9 @@ exports.getFileName = function (id, book) {
     return String(id).padStart(4, '0') + ' - ' + book.title
 }
 
-//Parse data from a 
+//Parse data from a folder with the naming scheme:
+// (prefix) [group (artist)] Title (tag1) (tag2)...
+//If any of the tags are in the [languages] array they get set as the book language instead of a tag
 function folderToJSON(folderName, contents, fileStats) {
     let output = {}
     if (!folderName || !contents || contents.length < 1) {
