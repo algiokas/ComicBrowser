@@ -21,7 +21,7 @@ class CollectionGallery extends BaseGallery<ICollection, CollectionGalleryProps,
             galleryPage: 0,
             currentPageSize: props.allItems.length < props.pageSize ? props.allItems.length : props.pageSize,
             items: this.props.allItems,
-            totalPages: 0,
+            totalPages: this.getTotalPages(this.props.allItems),
         }
     }
 
