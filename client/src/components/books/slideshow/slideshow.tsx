@@ -1,10 +1,11 @@
-import React, { Component } from "react";
+import React, { Component, createRef } from "react";
 import { GetPagePathByID, GetPagePathMulti } from "../../../util/helpers"
 import Sidebar from "./slideshow-sidebar";
 import ISlideshow from "../../../interfaces/slideshow";
 import { BooksViewMode } from "../../../util/enums";
 import IBook from "../../../interfaces/book";
 import { IBookSearchQuery }from "../../../interfaces/searchQuery";
+import GridPage from "./gridPage";
 
 interface SlideshowProps {
     slideshow: ISlideshow,
@@ -28,10 +29,10 @@ interface SlideshowState {
     intervalId: number,
     intervalCounter: number,
     intervalLength: number,
-    gridPages: GridPage[]
+    gridPages: IGridPage[]
 }
 
-interface GridPage {
+export interface IGridPage {
     bookId: number,
     bookPageNum: number,
     slideNum: number
@@ -51,10 +52,14 @@ class Slideshow extends Component<SlideshowProps, SlideshowState> {
             intervalLength: 5,
             gridPages: this.getGridPages()
         }
+
     }
 
-    getGridPages = (): GridPage[] => {
-        let gPages: GridPage[] = []
+    gridRef = React.createRef<HTMLDivElement>()
+    currentGridPagRef = React.createRef<HTMLDivElement>()
+
+    getGridPages = (): IGridPage[] => {
+        let gPages: IGridPage[] = []
         let ssIndex = 0
         this.props.slideshow.books.forEach((book) => {
             for (let i = 0; i < book.pageCount; i++) {
@@ -83,6 +88,18 @@ class Slideshow extends Component<SlideshowProps, SlideshowState> {
                     gridPages: this.getGridPages()
                 })
             }
+        }
+        if (this.state.gridView && !prevState.gridView) {
+            console.log(this.state)
+            const currentPageRect = this.currentGridPagRef.current?.getBoundingClientRect()
+            if (currentPageRect) {
+                console.log(`width: ${currentPageRect.width} - height: ${currentPageRect.height}`)
+                const pageRow = Math.floor(this.props.currentPage / 5)
+                console.log(`PageRow: ${pageRow}`)
+                const scrollHeight = pageRow * currentPageRect.height
+                console.log(`Scrollheight: ${scrollHeight}`)
+                this.gridRef.current?.scrollTo(0, scrollHeight)
+            }    
         }
 
     }
@@ -219,16 +236,14 @@ class Slideshow extends Component<SlideshowProps, SlideshowState> {
             <div className={`slideshow-container ${this.state.showSidebar ? "show-sidebar" : ""}`}>
                 {
                     this.state.gridView ?
-                        <div className="pagegrid">
+                        <div className="pagegrid" ref={this.gridRef}>
                             {
-                                this.state.gridPages.map((page: GridPage) => {
-                                    return <div className="pagegrid-page" onClick={() => this.gridClick(page.slideNum)}>
-                                        <img className={`pagegrid-page-image ${page.slideNum === this.props.currentPage ? "selected" : ""}`}
-                                            src={GetPagePathByID(page.bookId, page.bookPageNum)}
-                                            alt={" page " + (page.slideNum + 1)}>
-                                        </img>
-                                    </div>
-                                })}
+                                this.state.gridPages.map((page: IGridPage, i: number) =>                                     
+                                <GridPage {...page} 
+                                    index={i} 
+                                    currentPage={this.props.currentPage} 
+                                    gridClick={this.gridClick}
+                                    pageRef={this.currentGridPagRef}/>)}
                         </div>
                         :
                         <div className="slideshow">
