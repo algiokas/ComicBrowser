@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { IBookSearchQuery }from "../../../interfaces/searchQuery";
 
-const baseURL = "https://nhentai.net/"
+const baseURL = process.env.REACT_APP_BOOK_SOURCE_URL
 
 interface FilterInfoProps {
     filterQuery: IBookSearchQuery

@@ -30,7 +30,7 @@ interface CoverGalleryState {
     sortOrder: BooksSortOrder
 }
 
-const DEFAULTSORTORDER = BooksSortOrder.Title
+const DEFAULTSORTORDER = BooksSortOrder.Favorite
 
 class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
     constructor(props: CoverGalleryProps) {
