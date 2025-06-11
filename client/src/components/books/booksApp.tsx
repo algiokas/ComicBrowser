@@ -63,18 +63,39 @@ function BooksApp(props: BooksAppProps) {
       await fillBooks();
       setViewMode(BooksViewMode.Listing)
     }
-
     init();
   }, [])
 
   const fillBooks = async () => {
     const res = await fetch(`${apiBaseUrl}/books`)
     const data = await res.json()
-    setAllBooks(booksFromJson(data))
-    await getCollections()
+    const books = booksFromJson(data)
+    setAllBooks(books)
+    await getCollections(books)
   }
 
-  const collectionFromJson = (c: any): ICollection => {
+
+  const bookFromJson = (e: any): any => {
+    let newBook = e as IBook
+    if (e.addedDate) {
+      newBook.addedDate = new Date(e.addedDate)
+    }
+    const terms = generateBookSearchTerms(newBook)
+    newBook.searchTerms = terms
+    return newBook
+  }
+
+  const booksFromJson = (bookJson: any): IBook[] => {
+    let bookList: IBook[] = []
+    if (!bookJson || bookJson.length < 1) console.log("booksFromJson - no books in input")
+    bookJson.forEach((e: any): any => {
+      let newBook = bookFromJson(e)
+      bookList.push(newBook)
+    });
+    return bookList
+  }
+
+  const collectionFromJson = (c: any, booksList: IBook[]): ICollection => {
     const newCollection: ICollection = {
       id: c.id,
       name: c.name,
@@ -85,7 +106,7 @@ function BooksApp(props: BooksAppProps) {
       pageCount: 0
     }
     c.books.forEach((b: any) => {
-      const matchingBook = allBooks.find(book => book.id === b.bookId)
+      const matchingBook = booksList.find(book => book.id === b.bookId)
       if (matchingBook) {
         newCollection.books.push(matchingBook)
         newCollection.pageCount += matchingBook.pageCount
@@ -96,10 +117,10 @@ function BooksApp(props: BooksAppProps) {
     return newCollection
   }
 
-  const getCollections = async () => {
+  const getCollections = async (books: IBook[]) => {
     const res = await fetch(`${apiBaseUrl}/books/collections/all`, { method: 'get' })
     const data = await res.json()
-    setAllCollections(data.map(collectionFromJson))
+    setAllCollections(data.map((c: any) => collectionFromJson(c, books)))
   }
 
   const createCollection = async (collectionName: string, coverBookId: number) => {
@@ -114,7 +135,7 @@ function BooksApp(props: BooksAppProps) {
       body: JSON.stringify(createCollectionRequest)
     })
     const data = await res.json()
-    const newCollection = collectionFromJson(data)
+    const newCollection = collectionFromJson(data, allBooks)
     setAllCollections([...allCollections, newCollection])
     setViewMode(BooksViewMode.Collections)
     setCurrentSlideshow(getEmptySlideshow())
@@ -172,12 +193,12 @@ function BooksApp(props: BooksAppProps) {
       headers: { 'Content-Type': 'application/json' }
     })
     const data = await res.json()
-            if (data) {
-          setAllBooks(booksFromJson(data.books))
-          setCurrentBook(null)
-          setCurrentSlideshow(getEmptySlideshow())
-          setViewMode(BooksViewMode.Listing)
-        }
+    if (data) {
+      setAllBooks(booksFromJson(data.books))
+      setCurrentBook(null)
+      setCurrentSlideshow(getEmptySlideshow())
+      setViewMode(BooksViewMode.Listing)
+    }
 
   }
   //#endregion
@@ -243,25 +264,6 @@ function BooksApp(props: BooksAppProps) {
     return termsList
   }
 
-  const bookFromJson = (e: any): any => {
-    let newBook = e as IBook
-    if (e.addedDate) {
-      newBook.addedDate = new Date(e.addedDate)
-    }
-    const terms = generateBookSearchTerms(newBook)
-    newBook.searchTerms = terms
-    return newBook
-  }
-
-  const booksFromJson = (bookJson: any): IBook[] => {
-    let bookList: IBook[] = []
-    if (!bookJson || bookJson.length < 1) console.log("booksFromJson - no books in input")
-    bookJson.forEach((e: any): any => {
-      let newBook = bookFromJson(e)
-      bookList.push(newBook)
-    });
-    return bookList
-  }
 
 
   //#endregion
@@ -401,6 +403,15 @@ function BooksApp(props: BooksAppProps) {
     setCurrentSlideshow(getEmptySlideshow())
     setViewMode(BooksViewMode.Listing)
   }
+
+  const setCurrentPage = (n: number) => {
+    if (viewMode === BooksViewMode.SingleBook) {
+      setSingleBookPage(n)
+    }
+    else if (viewMode === BooksViewMode.Slideshow) {
+      setSlideshowPage(n)
+    }
+  }
   //#endregion
 
   const navProps = {
@@ -421,7 +432,7 @@ function BooksApp(props: BooksAppProps) {
     addBookToSlideshow: addBookToSlideshow,
     removeBookFromSlideshow: removeBookFromSlideshow,
     setSlideshowInterval: setSlideshowInterval,
-    setSlideshowPage: setSlideshowPage,
+    setCurrentPage: setCurrentPage,
     resetSlideshow: resetSlideshow,
     updateBook: updateBook,
     deleteBook: deleteBook,
