@@ -43,7 +43,8 @@ class Player extends Component<PlayerProps, PlayerState> {
 
     videoUrl = () => {
         if (!this.props.video) return ""
-        return process.env.REACT_APP_VIDEOS_API_BASE_URL + "videos/" + this.props.video.id
+        const apiBaseUrl = process.env.REACT_APP_API_BASE_URL
+        return `${apiBaseUrl}/videos/${this.props.video.id}`
     }
 
 

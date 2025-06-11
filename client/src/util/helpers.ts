@@ -4,7 +4,7 @@ import IBook from "../interfaces/book"
 import IVideo from "../interfaces/video";
 
 export function GetCoverPath(book: IBook): string {
-    const basePath = process.env.REACT_APP_BOOKS_API_BASE_URL
+    const basePath = process.env.REACT_APP_API_BASE_URL
     if (basePath) {
         return basePath + `/books/${book.id}/page/0`
     }
@@ -13,7 +13,7 @@ export function GetCoverPath(book: IBook): string {
 }
 
 export function GetPagePathByID(bookId: number, pageNum: number): string {
-    const basePath = process.env.REACT_APP_BOOKS_API_BASE_URL
+    const basePath = process.env.REACT_APP_API_BASE_URL
     if (basePath) {
         return basePath + `/books/${bookId}/page/${pageNum}`
     }
@@ -22,11 +22,13 @@ export function GetPagePathByID(bookId: number, pageNum: number): string {
 }
 
 export function getVideoThumbnailUrl(video: IVideo): string {
-    return process.env.REACT_APP_VIDEOS_API_BASE_URL + "videos/thumbnail/" + video.id
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL
+    return `${apiBaseUrl}/videos/thumbnail/${video.id}`
 }
 
 export function getActorImageUrl(actor: IActor): string {
-    return process.env.REACT_APP_VIDEOS_API_BASE_URL + "actors/" + actor.id + "/image"
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL
+    return `${apiBaseUrl}/actors/${actor.id}/image`
 }
 
 export function GetPagePath(book: IBook, pageNum: number): string {

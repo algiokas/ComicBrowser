@@ -11,7 +11,7 @@ import INavItem from "../../interfaces/navItem";
 import Modal from "../shared/modal";
 import IVideoSource from "../../interfaces/videoSource";
 
-const apiBaseUrl = process.env.REACT_APP_VIDEOS_API_BASE_URL
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL
 
 interface VideosAppProps extends SubAppProps {
 
@@ -79,7 +79,7 @@ class VideosApp extends Component<VideosAppProps, VideosAppState> {
   }
 
   fillData = () => {
-    fetch(apiBaseUrl + "videos")
+    fetch(`${apiBaseUrl}/videos`)
       .then(res => res.json())
       .then(data => {
         console.log('fetch videos')
@@ -90,7 +90,7 @@ class VideosApp extends Component<VideosAppProps, VideosAppState> {
   }
 
   fillActors = (videoJson: any) => {
-    fetch(apiBaseUrl + "actors")
+    fetch(`${apiBaseUrl}/actors`)
       .then(res => res.json())
       .then(data => {
         console.log('fetch actors')
@@ -100,7 +100,7 @@ class VideosApp extends Component<VideosAppProps, VideosAppState> {
   }
 
   fillSources = () => {
-    fetch(apiBaseUrl + "/videos/sources")
+    fetch(`${apiBaseUrl}/videos/sources`)
       .then(res => res.json())
       .then(data => {
         console.log('fetch sources')
@@ -110,7 +110,7 @@ class VideosApp extends Component<VideosAppProps, VideosAppState> {
   }
 
   updateVideo = (video: IVideo) => {
-    fetch(apiBaseUrl + 'videos/' + video.id + "/update", {
+    fetch(`${apiBaseUrl}/videos/${video.id}/update`, {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(video)
@@ -133,8 +133,7 @@ class VideosApp extends Component<VideosAppProps, VideosAppState> {
   }
 
   updateActor = (actor: IActor) => {
-    fetch(apiBaseUrl + 'actors/' + actor.id + '/update', {
-      method: 'post',
+    fetch(`${apiBaseUrl}/actors/${actor.id}/update`, {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(actor)
     })
@@ -160,7 +159,7 @@ class VideosApp extends Component<VideosAppProps, VideosAppState> {
 
   deleteVideo = (videoId: number) => {
     console.log('delete video with id: ' + videoId)
-    fetch(apiBaseUrl + 'videos/' + videoId, {
+    fetch(`${apiBaseUrl}/videos/${videoId}`, {
       method: 'delete'
     })
       .then(res => res.json())

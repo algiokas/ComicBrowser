@@ -18,7 +18,7 @@ class App extends Component<AppProps, AppState> {
     super(props);
 
     this.state = {
-      appMode: AppMode.Books
+      appMode: AppMode.Videos
     }
   }
   toggleAppMode = () => {

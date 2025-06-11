@@ -9,7 +9,7 @@ import { SubAppProps } from "../../App";
 import INavItem from "../../interfaces/navItem";
 import { filterAlphanumeric, isAlphanumeric } from "../../util/helpers";
 
-const apiBaseUrl = process.env.REACT_APP_BOOKS_API_BASE_URL
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL
 
 interface BooksAppProps extends SubAppProps {
 }

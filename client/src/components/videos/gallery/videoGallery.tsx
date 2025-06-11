@@ -7,6 +7,7 @@ import BaseGallery, { BaseGalleryProps, BaseGalleryState } from "../../shared/ba
 import IActor from "../../../interfaces/actor"
 import VideoSortControls from "./videoSortControls"
 import ActorDetail from "./actorDetail"
+import { getVideoThumbnailUrl } from "../../../util/helpers"
 
 export interface VideoGalleryProps extends BaseGalleryProps<IVideo> {
     sortOrder?: VideosSortOrder,
@@ -158,10 +159,6 @@ class VideoGallery extends BaseGallery<IVideo, VideoGalleryProps, VideoGallerySt
         }
     }
 
-    getThumbnailUrl = (video: IVideo) => {
-        return process.env.REACT_APP_VIDEOS_API_BASE_URL + "videos/thumbnail/" + video.id
-    }
-
     getTotalPages = (Videos: IVideo[]): number => {
         if (Videos) {
             return Math.max(1, Math.ceil(Videos.length / this.props.pageSize))
@@ -247,7 +244,7 @@ class VideoGallery extends BaseGallery<IVideo, VideoGalleryProps, VideoGallerySt
                             key={i}
                             index={i}
                             data={video}
-                            imageUrl={this.getThumbnailUrl(video)}
+                            imageUrl={getVideoThumbnailUrl(video)}
                             bodyClickHandler={this.bodyClick}
                             subTitleItemClickHandler={this.subtitleClick}
                             favoriteClickHandler={this.favoriteClick}
