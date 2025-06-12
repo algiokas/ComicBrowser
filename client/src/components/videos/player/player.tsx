@@ -109,7 +109,7 @@ class Player extends Component<PlayerProps, PlayerState> {
                 <div className="player-inner">
                     <div className="player-video-container">
                         <div className="player-video">
-                            <video muted preload="auto" ref={this.videoRef} controls={true} src={this.videoUrl()} style={{ width: '100%', height: '100%' }}></video>
+                            <video muted preload="auto" ref={this.videoRef} controls={true} src={this.videoUrl()} width="100%" height="auto"></video>
                         </div>
                     </div>
                     <div className="player-video-info">
