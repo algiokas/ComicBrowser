@@ -1,47 +1,44 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import BooksApp from "./components/books/booksApp";
 import { AppMode } from "./util/enums";
 import VideosApp from "./components/videos/videosApp";
 
-interface AppProps {} //empty
+interface AppProps { } //empty
 
 export interface SubAppProps {
-  toggleAppMode(): void 
+  viewBooksApp(): void
+  viewVideosApp(): void
 }
 
 export interface AppState {
   appMode: AppMode
 }
 
-class App extends Component<AppProps, AppState> {
-  constructor(props: AppProps) {
-    super(props);
+const App = () => {
+  const [appMode, setAppMode] = useState<AppMode>(AppMode.Videos)
 
-    this.state = {
-      appMode: AppMode.Videos
-    }
+  const viewBooksApp = () => {
+    setAppMode(AppMode.Books)
   }
-  toggleAppMode = () => {
-    this.setState((state) => {
-      if (state.appMode == AppMode.Books) return { appMode: AppMode.Videos}
-      return { appMode: AppMode.Books }
-    })
+
+  const viewVideosApp = () => {
+    setAppMode(AppMode.Videos)
   }
-  render(): React.ReactNode {
-    const appProps = {
-      toggleAppMode: this.toggleAppMode
-    }
-    return (
-      <div className="App">
-        {
-          this.state.appMode == AppMode.Books ? 
-          <BooksApp {...appProps}></BooksApp> : 
+
+  const appProps: SubAppProps = {
+    viewBooksApp, viewVideosApp
+  }
+
+  return (
+    <div className="App">
+      {
+        appMode == AppMode.Books ?
+          <BooksApp {...appProps}></BooksApp> :
           <VideosApp {...appProps}></VideosApp>
-        }
-      </div>
+      }
+    </div>
 
-    )
-  }
+  )
 }
 
 export default App;

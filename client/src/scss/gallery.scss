@@ -309,6 +309,39 @@
 
 }
 
+.VideosApp .sourcegallery {
+    flex: 0 0 19%;
+    position: relative;
+    margin: auto;
+    margin-bottom: 2em;
+
+    &-inner {
+        cursor: pointer;
+    }
+
+    &-image {
+        display: block;
+        border-top-left-radius: .3em;
+        border-top-right-radius: .3em;
+        width: 480px;
+    }
+
+    &-container {
+        clear: both;
+        margin: 10px auto;
+        padding: 10px;
+        border-radius: 5px;
+        width: 90%;
+        background-color: $gray-2;
+
+        &-inner {
+            display: flex;
+            flex-wrap: wrap;
+        }
+    }
+
+}
+
 .caption {
     line-height: 15px;
     left: 0;

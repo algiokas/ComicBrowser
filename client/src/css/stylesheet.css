@@ -417,6 +417,34 @@ h2 {
   border: 2px solid #e6e3aa;
 }
 
+.VideosApp .sourcegallery {
+  flex: 0 0 19%;
+  position: relative;
+  margin: auto;
+  margin-bottom: 2em;
+}
+.VideosApp .sourcegallery-inner {
+  cursor: pointer;
+}
+.VideosApp .sourcegallery-image {
+  display: block;
+  border-top-left-radius: 0.3em;
+  border-top-right-radius: 0.3em;
+  width: 480px;
+}
+.VideosApp .sourcegallery-container {
+  clear: both;
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 5px;
+  width: 90%;
+  background-color: #1f1f1f;
+}
+.VideosApp .sourcegallery-container-inner {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .caption {
   line-height: 15px;
   left: 0;

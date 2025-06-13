@@ -365,7 +365,7 @@ function BooksApp(props: BooksAppProps) {
       },
       {
         text: "Videos",
-        clickHandler: props.toggleAppMode
+        clickHandler: props.viewVideosApp
       }]
   }
 

@@ -38,7 +38,7 @@ const getEmptyQuery = (): IVideoSearchQuery => {
   }
 }
 
-function VideosApp(props: VideosAppProps) {
+const VideosApp = (props: VideosAppProps) => {
   const [allVideos, setAllVideos] = useState<IVideo[]>([])
   const [allActors, setAllActors] = useState<IActor[]>([])
   const [allSources, setAllSources] = useState<IVideoSource[]>([])
@@ -87,8 +87,9 @@ function VideosApp(props: VideosAppProps) {
     const res = await fetch(`${apiBaseUrl}/videos`)
     const data = await res.json()
     const videos = videosFromJson(data)
-    await setAllVideos(videos)
+    setAllVideos(videos)
     await fillActors(videos)
+    await fillSources()
   }
 
   const fillActors = async (videoJson: any) => {
@@ -162,7 +163,7 @@ function VideosApp(props: VideosAppProps) {
   const importVideos = async () => {
     console.log("Importing Videos")
     setViewMode(VideosViewMode.Loading)
-    const res = await fetch(apiBaseUrl + 'videos/import', {
+    const res = await fetch(`${apiBaseUrl}/videos/import`, {
       method: 'get',
       headers: { 'Content-Type': 'application/json' }
     })
@@ -177,7 +178,7 @@ function VideosApp(props: VideosAppProps) {
   const setThumbnailToTime = async (videoId: number, timeMs: number) => {
     console.log('set thumbnail for video:' + videoId + ' to ' + timeMs + 'ms')
     toggleLoadingModal("Generating thumbnail for video " + videoId)
-    const res = await fetch(apiBaseUrl + '/videos/thumbnail/' + videoId + '/generate/' + timeMs, {
+    const res = await fetch(`${apiBaseUrl}/videos/thumbnail/${videoId}/generate/${timeMs}`, {
       method: 'post'
     })
     const data = await res.json()
@@ -197,7 +198,7 @@ function VideosApp(props: VideosAppProps) {
   const generateImageForActor = async (videoId: number, actorId: number, timeMs: number) => {
     console.log('Generating image for actor: ' + actorId + " from video " + videoId + " @" + timeMs + 'ms')
     toggleLoadingModal("Generating image for actor " + actorId)
-    const res = await fetch(apiBaseUrl + 'actors/' + actorId + '/imagefromvideo', {
+    const res = await fetch(`${apiBaseUrl}/actors/${actorId}/imagefromvideo`, {
       method: 'post',
       headers: {
         'Accept': 'application/json, text/plain, */*',
@@ -254,6 +255,10 @@ function VideosApp(props: VideosAppProps) {
     setViewMode(VideosViewMode.Actors)
   }
 
+  const viewSources = () => {
+    setViewMode(VideosViewMode.Sources)
+  }
+
   const getActorImageUrlWithFallback = (actor: IActor): string => {
     let matchingActor = allActors.find((a) => a.id === actor.id)
     if (!matchingActor) return ""
@@ -276,6 +281,11 @@ function VideosApp(props: VideosAppProps) {
         clickHandler: viewActors
       },
       {
+        text: "Sources",
+        viewMode: VideosViewMode.Sources,
+        clickHandler: viewSources
+      },
+      {
         text: "Current Video",
         viewMode: VideosViewMode.Player,
         clickHandler: viewCurrentVideo
@@ -296,7 +306,7 @@ function VideosApp(props: VideosAppProps) {
       },
       {
         text: "Books",
-        clickHandler: props.toggleAppMode
+        clickHandler: props.viewBooksApp
       }]
   }
 
