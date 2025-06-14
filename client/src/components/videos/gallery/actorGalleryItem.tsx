@@ -3,36 +3,41 @@ import BaseGalleryItem, { BaseGalleryItemProps, BaseGalleryItemState } from "../
 import StarsImage from "../../../img/svg/stars.svg"
 
 
-interface ActorGalleryItemProps extends BaseGalleryItemProps<IActor>{
+interface ActorGalleryItemProps extends BaseGalleryItemProps<IActor> {}
 
-}
+const ActorGalleryItem = (props: ActorGalleryItemProps) => {
+  const bodyClick = (e: React.MouseEvent) => {
+    if (props.bodyClickHandler)
+      props.bodyClickHandler(props.data, props.index)
+  }
 
-interface ActorGalleryItemState extends BaseGalleryItemState<IActor>{}
+  const favoriteClick = (e: React.MouseEvent) => {
+    if (props.favoriteClickHandler) {
+      e.stopPropagation()
+      props.favoriteClickHandler(props.data)
+    }
+  }
 
-class ActorGalleryItem extends BaseGalleryItem<IActor, ActorGalleryItemProps, ActorGalleryItemState> {
-
-  render() {
-    return (
-      <div className="actorgallery" key={this.props.data.id}>
-        <div className="actorgallery-inner" onClick={this.props.bodyClickHandler ? this.bodyClick : undefined}>
-          <img className="actorgallery-image" src={this.props.imageUrl} alt={`${this.props.data.name} thumbnail`}></img>
-          <div className={ this.props.data.isFavorite ? "caption favorite" : "caption"}>
-            <div className="caption-text">
-              <span className="title">{this.props.data.name}</span>
-            </div>
-            <div className="favorite-icon" onClick={this.props.favoriteClickHandler ? this.favoriteClick : undefined}>
-              {
-                this.props.data.isFavorite ?
+  return (
+    <div className="actorgallery" key={props.data.id}>
+      <div className="actorgallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
+        <img className="actorgallery-image" src={props.imageUrl} alt={`${props.data.name} thumbnail`}></img>
+        <div className={props.data.isFavorite ? "caption favorite" : "caption"}>
+          <div className="caption-text">
+            <span className="title">{props.data.name}</span>
+          </div>
+          <div className="favorite-icon" onClick={props.favoriteClickHandler ? favoriteClick : undefined}>
+            {
+              props.data.isFavorite ?
                 <img className="svg-icon-favorite" src={StarsImage.toString()} alt="remove from favorites"></img>
                 :
                 <img className="svg-icon-disabled test" src={StarsImage.toString()} alt="add to favorites"></img>
-              }
-            </div>
+            }
           </div>
         </div>
       </div>
-    )
-  }
+    </div>
+  )
 }
 
 export default ActorGalleryItem

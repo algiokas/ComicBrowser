@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useEffect, useRef, useState } from "react";
 import { getAlphabet } from "../../../util/helpers";
 import { ActorsSortOrder } from "../../../util/enums";
 import IActor from "../../../interfaces/actor";
@@ -11,102 +11,88 @@ interface ActorSortControlsProps {
     setPage(pageNum: number): void
 }
 
-interface ActorSortControlState {
-    sortIndex: string[] | null,
-    selectedIndex: string | null
-}
-
-class ActorSortControls extends Component<ActorSortControlsProps, ActorSortControlState> {
-    constructor(props: ActorSortControlsProps) {
-        super(props)
-
-        //props: sortOrder, videoList, pageSize, sortVideos(), setPage()
-
-        this.state = {
-            sortIndex: this.getSortIndex(this.props.sortOrder),
-            selectedIndex: null
-        }
-
-    }
-
-    componentDidUpdate(prevProps: ActorSortControlsProps) {
-        if (prevProps.sortOrder !== this.props.sortOrder) {
-            this.setState({ sortIndex: this.getSortIndex(this.props.sortOrder) })
-        }
-    }
-
-    isAlphaSort = (sortOrder: ActorsSortOrder) => {
+const ActorSortControls = (props: ActorSortControlsProps) => {
+    const isAlphaSort = (sortOrder: ActorsSortOrder) => {
         return sortOrder.toString().includes("Alpha")
     }
-
-    getSortIndex = (sortOrder: ActorsSortOrder): string[] | null => {
+    const getSortIndex = (sortOrder: ActorsSortOrder): string[] | null => {
         let sortIndex = null
         if (!sortOrder) return sortIndex
-        if (this.isAlphaSort(sortOrder)) {
+        if (isAlphaSort(sortOrder)) {
             return getAlphabet()
         }
         return sortIndex
     }
 
-    firstGalleryMatchForIndex = (indexKey: string): number => {
+    const [sortIndex, setSortIndex] = useState<string[] | null>(getSortIndex(props.sortOrder))
+    const [selectedIndex, setSelectedIndex] = useState<string | null>(null)
+
+    const mountedRef = useRef(false)
+    useEffect(() => {
+        if (mountedRef.current) {
+            setSortIndex(getSortIndex(props.sortOrder))
+        } else {
+            mountedRef.current = true
+        }
+    }, [props.sortOrder])
+
+    const firstGalleryMatchForIndex = (indexKey: string): number => {
         let firstMatch = 0
         let hasFindFunction = false
-        let findFunction = (a: IActor) => {}
-        switch (this.props.sortOrder) {
+        let findFunction = (a: IActor) => { }
+        switch (props.sortOrder) {
             case ActorsSortOrder.Name:
-                findFunction = (a: IActor) => { 
-                    return indexKey.toLowerCase() === a.name.substring(0,1).toLowerCase() 
+                findFunction = (a: IActor) => {
+                    return indexKey.toLowerCase() === a.name.substring(0, 1).toLowerCase()
                 }
                 hasFindFunction = true
                 break;
         }
         if (hasFindFunction) {
-            firstMatch = this.props.actorList.findIndex(a => findFunction(a))
+            firstMatch = props.actorList.findIndex(a => findFunction(a))
         }
         return firstMatch
     }
 
-    setPageFromIndex = (indexKey: string) => {
-        let firstMatch = this.firstGalleryMatchForIndex(indexKey)
+    const setPageFromIndex = (indexKey: string) => {
+        let firstMatch = firstGalleryMatchForIndex(indexKey)
         if (firstMatch < 0) {
             console.log('no match found')
             firstMatch = 0
         }
-        let pageNum = Math.floor(firstMatch / this.props.pageSize)
-        this.props.setPage(pageNum)
+        let pageNum = Math.floor(firstMatch / props.pageSize)
+        props.setPage(pageNum)
     }
 
-
-    render() {
-        return (
+    return (
             <div className="sort-controls">
                 <div className="sort-select">
                     {
                         Object.keys(ActorsSortOrder).map((key, index) => {
-                            return <div key={key} className={`sort-order ${this.props.sortOrder === Object.values(ActorsSortOrder)[index] ? "selected" : ""}`} 
-                                onClick={() => {this.props.sortVideos(Object.values(ActorsSortOrder)[index])}}>{key}</div>
+                            return <div key={key} className={`sort-order ${props.sortOrder === Object.values(ActorsSortOrder)[index] ? "selected" : ""}`}
+                                onClick={() => { props.sortVideos(Object.values(ActorsSortOrder)[index]) }}>{key}</div>
                         })
                     }
                 </div>
                 {
-                    this.state.sortIndex ?
-                    <div className="sort-index">
-                        {
-                            this.state.sortIndex.map((key) => {
-                                return <div key={key} 
-                                        className={`sort-index-item ${key === this.state.selectedIndex ? "selected" : ""}`} 
-                                        onClick={() => {this.setPageFromIndex(key)}}>
-                                            {key}
-                                        </div>
-                            })
-                        }
+                    sortIndex ?
+                        <div className="sort-index">
+                            {
+                                sortIndex.map((key) => {
+                                    return <div key={key}
+                                        className={`sort-index-item ${key === selectedIndex ? "selected" : ""}`}
+                                        onClick={() => { setPageFromIndex(key) }}>
+                                        {key}
+                                    </div>
+                                })
+                            }
 
-                    </div> : null
+                        </div> : null
                 }
             </div>
 
         )
-    }
+
 }
 
 export default ActorSortControls

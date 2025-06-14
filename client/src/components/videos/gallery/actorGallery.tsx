@@ -5,6 +5,7 @@ import PageSelect from "../../shared/pageSelect"
 import ActorGalleryItem from "./actorGalleryItem"
 import ActorSortControls from "./actorSortControls"
 import BaseGallery, { BaseGalleryProps, BaseGalleryState } from "../../shared/baseGallery"
+import { useEffect, useRef, useState } from "react"
 
 
 interface ActorGalleryProps extends BaseGalleryProps<IActor> {
@@ -14,39 +15,28 @@ interface ActorGalleryProps extends BaseGalleryProps<IActor> {
     viewSearchResults(query?: IVideoSearchQuery): void,
 }
 
-interface ActorGalleryState extends BaseGalleryState<IActor> {
-    sortOrder: ActorsSortOrder
-}
+const ActorGallery = (props: ActorGalleryProps) => {
 
-class ActorGallery extends BaseGallery<IActor, ActorGalleryProps, ActorGalleryState> {
-    constructor(props: ActorGalleryProps) {
-        super(props)
 
-        let initialSortOrder = props.sortOrder ?? ActorsSortOrder.Favorite
+    const initialSortOrder = props.sortOrder ?? ActorsSortOrder.Favorite
 
-        let initialState: ActorGalleryState = {
-            galleryPage: 0,
-            currentPageSize: props.allItems.length < props.pageSize ? props.allItems.length : props.pageSize,
-            items: this.getSortedActors(props.allItems, initialSortOrder),
-            totalPages: this.getTotalPages(props.allItems),
-            sortOrder: initialSortOrder
-        }
+    const [items, setItems] = useState<IActor[]>([])
+    const [sortOrder, setSortOrder] = useState<ActorsSortOrder>(initialSortOrder)
+    const [galleryPage, setGalleryPage] = useState<number>(0)
+    const [totalPages, setTotalPages] = useState<number>(0)
+    const [currentPageSize, setCurrentPageSize] = useState<number>(props.allItems.length < props.pageSize ? props.allItems.length : props.pageSize)
 
-        this.state = initialState
+    useEffect(() => {
+        updateItems(props.allItems)
+    }, [props.allItems])
+
+    const updateItems = (actors: IActor[]) => {
+        setItems(getSortedActors(actors, initialSortOrder))
+        setTotalPages(getTotalPages(actors))
+        setGalleryPage(0)
+        setSortOrder(initialSortOrder)
     }
-
-    componentDidUpdate(prevProps: Readonly<ActorGalleryProps>, prevState: Readonly<ActorGalleryState>, snapshot?: any): void {
-        if (prevProps.allItems !== this.props.allItems) {
-            this.setState({
-                galleryPage: 0,
-                items: this.getSortedActors(this.props.allItems, ActorsSortOrder.Favorite),
-                totalPages: this.getTotalPages(this.props.allItems),
-                sortOrder: ActorsSortOrder.Favorite
-            })
-        }
-    }
-
-    getSortedActors = (actors: IActor[], sortOrder: ActorsSortOrder): IActor[] => {
+        const getSortedActors = (actors: IActor[], sortOrder: ActorsSortOrder): IActor[] => {
         let sortedCopy = [...actors]
         switch (sortOrder) {
             case ActorsSortOrder.Name:
@@ -73,92 +63,85 @@ class ActorGallery extends BaseGallery<IActor, ActorGalleryProps, ActorGallerySt
                 sortedCopy = favorites.concat(other)
                 break
         }
-
         return sortedCopy
     }
 
-
-    sortActors = (order: ActorsSortOrder) => {
-        if (this.state.sortOrder !== order || order === ActorsSortOrder.Random || order === ActorsSortOrder.Favorite) {
-            this.setState({
-                galleryPage: 0,
-                items: this.getSortedActors(this.props.allItems, order),
-                sortOrder: order
-            })
-        }
-    }
-
-    getTotalPages = (Actors: IActor[]): number => {
+    const getTotalPages = (Actors: IActor[]): number => {
         if (Actors) {
-            return Math.max(1, Math.ceil(Actors.length / this.props.pageSize))
+            return Math.max(1, Math.ceil(Actors.length / props.pageSize))
         }
         return 1
     }
 
-    getPageSize = (pageNum: number): number => {
-        if (pageNum < this.state.totalPages - 1) {
-            return this.props.pageSize
-        } else {
-            return this.state.items.length % this.props.pageSize
+    const sortActors = (order: ActorsSortOrder) => {
+        if (sortOrder !== order || order === ActorsSortOrder.Random || order === ActorsSortOrder.Favorite) {
+            setGalleryPage(0)
+            setItems(getSortedActors(props.allItems, order))
+            setSortOrder(sortOrder)
         }
     }
 
-    setPage = (pageNum: number) => {
-        this.setState({
-            galleryPage: pageNum
-        })
+    const getPageSize = (pageNum: number): number => {
+        if (pageNum < totalPages - 1) {
+            return props.pageSize
+        } else {
+            return items.length % props.pageSize
+        }
     }
 
-    getCurrentgalleryPage = (): IActor[] => {
-        let pageStart = this.state.galleryPage * this.props.pageSize;
-        let pageEnd = (this.state.galleryPage + 1) * this.props.pageSize;
-        return this.state.items.slice(pageStart, pageEnd)
+    const setPage = (pageNum: number) => {
+        setGalleryPage(pageNum)
     }
 
-    bodyClick = (a: IActor) => {
-        this.props.viewSearchResults({ actor: a.name })
+    const getCurrentgalleryPage = (): IActor[] => {
+        let pageStart = galleryPage * props.pageSize;
+        let pageEnd = (galleryPage + 1) * props.pageSize;
+        return items.slice(pageStart, pageEnd)
     }
 
-    favoriteClick = (a: IActor) => {
+    const bodyClick = (a: IActor) => {
+        props.viewSearchResults({ actor: a.name })
+    }
+
+    const favoriteClick = (a: IActor) => {
         console.log("toggle favorite for actor: " + a.id)
         a.isFavorite = !a.isFavorite; //toggle value
-        this.props.updateActor(a)
+        props.updateActor(a)
     }
 
-    render() {
-        return (
-            <div className="actorgallery-container dark-theme">
-                <div className="actorgallery-container-header">
-                    <PageSelect
-                        setPage={this.setPage}
-                        totalPages={this.state.totalPages}
-                        currentPage={this.state.galleryPage} />
-                    <ActorSortControls sortOrder={this.state.sortOrder}
-                        actorList={this.state.items}
-                        pageSize={this.props.pageSize}
-                        sortVideos={this.sortActors}
-                        setPage={this.setPage} />
-                </div>
-                <div className="actorgallery-container-inner">
-                    {this.getCurrentgalleryPage().map((actor, i) => {
-                        return <ActorGalleryItem
-                            key={i}
-                            index={i}
-                            data={actor}
-                            imageUrl={this.props.getActorImageUrl(actor)}
-                            bodyClickHandler={this.bodyClick}
-                            favoriteClickHandler={this.favoriteClick}
-                        ></ActorGalleryItem>
-                    })
-
-                    }
-                </div>
-                <div className="actorgallery-container-footer">
-                    <PageSelect setPage={this.setPage} totalPages={this.state.totalPages} currentPage={this.state.galleryPage}></PageSelect>
-                </div>
+    return (
+        <div className="actorgallery-container dark-theme">
+            <div className="actorgallery-container-header">
+                <PageSelect
+                    setPage={setPage}
+                    totalPages={totalPages}
+                    currentPage={galleryPage} />
+                <ActorSortControls sortOrder={sortOrder}
+                    actorList={items}
+                    pageSize={props.pageSize}
+                    sortVideos={sortActors}
+                    setPage={setPage} />
             </div>
-        )
-    }
+            <div className="actorgallery-container-inner">
+                {getCurrentgalleryPage().map((actor, i) => {
+                    return <ActorGalleryItem
+                        key={i}
+                        index={i}
+                        data={actor}
+                        imageUrl={props.getActorImageUrl(actor)}
+                        bodyClickHandler={bodyClick}
+                        favoriteClickHandler={favoriteClick}
+                    ></ActorGalleryItem>
+                })
+
+                }
+            </div>
+            <div className="actorgallery-container-footer">
+                <PageSelect setPage={setPage} totalPages={totalPages} currentPage={galleryPage}></PageSelect>
+            </div>
+        </div>
+    )
+
 }
 
 export default ActorGallery

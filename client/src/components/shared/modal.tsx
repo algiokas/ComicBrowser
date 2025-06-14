@@ -7,21 +7,19 @@ interface ModalProps {
     children: React.ReactNode
 }
 
-class Modal extends Component<ModalProps> {
-    render() {
-        return (
-            <dialog id={ this.props.modalId ?? "modal-component" }
-                className="modal-background"
-                open={this.props.displayModal}
-                onClick={() => { this.props.toggleModal() }}>
-                <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
-                    <div className="modal-dialog-inner">
-                        {this.props.children}
-                    </div>
+const Modal = (props: ModalProps) => {
+    return (
+        <dialog id={props.modalId ?? "modal-component"}
+            className="modal-background"
+            open={props.displayModal}
+            onClick={() => { props.toggleModal() }}>
+            <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-dialog-inner">
+                    {props.children}
                 </div>
-            </dialog>
-        )
-    }
+            </div>
+        </dialog>
+    )
 }
 
 export default Modal

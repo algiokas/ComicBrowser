@@ -7,34 +7,29 @@ interface EditPanelRowProps {
     valueClick?: (v: string) => void
 }
 
-interface EditPanelRowState {
-}
-
-class EditPanelRowStatic extends Component<EditPanelRowProps, EditPanelRowState> {
-    render() {
-        return (
-            <div className="edit-panel-row">
-                <span className="edit-panel-row-label">{this.props.label}:</span>
-                <div className="edit-panel-row-inner">
-                            <span className="edit-panel-row-value">
-                                {
-                                    this.props.valueClick ?
-                                    <span className="click-item clickable" onClick={() => this.props.valueClick!(this.props.value)}>
-                                        {this.props.value}
-                                    </span>
-                                    : this.props.value
-
-                                }
+const EditPanelRowStatic = (props: EditPanelRowProps) => {
+    return (
+        <div className="edit-panel-row">
+            <span className="edit-panel-row-label">{props.label}:</span>
+            <div className="edit-panel-row-inner">
+                <span className="edit-panel-row-value">
+                    {
+                        props.valueClick ?
+                            <span className="click-item clickable" onClick={() => props.valueClick!(props.value)}>
+                                {props.value}
                             </span>
-                            <div className="edit-panel-row-buttons">
-                                <button type="button" style={{visibility: 'hidden'}}>
-                                    <img className="svg-icon-pink text-icon" src={PencilSquareImg.toString()} alt="edit value"></img>
-                                </button>
-                            </div>
-                        </div>
+                            : props.value
+
+                    }
+                </span>
+                <div className="edit-panel-row-buttons">
+                    <button type="button" style={{ visibility: 'hidden' }}>
+                        <img className="svg-icon-pink text-icon" src={PencilSquareImg.toString()} alt="edit value"></img>
+                    </button>
+                </div>
             </div>
-        )
-    }
+        </div>
+    )
 }
 
 export default EditPanelRowStatic

@@ -24,10 +24,6 @@ interface PlayerProps {
     actorFavoriteClick?: (actor: IActor) => void
 }
 
-interface PlayerState {
-    showEditModal: boolean
-}
-
 const Player = (props: PlayerProps) => {
     const videoRef = React.createRef<HTMLVideoElement>()
     const [showEditModal, setShowEditModal] = useState<boolean>(false)

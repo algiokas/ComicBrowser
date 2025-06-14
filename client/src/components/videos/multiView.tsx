@@ -24,8 +24,6 @@ interface MultiViewProps extends VideosAppState {
     generateImageForActor(videoId: number, actorId: number, timeMs: number): void
 }
 
-interface MultiViewState { }
-
 const MultiView = (props: MultiViewProps) => {
     const videoGalleryHandlers = {
         watchVideo: props.watchVideo,
