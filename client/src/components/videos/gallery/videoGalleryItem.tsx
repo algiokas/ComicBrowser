@@ -2,7 +2,7 @@ import React from "react";
 import BaseGalleryItem, { BaseGalleryItemProps, BaseGalleryItemState } from "../../shared/baseGalleryItem";
 import IVideo from "../../../interfaces/video";
 import IActor from "../../../interfaces/actor";
-import StarsImage from "../../../img/stars.svg"
+import StarsImage from "../../../img/svg/stars.svg"
 
 
 

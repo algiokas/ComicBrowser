@@ -3,8 +3,8 @@ import { useRef } from "react";
 import IVideo from "../../../interfaces/video";
 import { IVideoSearchQuery } from "../../../interfaces/searchQuery";
 import IActor from "../../../interfaces/actor";
-import StarsIcon from "../../../img/stars.svg"
-import CameraIcon from "../../../img/camera.svg"
+import StarsIcon from "../../../img/svg/stars.svg"
+import CameraIcon from "../../../img/svg/camera.svg"
 import Modal from "../../shared/modal";
 import EditPanel from "../editPanel/editPanel";
 import IVideoSource from "../../../interfaces/videoSource";

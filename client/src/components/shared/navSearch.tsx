@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { IBookSearchQuery } from "../../interfaces/searchQuery";
-import searchIcon from "../../img/search.svg"
+import searchIcon from "../../img/svg/search.svg"
 
 export interface NavSearchProps {
     displayToggle: boolean,

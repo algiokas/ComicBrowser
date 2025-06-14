@@ -54,7 +54,7 @@ const SourceGallery = (props: SourceGalleryProps) => {
                             key={i}
                             index={i}
                             data={source}
-                            imageUrl=""
+                            imageUrl="https://picsum.photos/480/270"
                             bodyClickHandler={bodyClick}/>
                     })
                 }

@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { GetCoverPath } from "../../../util/helpers";
 import IBook from "../../../interfaces/book";
-import StarsImage from "../../../img/stars.svg"
-import PlusImg from "../../../img/plus-symbol.svg"
-import MinusImg from "../../../img/minus-symbol.svg"
+import StarsImage from "../../../img/svg/stars.svg"
+import PlusImg from "../../../img/svg/plus-symbol.svg"
+import MinusImg from "../../../img/svg/minus-symbol.svg"
 import GalleryItemOverlay from "./galleryItemOverlay";
 
 interface GalleryItemProps {

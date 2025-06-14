@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import PencilSquareImg from "../../../img/pencil-square.svg"
+import PencilSquareImg from "../../../img/svg/pencil-square.svg"
 
 interface EditPanelRowProps {
     label: string,

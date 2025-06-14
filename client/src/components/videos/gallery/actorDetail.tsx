@@ -1,6 +1,6 @@
 import { Component, useState } from "react";
 import IActor from "../../../interfaces/actor";
-import StarsImage from "../../../img/stars.svg"
+import StarsImage from "../../../img/svg/stars.svg"
 
 interface ActorDetailProps {
     actor: IActor,

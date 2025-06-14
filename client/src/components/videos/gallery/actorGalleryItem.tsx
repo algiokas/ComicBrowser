@@ -1,6 +1,6 @@
 import IActor from "../../../interfaces/actor";
 import BaseGalleryItem, { BaseGalleryItemProps, BaseGalleryItemState } from "../../shared/baseGalleryItem";
-import StarsImage from "../../../img/stars.svg"
+import StarsImage from "../../../img/svg/stars.svg"
 
 
 interface ActorGalleryItemProps extends BaseGalleryItemProps<IActor>{

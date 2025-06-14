@@ -1,4 +1,4 @@
-import LogoImg from "../../img/logo-LL036-outline.svg"
+import LogoImg from "../../img/svg/logo-LL036-outline.svg"
 
 interface LogoProps {  
     cssClass: string

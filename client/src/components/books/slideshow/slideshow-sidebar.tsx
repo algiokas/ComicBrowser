@@ -9,7 +9,7 @@ import { IBookSearchQuery }from "../../../interfaces/searchQuery";
 import { GetCoverPath } from "../../../util/helpers";
 import Modal from "../../shared/modal";
 import SavePanel from "./slideshow-save-panel";
-import ChevronRightImg from "../../../img/chevron-right.svg";
+import ChevronRightImg from "../../../img/svg/chevron-right.svg";
 
 interface SidebarProps {
     showSidebar: boolean,

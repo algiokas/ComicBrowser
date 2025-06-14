@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import DoubleStepperImg from "../../img/chevron-double-right.svg";
-import SingleStepperImg from "../../img/chevron-right.svg";
+import DoubleStepperImg from "../../img/svg/chevron-double-right.svg";
+import SingleStepperImg from "../../img/svg/chevron-right.svg";
 
 interface PageSelectProps{
     totalPages: number,

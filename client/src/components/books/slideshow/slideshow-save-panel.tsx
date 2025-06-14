@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import ISlideshow from "../../../interfaces/slideshow";
 import { GetCoverPath } from "../../../util/helpers";
 import GalleryItem from "../coverGallery/galleryItem";
-import coverIcon from "../../../img/book-half.svg"
+import coverIcon from "../../../img/svg/book-half.svg"
 
 interface SavePanelProps {
     currentSlideshow: ISlideshow,

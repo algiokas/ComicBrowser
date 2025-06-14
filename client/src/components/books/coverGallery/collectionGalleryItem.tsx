@@ -1,6 +1,6 @@
 
 import BaseGalleryItem, { BaseGalleryItemProps, BaseGalleryItemState } from "../../shared/baseGalleryItem";
-import StarsImage from "../../../img/stars.svg"
+import StarsImage from "../../../img/svg/stars.svg"
 import { ICollection } from "../../../interfaces/slideshow";
 
 

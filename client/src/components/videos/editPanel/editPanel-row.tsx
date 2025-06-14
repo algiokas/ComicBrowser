@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { VideosEditField } from "../../../util/enums";
-import XImg from "../../../img/x.svg"
-import Check2Img from "../../../img/check2.svg"
-import PencilSquareImg from "../../../img/pencil-square.svg"
+import XImg from "../../../img/svg/x.svg"
+import Check2Img from "../../../img/svg/check2.svg"
+import PencilSquareImg from "../../../img/svg/pencil-square.svg"
 
 interface EditPanelRowProps<T> {
     editField: VideosEditField,
