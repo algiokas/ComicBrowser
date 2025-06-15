@@ -17,21 +17,15 @@ interface EditPanelRowProps<T> {
     valueClick?: (v: string) => void
 }
 
-interface EditPanelRowState<T> {
-    editMode: boolean,
-    fieldValue: T | null,
-    collection: T[]
-}
-
 function EditPanelRowMulti<T>(props: EditPanelRowProps<T>) {
     const [editMode, setEditMode] = useState<boolean>(false)
     const [fieldValue, setFieldValue] = useState<T | null>(null)
-    const [collection, setCollection] = useState<T[]>(props.tempValue)
+    const [collection, setCollection] = useState<T[]>(props.tempValue ?? [])
 
     const mountedRef = useRef(false)
     useEffect(() => {
         if (mountedRef.current) {
-            setCollection(props.tempValue)
+            setCollection(props.tempValue ?? [])
             setFieldValue(null)
         } else {
             mountedRef.current = true
@@ -66,7 +60,7 @@ function EditPanelRowMulti<T>(props: EditPanelRowProps<T>) {
     }
 
     const cancelInput = () => {
-        setCollection(props.tempValue)
+        setCollection(props.tempValue ?? [])
         setFieldValue(null)
         toggleEditMode()
     }

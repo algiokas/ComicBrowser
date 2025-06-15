@@ -23,11 +23,12 @@ export interface VideoGalleryProps extends BaseGalleryProps<IVideo> {
 const VideoGallery = (props: VideoGalleryProps) => {
     const initialSortOrder = props.sortOrder ?? VideosSortOrder.Favorite
 
-    const [items, setItems] = useState<IVideo[]>([])
-    const [galleryPage, setGalleryPage] = useState<number>(0)
-    const [totalPages, setTotalPages] = useState<number>(0)
-    const [sortOrder, setSortOrder] = useState<VideosSortOrder>(initialSortOrder)
-    const [currentPageSize, setCurrentPageSize] = useState<number>(props.allItems.length < props.pageSize ? props.allItems.length : props.pageSize)
+    const [ items, setItems ] = useState<IVideo[]>([])
+    const [ galleryPage, setGalleryPage ] = useState<number>(0)
+    const [ totalPages, setTotalPages ] = useState<number>(0)
+    const [ sortOrder, setSortOrder ] = useState<VideosSortOrder>(initialSortOrder)
+    const [ actorListingActor, setActorListingActor ] = useState<IActor | null>(null)
+    const [ currentPageSize, setCurrentPageSize ] = useState<number>(props.allItems.length < props.pageSize ? props.allItems.length : props.pageSize)
 
     useEffect(() => {
         updateItems(props.allItems, props.query)
@@ -36,13 +37,17 @@ const VideoGallery = (props: VideoGalleryProps) => {
     const updateItems = (videos: IVideo[], query?: IVideoSearchQuery) => {
         if (query) {
             const filteredVideos = getFilteredVideos(videos, query)
-            setItems(getSortedVideos(filteredVideos, sortOrder))
+            const sortedVideos = getSortedVideos(filteredVideos, sortOrder)
+            setItems(sortedVideos)
             setTotalPages(getTotalPages(videos))
             setGalleryPage(0)
+            updateActorListingActor(sortedVideos)
         } else {
+            const sortedVideos = getSortedVideos(videos, sortOrder)
             setItems(getSortedVideos(videos, sortOrder))
             setTotalPages(getTotalPages(videos))
             setGalleryPage(0)
+            updateActorListingActor(sortedVideos)
         }
     }
 
@@ -146,10 +151,10 @@ const VideoGallery = (props: VideoGalleryProps) => {
         setGalleryPage(pageNum)
     }
 
-    const getCurrentGalleryPage = (): IVideo[] => {
+    const getCurrentGalleryPage = (videos: IVideo[]): IVideo[] => {
         let pageStart = galleryPage * props.pageSize;
         let pageEnd = (galleryPage + 1) * props.pageSize;
-        return items.slice(pageStart, pageEnd)
+        return videos.slice(pageStart, pageEnd)
     }
 
     const bodyClick = (Video: IVideo, VideoIndex: number) => {
@@ -168,18 +173,18 @@ const VideoGallery = (props: VideoGalleryProps) => {
         }
     }
 
-    const getActorListingActor = () => {
-        let isActorListing = props.query &&
+    const updateActorListingActor = (videos: IVideo[]) => {
+        const isActorListing = props.query &&
             props.query.filled &&
             props.query.actor &&
             !props.query.source &&
             !props.query.tag
-        if (!isActorListing) return null
-        let firstVideo = getCurrentGalleryPage()[0]
-        return firstVideo.actors.find(a => a.name == props.query!.actor)
+        if (!isActorListing) return
+        const firstVideo = getCurrentGalleryPage(videos)[0]
+        const listingActor = firstVideo.actors.find(a => a.name == props.query!.actor) ?? null
+        setActorListingActor(listingActor)
     }
 
-    const actorListingActor = getActorListingActor()
     return (
         <div className="videogallery-container dark-theme">
             {
@@ -204,7 +209,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
                 }
             </div>
             <div className="videogallery-container-inner">
-                {getCurrentGalleryPage().map((video, i) => {
+                {getCurrentGalleryPage(items).map((video, i) => {
                     return <VideoGalleryItem
                         key={i}
                         index={i}
