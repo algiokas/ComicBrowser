@@ -39,14 +39,14 @@ const VideoGallery = (props: VideoGalleryProps) => {
             const filteredVideos = getFilteredVideos(videos, query)
             const sortedVideos = getSortedVideos(filteredVideos, sortOrder)
             setItems(sortedVideos)
-            setTotalPages(getTotalPages(videos))
+            setTotalPages(getTotalPages(sortedVideos))
             setGalleryPage(0)
             updateActorListingActor(sortedVideos)
         } else {
             const sortedVideos = getSortedVideos(videos, sortOrder)
             setItems(getSortedVideos(videos, sortOrder))
             setTotalPages(getTotalPages(videos))
-            setGalleryPage(0)
+            setGalleryPage(0)  
             updateActorListingActor(sortedVideos)
         }
     }

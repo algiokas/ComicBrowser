@@ -1,13 +1,13 @@
-import React, { Component, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { SubAppProps } from "../../App";
+import IBook from "../../interfaces/book";
+import INavItem from "../../interfaces/navItem";
+import { IBookSearchQuery } from "../../interfaces/searchQuery";
+import ISlideshow, { ICollection } from "../../interfaces/slideshow";
+import { BooksViewMode } from "../../util/enums";
+import { filterAlphanumeric, isAlphanumeric } from "../../util/helpers";
 import Navigation from "../shared/navigation";
 import MultiView from "./multiView";
-import { BooksViewMode } from "../../util/enums";
-import IBook from "../../interfaces/book";
-import ISlideshow, { ICollection } from "../../interfaces/slideshow";
-import { IBookSearchQuery } from "../../interfaces/searchQuery";
-import { SubAppProps } from "../../App";
-import INavItem from "../../interfaces/navItem";
-import { filterAlphanumeric, isAlphanumeric } from "../../util/helpers";
 
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL
 

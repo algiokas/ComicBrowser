@@ -1,7 +1,7 @@
-import { Component } from "react";
+import { useState } from "react";
 import { ICollection } from "../../../interfaces/slideshow";
 import PageSelect from "../../shared/pageSelect"
-import BaseGallery, { BaseGalleryProps, BaseGalleryState } from "../../shared/baseGallery"
+import { BaseGalleryProps } from "../../shared/baseGallery"
 import CollectionGalleryItem from "./collectionGalleryItem";
 import { GetCoverPath, GetPagePathByID } from "../../../util/helpers";
 
@@ -10,22 +10,38 @@ interface CollectionGalleryProps extends BaseGalleryProps<ICollection> {
     viewCollection(col: ICollection): void
 }
 
-interface CoverGalleryState extends BaseGalleryState<ICollection> {
-}
+const CollectionGallery = (props: CollectionGalleryProps) => {
+    const [items, setItems] = useState<ICollection[]>(props.allItems)
+    const [galleryPage, setGalleryPage] = useState<number>(0)
+    const [totalPages, setTotalPages] = useState<number>(0)
+    const [currentPageSize, setCurrentPageSize] = useState<number>(0)
 
-class CollectionGallery extends BaseGallery<ICollection, CollectionGalleryProps, CoverGalleryState> {
-    constructor(props: CollectionGalleryProps) {
-        super(props)
+    const getTotalPages = (items: ICollection[]): number => {
+        if (items) {
+            return Math.max(1, Math.ceil(items.length / props.pageSize))
+        }
+        return 1
+    }
 
-        this.state = {
-            galleryPage: 0,
-            currentPageSize: props.allItems.length < props.pageSize ? props.allItems.length : props.pageSize,
-            items: this.props.allItems,
-            totalPages: this.getTotalPages(this.props.allItems),
+    const getPageSize = (pageNum: number): number => {
+        if (pageNum < totalPages - 1) {
+            return props.pageSize
+        } else {
+            return items.length % props.pageSize
         }
     }
 
-    getCollectionCover = (col: ICollection): string => {
+    const setPage = (pageNum: number) => {
+        setGalleryPage(pageNum)
+    }
+
+    const getCurrentGalleryPage = (): ICollection[] => {
+        let pageStart = galleryPage * props.pageSize;
+        let pageEnd = (galleryPage + 1) * props.pageSize;
+        return items.slice(pageStart, pageEnd)
+    }
+
+    const getCollectionCover = (col: ICollection): string => {
         if (col.coverImage) {
             console.log(`Cover images not supported: ${col.coverImage}`)
             return ''
@@ -37,34 +53,32 @@ class CollectionGallery extends BaseGallery<ICollection, CollectionGalleryProps,
         return GetCoverPath(coverbook)
     }
 
-    render() {
-        return (
-            <div className="gallery-container dark-theme">
-                <div className="gallery-container-header">
-                    <PageSelect 
-                        setPage={this.setPage} 
-                        totalPages={this.state.totalPages} 
-                        currentPage={this.state.galleryPage}/>
-                </div>
-                <div className="gallery-container-inner">
-                    {this.getCurrentGalleryPage().map((collection, i) => {
-                        return <CollectionGalleryItem
-                            key={i}
-                            index={i}
-                            data={collection}
-                            imageUrl={this.getCollectionCover(collection)}
-                            bodyClickHandler={() => this.props.viewCollection(collection)}
-                        ></CollectionGalleryItem>
-                    })
-
-                    }
-                </div>
-                <div className="gallery-container-footer">
-                    <PageSelect setPage={this.setPage} totalPages={this.state.totalPages} currentPage={this.state.galleryPage}></PageSelect>
-                </div>
+    return (
+        <div className="gallery-container dark-theme">
+            <div className="gallery-container-header">
+                <PageSelect
+                    setPage={setPage}
+                    totalPages={totalPages}
+                    currentPage={galleryPage} />
             </div>
-        )
-    }
+            <div className="gallery-container-inner">
+                {getCurrentGalleryPage().map((collection, i) => {
+                    return <CollectionGalleryItem
+                        key={i}
+                        index={i}
+                        data={collection}
+                        imageUrl={getCollectionCover(collection)}
+                        bodyClickHandler={() => props.viewCollection(collection)}
+                    ></CollectionGalleryItem>
+                })
+
+                }
+            </div>
+            <div className="gallery-container-footer">
+                <PageSelect setPage={setPage} totalPages={totalPages} currentPage={galleryPage}></PageSelect>
+            </div>
+        </div>
+    )
 }
 
 export default CollectionGallery

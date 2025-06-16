@@ -1,12 +1,12 @@
-import { Component } from "react";
-import GalleryItem from "./galleryItem";
-import PageSelect from "../../shared/pageSelect";
-import { GetCoverPath, getBookAuthor } from "../../../util/helpers";
-import FilterInfo from "./filterInfo";
-import SortControls from "./sortControls";
-import { BooksSortOrder } from "../../../util/enums";
+import { useEffect, useState } from "react";
 import IBook from "../../../interfaces/book";
-import { IBookSearchQuery }from "../../../interfaces/searchQuery";
+import { IBookSearchQuery } from "../../../interfaces/searchQuery";
+import { BooksSortOrder } from "../../../util/enums";
+import { GetCoverPath, getBookAuthor } from "../../../util/helpers";
+import PageSelect from "../../shared/pageSelect";
+import FilterInfo from "./filterInfo";
+import GalleryItem from "./galleryItem";
+import SortControls from "./sortControls";
 
 interface CoverGalleryProps {
     allBooks: IBook[],
@@ -22,72 +22,41 @@ interface CoverGalleryProps {
     addBookToSlideshow(book : IBook): void
 }
 
-interface CoverGalleryState {
-    galleryPage: number,
-    currentPageSize: number,
-    bookList: IBook[],
-    totalPages: number,
-    sortOrder: BooksSortOrder
-}
+const CoverGallery = (props: CoverGalleryProps) => {
+    const initialSortOrder = props.sortOrder ?? BooksSortOrder.Favorite
 
-const DEFAULTSORTORDER = BooksSortOrder.Favorite
+    const [ galleryPage, setGalleryPage ] = useState<number>(0)
+    const [ currentPageSize, setCurrentPageSize ] = useState<number>(props.allBooks.length < props.pageSize ? props.allBooks.length : props.pageSize)
+    const [ bookList, setBookList ] = useState<IBook[]>([])
+    const [ totalPages, setTotalPages ] = useState<number>(0)
+    const [ sortOrder, setSortOrder ] = useState<BooksSortOrder>(initialSortOrder)
 
-class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
-    constructor(props: CoverGalleryProps) {
-        super(props)
+    useEffect(() => {
+        updateBookList(props.allBooks, props.query)
+    }, [ props.allBooks, props.query ])
 
-        // this.totalPages = this.getTotalPages(props.allBooks)
-
-        let initialSortOrder = props.sortOrder ?? DEFAULTSORTORDER
-
-        let initialState: CoverGalleryState = {
-            galleryPage: 0,
-            currentPageSize: props.allBooks.length < props.pageSize ? props.allBooks.length : props.pageSize,
-            bookList: [],
-            totalPages: 0,
-            sortOrder: initialSortOrder
-        }
-
-        if (props.query) {
-            let filteredBooks = this.getFilteredBooks(props.allBooks, props.query)
-            initialState.bookList = this.getSortedBooks(filteredBooks, initialSortOrder)
-            initialState.totalPages = this.getTotalPages(filteredBooks)
+     const updateBookList = (books: IBook[], query?: IBookSearchQuery) => {
+        if (query) {
+            const filteredBooks = getFilteredBooks(books, query)
+            const sortedBooks = getSortedBooks(filteredBooks, initialSortOrder)
+            setBookList(sortedBooks)
+            setTotalPages(getTotalPages(sortedBooks))
+            setGalleryPage(0)
         } else {
-            initialState.bookList = this.getSortedBooks(props.allBooks, initialSortOrder)
-            initialState.totalPages = this.getTotalPages(props.allBooks)
+            const sortedBooks = getSortedBooks(books, initialSortOrder)
+            setBookList(sortedBooks)
+            setTotalPages(getTotalPages(books))
         }
-        this.state = initialState
-    }
+     }
 
-    componentDidUpdate(prevProps: CoverGalleryProps) {
-        if (prevProps.allBooks !== this.props.allBooks || prevProps.query !== this.props.query) {
-            if (this.props.query) {
-                let filteredBooks = this.getFilteredBooks(this.props.allBooks, this.props.query)
-                this.setState({
-                    galleryPage: 0,
-                    bookList: this.getSortedBooks(filteredBooks, this.state.sortOrder),
-                    totalPages: this.getTotalPages(filteredBooks)
-                })
-            } else {
-                this.setState({
-                    galleryPage: 0,
-                    bookList: this.getSortedBooks(this.props.allBooks, DEFAULTSORTORDER),
-                    totalPages: this.getTotalPages(this.props.allBooks),
-                    sortOrder: DEFAULTSORTORDER
-                })
-            }
-        }
-    }
-
-    
-    getTotalPages = (books: IBook[]): number => {
+    const getTotalPages = (books: IBook[]): number => {
         if (books) {
-            return Math.max(1, Math.ceil(books.length / this.props.pageSize))
+            return Math.max(1, Math.ceil(books.length / props.pageSize))
         }
         return 1
     }
 
-    getSortedBooks = (books: IBook[], sortOrder: BooksSortOrder): IBook[] => {
+    const getSortedBooks = (books: IBook[], sortOrder: BooksSortOrder): IBook[] => {
         let sortedCopy = [...books]
         switch (sortOrder) {
             case BooksSortOrder.Title:
@@ -138,7 +107,7 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
         return sortedCopy
     }
 
-    getFilteredBooks = (books: IBook[], searchQuery: IBookSearchQuery): IBook[] => {
+    const getFilteredBooks = (books: IBook[], searchQuery: IBookSearchQuery): IBook[] => {
         let results = books
         if (searchQuery.artists) {
             let queryArtists = searchQuery.artists.split(',').map(s => s.toLowerCase())
@@ -182,113 +151,106 @@ class CoverGallery extends Component<CoverGalleryProps, CoverGalleryState> {
         return results
     }
 
-    sortBooks = (order: BooksSortOrder) => {
-        if (this.state.sortOrder !== order || order === BooksSortOrder.Random || order === BooksSortOrder.Favorite){
-            this.setState({
-                galleryPage: 0,
-                bookList: this.getSortedBooks(this.props.allBooks, order),
-                sortOrder: order
-            })
+    const sortBooks = (order: BooksSortOrder) => {
+        if (sortOrder !== order || order === BooksSortOrder.Random || order === BooksSortOrder.Favorite){
+            setBookList(getSortedBooks(props.allBooks, order))
+            setSortOrder(order)
+            setGalleryPage(0)
         }
     }
 
-    getItemSubtitle = (book: IBook): string => {
-        if (this.state.sortOrder === BooksSortOrder.Author) {
+    const getItemSubtitle = (book: IBook): string => {
+        if (sortOrder === BooksSortOrder.Author) {
             return getBookAuthor(book)
         }
         return book.artists.join(', ')
     }
 
-    getCurrentGalleryPage = (): IBook[] => {
-        let pageStart = this.state.galleryPage * this.props.pageSize;
-        let pageEnd = (this.state.galleryPage+1) * this.props.pageSize;
-        return this.state.bookList.slice(pageStart, pageEnd)
+    const getCurrentGalleryPage = (): IBook[] => {
+        let pageStart = galleryPage * props.pageSize;
+        let pageEnd = (galleryPage+1) * props.pageSize;
+        return bookList.slice(pageStart, pageEnd)
     }
 
-    getPageSize = (pageNum: number): number => {
-        if (pageNum < this.state.totalPages-1) {
-            return this.props.pageSize
+    const getPageSize = (pageNum: number): number => {
+        if (pageNum < totalPages-1) {
+            return props.pageSize
         } else {
-            return this.state.bookList.length % this.props.pageSize
+            return bookList.length % props.pageSize
         }
     }
 
-    setPage = (pageNum: number) => {
-        this.setState({ 
-            galleryPage : pageNum
-        })
+    const setPage = (pageNum: number) => {
+        setGalleryPage(pageNum)
     }
 
-    bodyClick = (book: IBook, bookIndex: number) => {
-        this.props.viewBook(book)
+    const bodyClick = (book: IBook, bookIndex: number) => {
+        props.viewBook(book)
     }
 
-    subTitleClick = (book: IBook) => {
-        let subtitle = this.getItemSubtitle(book)
+    const subTitleClick = (book: IBook) => {
+        let subtitle = getItemSubtitle(book)
         
         if (subtitle === book.artGroup) {
             console.log(`subtitle search - Group: ${subtitle}`)
-            this.props.viewSearchResults({ groups: subtitle })
+            props.viewSearchResults({ groups: subtitle })
         }
         else {
             console.log(`subtitle search - Artist: ${subtitle}`)
-            this.props.viewSearchResults({ artists: subtitle })
+            props.viewSearchResults({ artists: subtitle })
         }      
     }
 
-    favoriteClick = (book: IBook) => {
+    const favoriteClick = (book: IBook) => {
         console.log("toggle favorite for book: " + book.id)
-        if (this.props.updateBook) {
+        if (props.updateBook) {
             book.isFavorite = !book.isFavorite; //toggle value
-            this.props.updateBook(book)
+            props.updateBook(book)
         }
     }
 
-    render() {
-        return (
+    return (
             <div className="gallery-container dark-theme">
                 <div className="gallery-container-header">
                     {
-                        this.props.showFilters && this.props.query && this.props.query.filled ?
-                        <FilterInfo filterQuery={this.props.query}></FilterInfo>
+                        props.showFilters && props.query && props.query.filled ?
+                        <FilterInfo filterQuery={props.query}></FilterInfo>
                         : null
                     }
                     <PageSelect 
-                        setPage={this.setPage} 
-                        totalPages={this.state.totalPages} 
-                        currentPage={this.state.galleryPage}/>
+                        setPage={setPage} 
+                        totalPages={totalPages} 
+                        currentPage={galleryPage}/>
                     {
-                        this.props.sortOrder ? null :
-                        <SortControls sortOrder={this.state.sortOrder}
-                            bookList={this.state.bookList}
-                            pageSize={this.props.pageSize}
-                            sortBooks={this.sortBooks}
-                            setPage={this.setPage}/>
+                        props.sortOrder ? null :
+                        <SortControls sortOrder={sortOrder}
+                            bookList={bookList}
+                            pageSize={props.pageSize}
+                            sortBooks={sortBooks}
+                            setPage={setPage}/>
                     }
                 </div>
                 <div className="gallery-container-inner">
-                    {this.getCurrentGalleryPage().map((book, i) => {
+                    {getCurrentGalleryPage().map((book, i) => {
                         return <GalleryItem
                             key={i}
                             index={i}
                             book={book}
                             coverUrl={GetCoverPath(book)}
-                            subtitle={this.getItemSubtitle(book)}
-                            addButtonHandler={this.props.addBookToSlideshow} 
-                            bodyClickHandler={this.bodyClick}
-                            subTitleClickHandler={this.subTitleClick}
-                            favoriteClickHandler={this.favoriteClick}
+                            subtitle={getItemSubtitle(book)}
+                            addButtonHandler={props.addBookToSlideshow} 
+                            bodyClickHandler={bodyClick}
+                            subTitleClickHandler={subTitleClick}
+                            favoriteClickHandler={favoriteClick}
                         ></GalleryItem>
                     })
 
                     }
                 </div>
                 <div className="gallery-container-footer">
-                    <PageSelect setPage={this.setPage} totalPages={this.state.totalPages} currentPage={this.state.galleryPage}></PageSelect>
+                    <PageSelect setPage={setPage} totalPages={totalPages} currentPage={galleryPage}></PageSelect>
                 </div>
             </div>
         )
-    }
 }
-
 export default CoverGallery

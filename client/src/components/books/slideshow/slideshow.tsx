@@ -1,11 +1,11 @@
-import React, { Component, createRef } from "react";
-import { GetPagePathByID, GetPagePathMulti } from "../../../util/helpers"
-import Sidebar from "./slideshow-sidebar";
+import React, { useEffect, useState } from "react";
+import IBook from "../../../interfaces/book";
+import { IBookSearchQuery } from "../../../interfaces/searchQuery";
 import ISlideshow from "../../../interfaces/slideshow";
 import { BooksViewMode } from "../../../util/enums";
-import IBook from "../../../interfaces/book";
-import { IBookSearchQuery }from "../../../interfaces/searchQuery";
+import { GetPagePathMulti } from "../../../util/helpers";
 import GridPage from "./gridPage";
+import Sidebar from "./slideshow-sidebar";
 
 interface SlideshowProps {
     slideshow: ISlideshow,
@@ -36,32 +36,77 @@ export interface IGridPage {
     bookId: number,
     bookPageNum: number,
     slideNum: number
-    
+
 }
 
-class Slideshow extends Component<SlideshowProps, SlideshowState> {
-    constructor(props: SlideshowProps) {
-        super(props)
+const Slideshow = (props: SlideshowProps) => {
+    const [showSidebar, setShowSidebar] = useState<boolean>(true)
+    const [gridView, setGridView] = useState<boolean>(false)
+    const [playing, setPlaying] = useState<boolean>(false)
+    const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null)
+    const [intervalCounter, setIntervalCounter] = useState<number>(0)
+    const [intervalLength, setIntervalLength] = useState<number>(5)
+    const [gridPages, setGridPages] = useState<IGridPage[]>([])
 
-        this.state = {
-            showSidebar: true,
-            gridView: false,
-            playing: false,
-            intervalId: 0,
-            intervalCounter: 0,
-            intervalLength: 5,
-            gridPages: this.getGridPages()
+    const gridRef = React.createRef<HTMLDivElement>()
+    const currentGridPagRef = React.createRef<HTMLDivElement>()
+
+    useEffect(() => {
+        setGridPages(getGridPages()) //mount
+        return () => {
+            if (intervalId) { //unmount
+                clearInterval(intervalId)
+            }
+        }
+    }, [])
+
+    useEffect(() => {
+        if (intervalId) {
+            clearInterval(intervalId)
+        }
+        setPlaying(false)
+        setIntervalId(null)
+        setIntervalCounter(0)
+        setGridView(false)
+        setGridPages(getGridPages())
+    }, [ JSON.stringify(props.slideshow.books) ])
+
+    // useEffect(() => {
+    //     if (playing) {
+    //         const id = setInterval(incrementInterval, 1000)
+    //         setIntervalId(id)
+    //     } else {
+    //         if (intervalId) {
+    //             clearInterval(intervalId)
+    //         }
+    //     }
+
+    // }, [playing])
+
+    useEffect(() => {
+        const currentPageRect = currentGridPagRef.current?.getBoundingClientRect()
+        if (currentPageRect) {
+            console.log(`width: ${currentPageRect.width} - height: ${currentPageRect.height}`)
+            const pageRow = Math.floor(props.currentPage / 5)
+            console.log(`PageRow: ${pageRow}`)
+            const scrollHeight = pageRow * currentPageRect.height
+            console.log(`Scrollheight: ${scrollHeight}`)
+            gridRef.current?.scrollTo(0, scrollHeight)
         }
 
-    }
+    }, [gridView])
 
-    gridRef = React.createRef<HTMLDivElement>()
-    currentGridPagRef = React.createRef<HTMLDivElement>()
+    useEffect(() => {
+        if (intervalCounter >= intervalLength) {
+            setIntervalCounter(0)
+            nextPage()
+        }
+    }, [ intervalCounter ])
 
-    getGridPages = (): IGridPage[] => {
+    const getGridPages = (): IGridPage[] => {
         let gPages: IGridPage[] = []
         let ssIndex = 0
-        this.props.slideshow.books.forEach((book) => {
+        props.slideshow.books.forEach((book) => {
             for (let i = 0; i < book.pageCount; i++) {
                 gPages.push({ bookId: book.id, bookPageNum: i, slideNum: ssIndex })
                 ssIndex++
@@ -70,198 +115,136 @@ class Slideshow extends Component<SlideshowProps, SlideshowState> {
         return gPages
     }
 
-    componentDidUpdate(prevProps: SlideshowProps, prevState: SlideshowState) {
-        if (this.props.slideshow && prevProps.slideshow) {
-            let ssOld = prevProps.slideshow.id !== null ? prevProps.slideshow.id : JSON.stringify(prevProps.slideshow.books.map(b => b.id))
-            let ssNew = this.props.slideshow.id !== null ? this.props.slideshow.id : JSON.stringify(this.props.slideshow.books.map(b => b.id))
-            if (ssOld !== ssNew) {
-                if (prevState.intervalId > 0) {
-                    clearInterval(this.state.intervalId);
-                    this.setState({
-                        playing: false,
-                        intervalId: 0,
-                        intervalCounter: 0,
-                    })
-                }
-                this.setState({ 
-                    gridView: false,
-                    gridPages: this.getGridPages()
-                })
-            }
-        }
-        if (this.state.gridView && !prevState.gridView) {
-            console.log(this.state)
-            const currentPageRect = this.currentGridPagRef.current?.getBoundingClientRect()
-            if (currentPageRect) {
-                console.log(`width: ${currentPageRect.width} - height: ${currentPageRect.height}`)
-                const pageRow = Math.floor(this.props.currentPage / 5)
-                console.log(`PageRow: ${pageRow}`)
-                const scrollHeight = pageRow * currentPageRect.height
-                console.log(`Scrollheight: ${scrollHeight}`)
-                this.gridRef.current?.scrollTo(0, scrollHeight)
-            }    
-        }
-
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.state.intervalId)
-    }
-
     //override
-    setCurrentPage = (pageNum: number) => {
-        this.setState({ intervalCounter: 0 })
-        this.props.setCurrentPage(pageNum)
+    const setCurrentPage = (pageNum: number) => {
+        setIntervalCounter(0)
+        props.setCurrentPage(pageNum)
     }
 
-    toggleSidebar = () => {
-        this.setState((state) => {
-            return { showSidebar: !state.showSidebar }
-        })
+    const toggleSidebar = () => {
+        setShowSidebar(!showSidebar)
     }
 
-    previousPage = () => {
-        if (this.props.currentPage > 0) {
-            this.setCurrentPage(this.props.currentPage - 1)
+    const previousPage = () => {
+        if (props.currentPage > 0) {
+            setCurrentPage(props.currentPage - 1)
         }
     }
 
-    nextPage = () => {
-        if (this.props.currentPage < this.props.slideshow.pageCount - 1) {
-            this.setCurrentPage(this.props.currentPage + 1)
+    const nextPage = () => {
+        if (props.currentPage < props.slideshow.pageCount - 1) {
+            setCurrentPage(props.currentPage + 1)
         }
     }
 
-    firstPageOfBook = (book: IBook, bookIndex: number) => {
+    const firstPageOfBook = (book: IBook, bookIndex: number) => {
         let pageIndex = 0;
         for (let i = 0; i < bookIndex; i++) {
-            pageIndex += this.props.slideshow.books[i].pageCount
+            pageIndex += props.slideshow.books[i].pageCount
         }
-        this.setCurrentPage(pageIndex)
+        setCurrentPage(pageIndex)
     }
 
-    resetPage = () => {
-        this.props.setCurrentPage(0)
+    const resetPage = () => {
+        props.setCurrentPage(0)
     }
 
-    toggleGrid = () => {
-        this.setState((prevState: SlideshowState) => {
-            return { ...prevState, gridView: !prevState.gridView }
-        })
+    const toggleGrid = () => {
+        setGridView(!gridView)
     }
 
-    gridClick = (pageNum: number) => {
-        this.setCurrentPage(pageNum)
-        this.toggleGrid()
+    const gridClick = (pageNum: number) => {
+        setCurrentPage(pageNum)
+        toggleGrid()
     }
 
-    handleIntervalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleIntervalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let newInterval = parseInt(e.target.value)
         if (!Number.isNaN(newInterval)) {
-            this.setState({
-                intervalLength: newInterval,
-                intervalCounter: 0
-            })
+            setIntervalLength(newInterval)
+            setIntervalCounter(0)
         } else {
             console.log('handleIntervalChange: invalid interval value')
         }
 
     }
 
-    incrementInterval = () => {
-        let counterVal = this.state.intervalCounter + 1
-        if (counterVal < this.state.intervalLength) {
-            this.setState({ intervalCounter: counterVal })
-        } else {
-            this.setState({ intervalCounter: 0 })
-            this.nextPage()
-        }
-    }
-
-    playPause = () => {
-        if (!this.state.playing) {
+    const playPause = () => {
+        if (!playing) {
             console.log('play')
-            let currentInterval = window.setInterval(this.incrementInterval, 1000)
-            this.setState({ intervalId: currentInterval })
-            this.setState((state) => {
-                return { playing: !state.playing }
-            })
+            let currentInterval = setInterval(() => setIntervalCounter((oldVal) => oldVal + 1), 1000)
+            setIntervalId(currentInterval)
+            setPlaying(true)
         }
         else {
             console.log('pause')
-            clearInterval(this.state.intervalId);
-            this.setState({ intervalId: 0 })
-            this.setState((state) => {
-                return { playing: !state.playing }
-            })
+            if (intervalId) {
+                clearInterval(intervalId)
+            }
+            setIntervalId(null)
+            setPlaying(false)
         }
     }
 
-    pause = () => {
-        this.setState({ playing: false })
+    let sidebarProps = {
+        toggleSidebar: toggleSidebar,
+        previousPage: previousPage,
+        nextPage: nextPage,
+        handleIntervalChange: handleIntervalChange,
+        playPause: playPause,
+        setPage: setCurrentPage,
+        resetPage: resetPage,
+        toggleGrid: toggleGrid,
+
+        galleryItemClickHandler: firstPageOfBook,
+        addButtonHandler: props.addButtonHandler,
+        removeButtonHandler: props.removeButtonHandler,
+        emptySlideshow: props.emptySlideshow,
+        updateBook: props.updateBook,
+        deleteBook: props.deleteBook,
+        viewSearchResults: props.viewSearchResults,
+        createCollection: props.createCollection,
+
+        slideshow: props.slideshow,
+        showSidebar: showSidebar,
+        currentPage: props.currentPage,
+        pageCount: props.slideshow.pageCount,
+        intervalLength: intervalLength,
+        intervalCount: intervalCounter,
+        viewMode: props.viewMode,
+        gridView: gridView,
+        playing: playing
     }
 
-    render() {
-        let sidebarProps = {
-            toggleSidebar: this.toggleSidebar,
-            previousPage: this.previousPage,
-            nextPage: this.nextPage,
-            handleIntervalChange: this.handleIntervalChange,
-            playPause: this.playPause,
-            setPage: this.setCurrentPage,
-            resetPage: this.resetPage,
-            toggleGrid: this.toggleGrid,
-
-            galleryItemClickHandler: this.firstPageOfBook,
-            addButtonHandler: this.props.addButtonHandler,
-            removeButtonHandler: this.props.removeButtonHandler,
-            emptySlideshow: this.props.emptySlideshow,
-            updateBook: this.props.updateBook,
-            deleteBook: this.props.deleteBook,
-            viewSearchResults: this.props.viewSearchResults,
-            createCollection: this.props.createCollection,
-
-            slideshow: this.props.slideshow,
-            showSidebar: this.state.showSidebar,
-            currentPage: this.props.currentPage,
-            pageCount: this.props.slideshow.pageCount,
-            intervalLength: this.state.intervalLength,
-            intervalCount: this.state.intervalCounter,
-            viewMode: this.props.viewMode,
-            gridView: this.state.gridView,
-            playing: this.state.playing
-        }
-
-        return (
-            <div className={`slideshow-container ${this.state.showSidebar ? "show-sidebar" : ""}`}>
-                {
-                    this.state.gridView ?
-                        <div className="pagegrid" ref={this.gridRef}>
-                            {
-                                this.state.gridPages.map((page: IGridPage, i: number) =>                                     
-                                <GridPage {...page} 
-                                    index={i} 
-                                    currentPage={this.props.currentPage} 
-                                    gridClick={this.gridClick}
-                                    pageRef={this.currentGridPagRef}/>)}
+    return (
+        <div className={`slideshow-container ${showSidebar ? "show-sidebar" : ""}`}>
+            {
+                gridView ?
+                    <div className="pagegrid" ref={gridRef}>
+                        {
+                            gridPages.map((page: IGridPage, i: number) =>
+                                <GridPage {...page}
+                                    index={i}
+                                    currentPage={props.currentPage}
+                                    gridClick={gridClick}
+                                    pageRef={currentGridPagRef} />)}
+                    </div>
+                    :
+                    <div className="slideshow">
+                        <img className={`slideshow-image`}
+                            src={GetPagePathMulti(props.slideshow.books, props.currentPage)}
+                            alt={" page " + props.currentPage + 1}>
+                        </img>
+                        <div className="slideshow-overlay">
+                            <div className="overlay-left" onClick={previousPage}></div>
+                            <div className="overlay-right" onClick={nextPage}></div>
                         </div>
-                        :
-                        <div className="slideshow">
-                            <img className={`slideshow-image`}
-                                src={GetPagePathMulti(this.props.slideshow.books, this.props.currentPage)}
-                                alt={" page " + this.props.currentPage + 1}>
-                            </img>
-                            <div className="slideshow-overlay">
-                                <div className="overlay-left" onClick={this.previousPage}></div>
-                                <div className="overlay-right" onClick={this.nextPage}></div>
-                            </div>
-                        </div>
+                    </div>
 
-                }
-                <Sidebar {...sidebarProps}></Sidebar>
-            </div>
-        )
-    }
+            }
+            <Sidebar {...sidebarProps}></Sidebar>
+        </div>
+    )
 }
 
 export default Slideshow

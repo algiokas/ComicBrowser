@@ -1,24 +1,20 @@
-import React, { Component } from "react";
+import React from "react";
 
 interface GalleryItemOverlayProps {
-    icon?: React.Component<SVGElement>
-    iconAltText?: string
+  icon?: React.Component<SVGElement>
+  iconAltText?: string
 }
 
-interface GalleryItemOverlayState {}
-
-class GalleryItemOverlay extends Component<GalleryItemOverlayProps, GalleryItemOverlayState> {
-  render() {
-    return (
-        <div className="gallery-overlay">
-            {
-                this.props.icon ?
-                <img className="svg-icon" src={this.props.icon.toString()} alt="remove from favorites"></img>
-                : null
-            }
-        </div>
-    )
-  }
+const GalleryItemOverlay = (props: GalleryItemOverlayProps) => {
+  return (
+    <div className="gallery-overlay">
+      {
+        props.icon ?
+          <img className="svg-icon" src={props.icon.toString()} alt="remove from favorites"></img>
+          : null
+      }
+    </div>
+  )
 }
 
 export default GalleryItemOverlay

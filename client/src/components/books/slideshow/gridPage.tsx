@@ -9,7 +9,7 @@ interface GridPageProps extends IGridPage {
     pageRef: React.RefObject<HTMLDivElement>
 }
 
-function GridPage(props: GridPageProps) {
+const GridPage = (props: GridPageProps) => {
     const isCurrentPage = props.slideNum === props.currentPage
 
     if (isCurrentPage) {

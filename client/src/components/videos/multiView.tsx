@@ -1,14 +1,13 @@
-import React, { Component } from "react";
+import IActor from "../../interfaces/actor";
+import { IVideoSearchQuery } from "../../interfaces/searchQuery";
+import IVideo from "../../interfaces/video";
+import { ActorsSortOrder, VideosSortOrder, VideosViewMode } from "../../util/enums";
+import ActorGallery from "./gallery/actorGallery";
+import SourceGallery from "./gallery/sourceGallery";
+import VideoGallery from "./gallery/videoGallery";
 import LoadingView from "./loadingView";
 import Player from "./player/player";
-import { ActorsSortOrder, VideosSortOrder, VideosViewMode } from "../../util/enums";
-import { IVideoSearchQuery } from "../../interfaces/searchQuery";
 import { VideosAppState } from "./videosApp";
-import IVideo from "../../interfaces/video";
-import VideoGallery from "./gallery/videoGallery";
-import ActorGallery from "./gallery/actorGallery";
-import IActor from "../../interfaces/actor";
-import SourceGallery from "./gallery/sourceGallery";
 
 interface MultiViewProps extends VideosAppState {
     watchVideo(Video: IVideo): void,

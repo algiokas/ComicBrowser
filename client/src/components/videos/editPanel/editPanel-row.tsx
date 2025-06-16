@@ -1,8 +1,8 @@
-import React, { Component, useState } from "react";
+import React, { useState } from "react";
+import Check2Img from "../../../img/svg/check2.svg";
+import PencilSquareImg from "../../../img/svg/pencil-square.svg";
+import XImg from "../../../img/svg/x.svg";
 import { VideosEditField } from "../../../util/enums";
-import XImg from "../../../img/svg/x.svg"
-import Check2Img from "../../../img/svg/check2.svg"
-import PencilSquareImg from "../../../img/svg/pencil-square.svg"
 
 interface EditPanelRowProps<T> {
     editField: VideosEditField,
@@ -12,11 +12,6 @@ interface EditPanelRowProps<T> {
     getValueFromDisplayString: (str: string) => T,
     updateTempValue(field: VideosEditField, value: any): void,
     valueClick?: (v: string) => void
-}
-
-interface EditPanelRowState<T> {
-    editMode: boolean,
-    fieldValue: T
 }
 
 function EditPanelRow<T>(props: EditPanelRowProps<T>) {

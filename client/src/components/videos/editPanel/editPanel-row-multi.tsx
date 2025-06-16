@@ -1,10 +1,9 @@
-import React, { Component, useEffect, useReducer, useRef, useState } from "react";
-import { scalarArrayCompare } from "../../../util/helpers";
+import React, { useEffect, useRef, useState } from "react";
+import Check2Img from "../../../img/svg/check2.svg";
+import PencilSquareImg from "../../../img/svg/pencil-square.svg";
+import PlusImg from "../../../img/svg/plus-symbol.svg";
+import XImg from "../../../img/svg/x.svg";
 import { VideosEditField } from "../../../util/enums";
-import XImg from "../../../img/svg/x.svg"
-import PlusImg from "../../../img/svg/plus-symbol.svg"
-import Check2Img from "../../../img/svg/check2.svg"
-import PencilSquareImg from "../../../img/svg/pencil-square.svg"
 
 interface EditPanelRowProps<T> {
     editField: VideosEditField,

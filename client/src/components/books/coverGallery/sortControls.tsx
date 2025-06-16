@@ -1,8 +1,7 @@
-import React, { Component } from "react";
-import { getAlphabet } from "../../../util/helpers";
-import { getBookAuthor } from "../../../util/helpers";
-import { BooksSortOrder } from "../../../util/enums";
+import { useEffect, useState } from "react";
 import IBook from "../../../interfaces/book";
+import { BooksSortOrder } from "../../../util/enums";
+import { getAlphabet, getBookAuthor } from "../../../util/helpers";
 
 interface SortControlsProps {
     sortOrder: BooksSortOrder,
@@ -12,48 +11,32 @@ interface SortControlsProps {
     setPage(pageNum: number): void
 }
 
-interface SortControlState {
-    sortIndex: string[] | null,
-    selectedIndex: string | null
-}
+const SortControls = (props: SortControlsProps) => {
+    const [ sortIndex, setSortIndex ] = useState<string[] | null>(null)
+    const [ selectedIndex, setSelectedIndex ] = useState<string | null>(null)
 
-class SortControls extends Component<SortControlsProps, SortControlState> {
-    constructor(props: SortControlsProps) {
-        super(props)
+    useEffect(() => {
+        setSortIndex(getSortIndex(props.sortOrder))
+    }, [ props.sortOrder ])
 
-        //props: sortOrder, bookList, pageSize, sortBooks(), setPage()
-
-        this.state = {
-            sortIndex: this.getSortIndex(this.props.sortOrder),
-            selectedIndex: null
-        }
-
-    }
-
-    componentDidUpdate(prevProps: SortControlsProps) {
-        if (prevProps.sortOrder !== this.props.sortOrder) {
-            this.setState({ sortIndex: this.getSortIndex(this.props.sortOrder) })
-        }
-    }
-
-    isAlphaSort = (sortOrder: BooksSortOrder) => {
+    const isAlphaSort = (sortOrder: BooksSortOrder) => {
         return sortOrder === BooksSortOrder.Artist || sortOrder === BooksSortOrder.Author || sortOrder === BooksSortOrder.Title
     }
 
-    getSortIndex = (sortOrder: BooksSortOrder): string[] | null => {
+    const getSortIndex = (sortOrder: BooksSortOrder): string[] | null => {
         let sortIndex = null
         if (!sortOrder) return sortIndex
-        if (this.isAlphaSort(sortOrder)) {
+        if (isAlphaSort(sortOrder)) {
             return getAlphabet()
         }
         return sortIndex
     }
 
-    firstGalleryMatchForIndex = (indexKey: string): number => {
+    const firstGalleryMatchForIndex = (indexKey: string): number => {
         let firstMatch = 0
         let hasFindFunction = false
         let findFunction = (b: IBook) => {}
-        switch (this.props.sortOrder) {
+        switch (props.sortOrder) {
             case BooksSortOrder.Author:
                 findFunction = (b: IBook) => { 
                     return indexKey.toLowerCase() === getBookAuthor(b).substring(0,1).toLowerCase() 
@@ -78,41 +61,40 @@ class SortControls extends Component<SortControlsProps, SortControlState> {
 
         }
         if (hasFindFunction) {
-            firstMatch = this.props.bookList.findIndex(b => findFunction(b))
+            firstMatch = props.bookList.findIndex(b => findFunction(b))
         }
         return firstMatch
     }
 
-    setPageFromIndex = (indexKey: string) => {
-        let firstMatch = this.firstGalleryMatchForIndex(indexKey)
+    const setPageFromIndex = (indexKey: string) => {
+        let firstMatch = firstGalleryMatchForIndex(indexKey)
         if (firstMatch < 0) {
             console.log('no match found')
             firstMatch = 0
         }
-        let pageNum = Math.floor(firstMatch / this.props.pageSize)
-        this.props.setPage(pageNum)
+        let pageNum = Math.floor(firstMatch / props.pageSize)
+        props.setPage(pageNum)
+        setSelectedIndex(indexKey)
     }
 
-
-    render() {
-        return (
+    return (
             <div className="sort-controls">
                 <div className="sort-select">
                     {
                         Object.keys(BooksSortOrder).map((key, index) => {
-                            return <div key={key} className={`sort-order ${this.props.sortOrder === Object.values(BooksSortOrder)[index] ? "selected" : ""}`} 
-                                onClick={() => {this.props.sortBooks(Object.values(BooksSortOrder)[index])}}>{key}</div>
+                            return <div key={key} className={`sort-order ${props.sortOrder === Object.values(BooksSortOrder)[index] ? "selected" : ""}`} 
+                                onClick={() => {props.sortBooks(Object.values(BooksSortOrder)[index])}}>{key}</div>
                         })
                     }
                 </div>
                 {
-                    this.state.sortIndex ?
+                    sortIndex ?
                     <div className="sort-index">
                         {
-                            this.state.sortIndex.map((key) => {
+                            sortIndex.map((key) => {
                                 return <div key={key} 
-                                        className={`sort-index-item ${key === this.state.selectedIndex ? "selected" : ""}`} 
-                                        onClick={() => {this.setPageFromIndex(key)}}>
+                                        className={`sort-index-item ${key === selectedIndex ? "selected" : ""}`} 
+                                        onClick={() => {setPageFromIndex(key)}}>
                                             {key}
                                         </div>
                             })
@@ -123,7 +105,6 @@ class SortControls extends Component<SortControlsProps, SortControlState> {
             </div>
 
         )
-    }
 }
 
 export default SortControls

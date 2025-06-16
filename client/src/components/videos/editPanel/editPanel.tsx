@@ -1,11 +1,11 @@
-import React, { Component, useState } from "react";
+import { useState } from "react";
+import IActor from "../../../interfaces/actor";
+import IVideo from "../../../interfaces/video";
+import IVideoSource from "../../../interfaces/videoSource";
+import { VideosEditField } from "../../../util/enums";
 import EditPanelRow from "./editPanel-row";
 import EditPanelRowMulti from "./editPanel-row-multi";
-import { VideosEditField } from "../../../util/enums";
-import IVideo from "../../../interfaces/video";
 import EditPanelRowStatic from "./editPanel-row-static";
-import IActor from "../../../interfaces/actor";
-import IVideoSource from "../../../interfaces/videoSource";
 
 interface EditPanelProps {
     video: IVideo,

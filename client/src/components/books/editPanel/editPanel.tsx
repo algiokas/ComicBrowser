@@ -1,8 +1,8 @@
-import React, { Component } from "react";
+import { useState } from "react";
+import IBook from "../../../interfaces/book";
+import { BooksEditField } from "../../../util/enums";
 import EditPanelRow from "./editPanel-row";
 import EditPanelRowMulti from "./editPanel-row-multi";
-import { BooksEditField } from "../../../util/enums";
-import IBook from "../../../interfaces/book";
 import EditPanelRowStatic from "./editPanel-row-static";
 
 interface EditPanelProps {
@@ -26,33 +26,18 @@ interface EditFields {
     hiddenPages: number[]
 }
 
-interface EditPanelState {
-    tempFields: EditFields,
-    artistToAdd: string,
-    tagToAdd: string,
-    changesPending: boolean
-}
+const EditPanel = (props: EditPanelProps) => {
+    const [tempFields, setTempFields] = useState<EditFields>({
+        title: props.book.title,
+        group: props.book.artGroup,
+        artists: props.book.artists,
+        tags: props.book.tags,
+        prefix: props.book.prefix,
+        hiddenPages: props.book.hiddenPages,
+    })
+    const [changesPending, setChangesPending] = useState<boolean>(false)
 
-class EditPanel extends Component<EditPanelProps, EditPanelState> {
-    constructor(props: EditPanelProps) {
-        super(props);
-
-        this.state = {
-            tempFields: {
-                title: this.props.book.title,
-                group: this.props.book.artGroup,
-                artists: this.props.book.artists,
-                tags: this.props.book.tags,
-                prefix: this.props.book.prefix,
-                hiddenPages: this.props.book.hiddenPages,
-            },
-            artistToAdd: '',
-            tagToAdd: '',
-            changesPending: false
-        }
-    }
-
-    arrayChangesPending = (temp: any[], original: any[]) => {
+    const arrayChangesPending = (temp: any[], original: any[]) => {
         if (temp.length !== original.length) return true;
         if (temp.length > 0) {
             for (let i = 0; i < temp.length; i++) {
@@ -62,33 +47,31 @@ class EditPanel extends Component<EditPanelProps, EditPanelState> {
         return false;
     }
 
-    checkPendingChanges = (tempFields: EditFields) => {
-        if (tempFields.title !== this.props.book.title) return true;
-        if (tempFields.group !== this.props.book.artGroup) return true;
+    const checkPendingChanges = (tempFields: EditFields) => {
+        if (tempFields.title !== props.book.title) return true;
+        if (tempFields.group !== props.book.artGroup) return true;
 
-        if (this.arrayChangesPending(tempFields.artists, this.props.book.artists)) return true;
-        if (this.arrayChangesPending(tempFields.tags, this.props.book.tags)) return true;
-        if (this.arrayChangesPending(tempFields.hiddenPages, this.props.book.hiddenPages)) return true;
+        if (arrayChangesPending(tempFields.artists, props.book.artists)) return true;
+        if (arrayChangesPending(tempFields.tags, props.book.tags)) return true;
+        if (arrayChangesPending(tempFields.hiddenPages, props.book.hiddenPages)) return true;
 
         return false;
     }
 
-    resetPendingChanges = () => {
-        this.setState({
-            tempFields: {
-                title: this.props.book.title,
-                group: this.props.book.artGroup,
-                artists: this.props.book.artists,
-                tags: this.props.book.tags,
-                prefix: this.props.book.prefix,
-                hiddenPages: this.props.book.hiddenPages,
-            },
-            changesPending: false
+    const resetPendingChanges = () => {
+        setTempFields({
+            title: props.book.title,
+            group: props.book.artGroup,
+            artists: props.book.artists,
+            tags: props.book.tags,
+            prefix: props.book.prefix,
+            hiddenPages: props.book.hiddenPages,
         })
+        setChangesPending(false)
     }
 
-    updateTempValue = (field: BooksEditField, value: any) => {
-        let fieldValues = this.state.tempFields
+    const updateTempValue = (field: BooksEditField, value: any) => {
+        let fieldValues = tempFields
         switch (field) {
             case BooksEditField.Title:
                 fieldValues.title = value
@@ -111,74 +94,70 @@ class EditPanel extends Component<EditPanelProps, EditPanelState> {
             default:
                 console.log('invalid edit field')
         }
-        this.setState({
-            tempFields: fieldValues,
-            changesPending: this.checkPendingChanges(fieldValues)
-        })
+        setTempFields(fieldValues)
+        setChangesPending(checkPendingChanges(fieldValues))
     }
 
-    saveBookChanges = () => {
-        console.log("saving changes to: " + this.props.book.title + " (ID: " + this.props.book.id + ")")
+    const saveBookChanges = () => {
+        console.log("saving changes to: " + props.book.title + " (ID: " + props.book.id + ")")
 
-        let tempBook = this.props.book
+        let tempBook = props.book
 
-        tempBook.title = this.state.tempFields.title
-        tempBook.artGroup = this.state.tempFields.group
-        tempBook.artists = this.state.tempFields.artists
-        tempBook.tags = this.state.tempFields.tags
-        tempBook.hiddenPages = this.state.tempFields.hiddenPages
+        tempBook.title = tempFields.title
+        tempBook.artGroup = tempFields.group
+        tempBook.artists = tempFields.artists
+        tempBook.tags = tempFields.tags
+        tempBook.hiddenPages = tempFields.hiddenPages
 
         console.log(tempBook)
 
-        this.props.updateBook(tempBook)
-        this.props.toggleDisplay()
+        props.updateBook(tempBook)
+        props.toggleDisplay()
     }
 
-    deleteBook = () => {
-        this.props.deleteBook(this.props.book.id)
+    const deleteBook = () => {
+        props.deleteBook(props.book.id)
     }
 
-    render() {
-        return (
-            <div className="edit-panel">
-                <h3>Edit Book</h3>
-                <h4>{"ID: " + this.props.book.id}</h4>
-                <div className="edit-panel-inner">
-                    <EditPanelRowStatic label={"Original Title"}
-                        value={this.props.book.originalTitle}/>
-                    <EditPanelRow editField={BooksEditField.Title}
-                        tempValue={this.state.tempFields.title}
-                        updateTempValue={this.updateTempValue}/>
-                    <EditPanelRow editField={BooksEditField.Group}
-                        tempValue={this.state.tempFields.group}
-                        updateTempValue={this.updateTempValue}
-                        valueClick={this.props.searchGroup}/>
-                    <EditPanelRowMulti editField={BooksEditField.Artists}
-                        tempValue={this.state.tempFields.artists}
-                        updateTempValue={this.updateTempValue}
-                        valueClick={this.props.searchArtist}/>
-                    <EditPanelRowMulti editField={BooksEditField.Tags}
-                        tempValue={this.state.tempFields.tags}
-                        updateTempValue={this.updateTempValue}
-                        valueClick={this.props.searchTag}/>
-                    <EditPanelRow editField={BooksEditField.Prefix}
-                        tempValue={this.state.tempFields.prefix}
-                        updateTempValue={this.updateTempValue}
-                        valueClick={this.props.searchPrefix}
-                    ></EditPanelRow>
-                    <EditPanelRowMulti editField={BooksEditField.HiddenPages}
-                        tempValue={this.state.tempFields.hiddenPages}
-                        updateTempValue={this.updateTempValue}
-                        hideTextInput={true}/>
-                </div>
-                <div className="edit-panel-controls">
-                    <button className="delete-button" onClick={this.deleteBook} type="button">DELETE BOOK</button>
-                    <button disabled={!this.state.changesPending} onClick={this.saveBookChanges} type="button">Confirm Changes</button>
-                    <button disabled={!this.state.changesPending} onClick={this.resetPendingChanges} type="button">Reset Changes</button>
-                </div>
+    return (
+        <div className="edit-panel">
+            <h3>Edit Book</h3>
+            <h4>{"ID: " + props.book.id}</h4>
+            <div className="edit-panel-inner">
+                <EditPanelRowStatic label={"Original Title"}
+                    value={props.book.originalTitle} />
+                <EditPanelRow editField={BooksEditField.Title}
+                    tempValue={tempFields.title}
+                    updateTempValue={updateTempValue} />
+                <EditPanelRow editField={BooksEditField.Group}
+                    tempValue={tempFields.group}
+                    updateTempValue={updateTempValue}
+                    valueClick={props.searchGroup} />
+                <EditPanelRowMulti editField={BooksEditField.Artists}
+                    tempValue={tempFields.artists}
+                    updateTempValue={updateTempValue}
+                    valueClick={props.searchArtist} />
+                <EditPanelRowMulti editField={BooksEditField.Tags}
+                    tempValue={tempFields.tags}
+                    updateTempValue={updateTempValue}
+                    valueClick={props.searchTag} />
+                <EditPanelRow editField={BooksEditField.Prefix}
+                    tempValue={tempFields.prefix}
+                    updateTempValue={updateTempValue}
+                    valueClick={props.searchPrefix}
+                ></EditPanelRow>
+                <EditPanelRowMulti editField={BooksEditField.HiddenPages}
+                    tempValue={tempFields.hiddenPages}
+                    updateTempValue={updateTempValue}
+                    hideTextInput={true} />
             </div>
-        )
-    }
+            <div className="edit-panel-controls">
+                <button className="delete-button" onClick={deleteBook} type="button">DELETE BOOK</button>
+                <button disabled={!changesPending} onClick={saveBookChanges} type="button">Confirm Changes</button>
+                <button disabled={!changesPending} onClick={resetPendingChanges} type="button">Reset Changes</button>
+            </div>
+        </div>
+    )
 }
 
 export default EditPanel

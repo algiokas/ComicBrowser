@@ -1,7 +1,7 @@
-import React, { Component, useEffect, useRef, useState } from "react";
-import { getAlphabet } from "../../../util/helpers";
-import { ActorsSortOrder } from "../../../util/enums";
+import { useEffect, useState } from "react";
 import IActor from "../../../interfaces/actor";
+import { ActorsSortOrder } from "../../../util/enums";
+import { getAlphabet } from "../../../util/helpers";
 
 interface ActorSortControlsProps {
     sortOrder: ActorsSortOrder,
@@ -12,9 +12,17 @@ interface ActorSortControlsProps {
 }
 
 const ActorSortControls = (props: ActorSortControlsProps) => {
+    const [sortIndex, setSortIndex] = useState<string[] | null>(null)
+    const [selectedIndex, setSelectedIndex] = useState<string | null>(null)
+
+    useEffect(() => {
+        setSortIndex(getSortIndex(props.sortOrder))
+    }, [props.sortOrder])
+
     const isAlphaSort = (sortOrder: ActorsSortOrder) => {
         return sortOrder.toString().includes("Alpha")
     }
+    
     const getSortIndex = (sortOrder: ActorsSortOrder): string[] | null => {
         let sortIndex = null
         if (!sortOrder) return sortIndex
@@ -23,18 +31,6 @@ const ActorSortControls = (props: ActorSortControlsProps) => {
         }
         return sortIndex
     }
-
-    const [sortIndex, setSortIndex] = useState<string[] | null>(getSortIndex(props.sortOrder))
-    const [selectedIndex, setSelectedIndex] = useState<string | null>(null)
-
-    const mountedRef = useRef(false)
-    useEffect(() => {
-        if (mountedRef.current) {
-            setSortIndex(getSortIndex(props.sortOrder))
-        } else {
-            mountedRef.current = true
-        }
-    }, [props.sortOrder])
 
     const firstGalleryMatchForIndex = (indexKey: string): number => {
         let firstMatch = 0
@@ -62,36 +58,37 @@ const ActorSortControls = (props: ActorSortControlsProps) => {
         }
         let pageNum = Math.floor(firstMatch / props.pageSize)
         props.setPage(pageNum)
+        setSelectedIndex(indexKey)
     }
 
     return (
-            <div className="sort-controls">
-                <div className="sort-select">
-                    {
-                        Object.keys(ActorsSortOrder).map((key, index) => {
-                            return <div key={key} className={`sort-order ${props.sortOrder === Object.values(ActorsSortOrder)[index] ? "selected" : ""}`}
-                                onClick={() => { props.sortVideos(Object.values(ActorsSortOrder)[index]) }}>{key}</div>
-                        })
-                    }
-                </div>
+        <div className="sort-controls">
+            <div className="sort-select">
                 {
-                    sortIndex ?
-                        <div className="sort-index">
-                            {
-                                sortIndex.map((key) => {
-                                    return <div key={key}
-                                        className={`sort-index-item ${key === selectedIndex ? "selected" : ""}`}
-                                        onClick={() => { setPageFromIndex(key) }}>
-                                        {key}
-                                    </div>
-                                })
-                            }
-
-                        </div> : null
+                    Object.keys(ActorsSortOrder).map((key, index) => {
+                        return <div key={key} className={`sort-order ${props.sortOrder === Object.values(ActorsSortOrder)[index] ? "selected" : ""}`}
+                            onClick={() => { props.sortVideos(Object.values(ActorsSortOrder)[index]) }}>{key}</div>
+                    })
                 }
             </div>
+            {
+                sortIndex ?
+                    <div className="sort-index">
+                        {
+                            sortIndex.map((key) => {
+                                return <div key={key}
+                                    className={`sort-index-item ${key === selectedIndex ? "selected" : ""}`}
+                                    onClick={() => { setPageFromIndex(key) }}>
+                                    {key}
+                                </div>
+                            })
+                        }
 
-        )
+                    </div> : null
+            }
+        </div>
+
+    )
 
 }
 

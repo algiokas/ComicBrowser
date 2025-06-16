@@ -1,10 +1,10 @@
-import React, { Component } from "react";
-import GalleryItem from "../coverGallery/galleryItem";
-import Modal from "../../shared/modal";
-import EditPanel from "../editPanel/editPanel";
+import React, { useState } from "react";
 import IBook from "../../../interfaces/book";
-import { IBookSearchQuery }from "../../../interfaces/searchQuery";
+import { IBookSearchQuery } from "../../../interfaces/searchQuery";
 import { GetCoverPath } from "../../../util/helpers";
+import Modal from "../../shared/modal";
+import GalleryItem from "../coverGallery/galleryItem";
+import EditPanel from "../editPanel/editPanel";
 
 interface BookInfoProps {
     book: IBook,
@@ -21,166 +21,155 @@ interface BookInfoState {
     tagToAdd: string
 }
 
-class BookInfo extends Component<BookInfoProps, BookInfoState> {
-    constructor(props: BookInfoProps) {
-        super(props);
+const BookInfo = (props: BookInfoProps) => {
+    const [tagToAdd, setTagToAdd] = useState<string>('')
+    const [showEditModal, setShowEditModal] = useState<boolean>(false)
 
-        this.state = {
-            inputRef: React.createRef<HTMLInputElement>(),
-            showEditModal: false,
-            tagToAdd: ""
-        }
-    }
-
-    searchGroup = (g: string): void => {
-        this.props.viewSearchResults({
+    const searchGroup = (g: string): void => {
+        props.viewSearchResults({
             groups: g
         })
     }
 
-    searchArtist = (a: string): void => {
-        this.props.viewSearchResults({
+    const searchArtist = (a: string): void => {
+        props.viewSearchResults({
             artists: a
         })
     }
 
-    searchPrefix = (p: string): void => {
-        this.props.viewSearchResults({
+    const searchPrefix = (p: string): void => {
+        props.viewSearchResults({
             prefix: p
         })
     }
 
-    searchTag = (t: string): void => {
-        this.props.viewSearchResults({
+    const searchTag = (t: string): void => {
+        props.viewSearchResults({
             tags: t
         })
     }
 
-    toggleEditModal = (): void => {
-        this.setState((state) => {
-            return ({ showEditModal: !state.showEditModal })
-        })
+    const toggleEditModal = (): void => {
+        setShowEditModal(!showEditModal)
     }
 
-    favoriteClick = (book: IBook) => {
+    const favoriteClick = (book: IBook) => {
         console.log("toggle favorite for book: " + book.id)
-        if (this.props.updateBook) {
+        if (props.updateBook) {
             book.isFavorite = !book.isFavorite; //toggle value
-            this.props.updateBook(book)
+            props.updateBook(book)
         }
     }
 
-    render() {
-        const searchHandlers = {
-            searchGroup: this.searchGroup,
-            searchArtist: this.searchArtist,
-            searchPrefix: this.searchPrefix,
-            searchTag: this.searchTag
-        }
-        return (
-            <div className="book-info">
-                <GalleryItem
-                    index={0}
-                    book={this.props.book}
-                    coverUrl={GetCoverPath(this.props.book)}
-                    subtitle={""}
-                    addButtonHandler={this.props.addButtonHandler}
-                    favoriteClickHandler={this.favoriteClick}/>
-                <div className="edit-container">
-                    <button type="button" className="edit-button" onClick={() => { this.toggleEditModal() }}>
-                        Edit Book
-                    </button>
-                    <Modal modalId={"bookinfo-edit-modal"} displayModal={this.state.showEditModal} toggleModal={this.toggleEditModal}>
-                        <EditPanel 
-                            book={this.props.book}
-                            updateBook={this.props.updateBook}
-                            deleteBook={this.props.deleteBook}
-                            toggleDisplay={this.toggleEditModal}
-                            {...searchHandlers}/>
-                    </Modal>
-                </div>
-                <div className="book-info-inner">
-                    {
-                        this.props.book.artGroup ?
-                            <div className="book-info-line">
-                                <span className="info-label">Group:</span>
-                                <span className="info-item clickable" onClick={() => { this.searchGroup(this.props.book.artGroup) }}>
-                                    {this.props.book.artGroup}
-                                </span>
-                            </div>
-                            : null
-                    }
-                    {
-                        this.props.book.artists.length > 0 ?
-                            <div className="book-info-line">
-                                <span className="info-label">Artists:</span>
-                                <div className="info-items">
-                                    {
-                                        this.props.book.artists.map((artist, i) => {
-                                            return <span className="info-item clickable" onClick={() => { this.searchArtist(artist) }} key={i}>
-                                                {artist}
-                                            </span>
-                                        })
-                                    }
-                                </div>
-                            </div>
-                            : null
-                    }
-                    <div className="book-info-line">
-                        <span className="info-label">Pages:</span>
-                        <span className="info-item">{this.props.book.pageCount}</span>
-                    </div>
-                    {
-                        this.props.book.language ?
-                            <div className="book-info-line">
-                                <span className="info-label">Language:</span>
-                                <span className="info-item">{this.props.book.language}</span>
-                            </div>
-                            : null
-                    }
-                    {
-                        this.props.book.prefix ?
-                            <div className="book-info-line">
-                                <span className="info-label">Prefix:</span>
-                                <span className="info-item clickable" onClick={() => { this.searchPrefix(this.props.book.prefix) }}>
-                                    {this.props.book.prefix}
-                                </span>
-                            </div>
-                            : null
-                    }
-                    <div className="book-info-line">
-                        <span className="info-label">Tags:</span>
-                        <div className="info-items">
-                            {
-                                this.props.book.tags && this.props.book.tags.length > 0 ?
-                                    this.props.book.tags.map((tag, i) => {
-                                        return <span className="info-item clickable" onClick={() => { this.searchTag(tag) }} key={i}>
-                                            {tag}
-                                        </span>
-                                    }) : null
-                            }
-                        </div>
-                    </div>
-                    {
-                        this.props.book.hiddenPages && this.props.book.hiddenPages.length ?
-                            <div className="book-info-line">
-                                <span className="info-label">Hidden Pages:</span>
-                                <div className="info-items">
-                                    {
-                                        this.props.book.hiddenPages.map((page, i) => {
-                                            return <span className="info-item clickable" onClick={() => { this.props.unhidePage(page) }} key={i}>
-                                                {page + 1}
-                                            </span>
-                                        })
-                                    }
-                                </div>
-                            </div>
-                            : null
-                    }
-                </div>
-            </div>
-        )
+    const searchHandlers = {
+        searchGroup: searchGroup,
+        searchArtist: searchArtist,
+        searchPrefix: searchPrefix,
+        searchTag: searchTag
     }
+    return (
+        <div className="book-info">
+            <GalleryItem
+                index={0}
+                book={props.book}
+                coverUrl={GetCoverPath(props.book)}
+                subtitle={""}
+                addButtonHandler={props.addButtonHandler}
+                favoriteClickHandler={favoriteClick} />
+            <div className="edit-container">
+                <button type="button" className="edit-button" onClick={() => { toggleEditModal() }}>
+                    Edit Book
+                </button>
+                <Modal modalId={"bookinfo-edit-modal"} displayModal={showEditModal} toggleModal={toggleEditModal}>
+                    <EditPanel
+                        book={props.book}
+                        updateBook={props.updateBook}
+                        deleteBook={props.deleteBook}
+                        toggleDisplay={toggleEditModal}
+                        {...searchHandlers} />
+                </Modal>
+            </div>
+            <div className="book-info-inner">
+                {
+                    props.book.artGroup ?
+                        <div className="book-info-line">
+                            <span className="info-label">Group:</span>
+                            <span className="info-item clickable" onClick={() => { searchGroup(props.book.artGroup) }}>
+                                {props.book.artGroup}
+                            </span>
+                        </div>
+                        : null
+                }
+                {
+                    props.book.artists.length > 0 ?
+                        <div className="book-info-line">
+                            <span className="info-label">Artists:</span>
+                            <div className="info-items">
+                                {
+                                    props.book.artists.map((artist, i) => {
+                                        return <span className="info-item clickable" onClick={() => { searchArtist(artist) }} key={i}>
+                                            {artist}
+                                        </span>
+                                    })
+                                }
+                            </div>
+                        </div>
+                        : null
+                }
+                <div className="book-info-line">
+                    <span className="info-label">Pages:</span>
+                    <span className="info-item">{props.book.pageCount}</span>
+                </div>
+                {
+                    props.book.language ?
+                        <div className="book-info-line">
+                            <span className="info-label">Language:</span>
+                            <span className="info-item">{props.book.language}</span>
+                        </div>
+                        : null
+                }
+                {
+                    props.book.prefix ?
+                        <div className="book-info-line">
+                            <span className="info-label">Prefix:</span>
+                            <span className="info-item clickable" onClick={() => { searchPrefix(props.book.prefix) }}>
+                                {props.book.prefix}
+                            </span>
+                        </div>
+                        : null
+                }
+                <div className="book-info-line">
+                    <span className="info-label">Tags:</span>
+                    <div className="info-items">
+                        {
+                            props.book.tags && props.book.tags.length > 0 ?
+                                props.book.tags.map((tag, i) => {
+                                    return <span className="info-item clickable" onClick={() => { searchTag(tag) }} key={i}>
+                                        {tag}
+                                    </span>
+                                }) : null
+                        }
+                    </div>
+                </div>
+                {
+                    props.book.hiddenPages && props.book.hiddenPages.length ?
+                        <div className="book-info-line">
+                            <span className="info-label">Hidden Pages:</span>
+                            <div className="info-items">
+                                {
+                                    props.book.hiddenPages.map((page, i) => {
+                                        return <span className="info-item clickable" onClick={() => { props.unhidePage(page) }} key={i}>
+                                            {page + 1}
+                                        </span>
+                                    })
+                                }
+                            </div>
+                        </div>
+                        : null
+                }
+            </div>
+        </div>
+    )
 }
 
 export default BookInfo

@@ -1,8 +1,8 @@
 import React from "react";
-import BaseGalleryItem, { BaseGalleryItemProps, BaseGalleryItemState } from "../../shared/baseGalleryItem";
-import IVideo from "../../../interfaces/video";
+import StarsImage from "../../../img/svg/stars.svg";
 import IActor from "../../../interfaces/actor";
-import StarsImage from "../../../img/svg/stars.svg"
+import IVideo from "../../../interfaces/video";
+import { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
 
 
 
@@ -10,48 +10,57 @@ interface VideoGalleryItemProps extends BaseGalleryItemProps<IVideo> {
   subTitleItemClickHandler?: (actor: IActor) => void,
 }
 
-interface VideoGalleryItemState extends BaseGalleryItemState<IVideo>{}
+const VideoGalleryItem = (props: VideoGalleryItemProps) => {
+  const bodyClick = (e: React.MouseEvent) => {
+    if (props.bodyClickHandler)
+      props.bodyClickHandler(props.data, props.index)
+  }
 
-class VideoGalleryItem extends BaseGalleryItem<IVideo, VideoGalleryItemProps, VideoGalleryItemState> {
-  subtitleClick = (e: React.MouseEvent, actor: IActor) => {
-    if (this.props.subTitleItemClickHandler) {
+  const favoriteClick = (e: React.MouseEvent) => {
+    if (props.favoriteClickHandler) {
       e.stopPropagation()
-      this.props.subTitleItemClickHandler(actor)
+      props.favoriteClickHandler(props.data)
     }
   }
-  render() {
-    return (
-      <div className="videogallery" key={this.props.data.title}>
-        <div className="videogallery-inner" onClick={this.props.bodyClickHandler ? this.bodyClick : undefined}>
-          <div className="videogallery-image">
-            <img src={this.props.imageUrl} alt={`${this.props.data.title} thumbnail`}></img>
-          </div>
-          <div className={ this.props.data.isFavorite ? "caption favorite" : "caption"}>
-            <div className="caption-text">
-              <span className="subtitle">
-                {
-                  this.props.data.actors.map((actor, i) => {
-                    return (
-                      <span key={i} onClick={(e) => this.subtitleClick(e, actor)}>{actor.name}</span>
-                    )
-                  })
-                }
-              </span>
-              <span className="title">{this.props.data.title}</span>
-            </div>
-            <div className="favorite-icon" onClick={this.props.favoriteClickHandler ? this.favoriteClick : undefined}>
+  const subtitleClick = (e: React.MouseEvent, actor: IActor) => {
+    if (props.subTitleItemClickHandler) {
+      e.stopPropagation()
+      props.subTitleItemClickHandler(actor)
+    }
+  }
+
+  return (
+    <div className="videogallery" key={props.data.title}>
+      <div className="videogallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
+        <div className="videogallery-image">
+          <img src={props.imageUrl} alt={`${props.data.title} thumbnail`}></img>
+        </div>
+        <div className={props.data.isFavorite ? "caption favorite" : "caption"}>
+          <div className="caption-text">
+            <span className="subtitle">
               {
-                this.props.data.isFavorite ?
+                props.data.actors.map((actor, i) => {
+                  return (
+                    <span key={i} onClick={(e) => subtitleClick(e, actor)}>{actor.name}</span>
+                  )
+                })
+              }
+            </span>
+            <span className="title">{props.data.title}</span>
+          </div>
+          <div className="favorite-icon" onClick={props.favoriteClickHandler ? favoriteClick : undefined}>
+            {
+              props.data.isFavorite ?
                 <img className="svg-icon-favorite" src={StarsImage.toString()} alt="remove from favorites"></img>
                 :
                 <img className="svg-icon-disabled test" src={StarsImage.toString()} alt="add to favorites"></img>
-              }
-            </div>
+            }
           </div>
         </div>
       </div>
-    )
-  }
+    </div>
+  )
+
 }
 
 export default VideoGalleryItem

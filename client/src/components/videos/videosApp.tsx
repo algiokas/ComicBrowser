@@ -1,15 +1,15 @@
-import React, { Component, useEffect, useState } from "react";
-import Navigation from "../shared/navigation";
-import MultiView from "./multiView";
-import { VideosViewMode } from "../../util/enums";
-import IVideo from "../../interfaces/video";
-import { IVideoSearchQuery } from "../../interfaces/searchQuery";
+import { useEffect, useState } from "react";
 import { SubAppProps } from "../../App";
 import IActor from "../../interfaces/actor";
-import { getActorImageUrl, getVideoThumbnailUrl } from "../../util/helpers";
 import INavItem from "../../interfaces/navItem";
-import Modal from "../shared/modal";
+import { IVideoSearchQuery } from "../../interfaces/searchQuery";
+import IVideo from "../../interfaces/video";
 import IVideoSource from "../../interfaces/videoSource";
+import { VideosViewMode } from "../../util/enums";
+import { getActorImageUrl, getVideoThumbnailUrl } from "../../util/helpers";
+import Modal from "../shared/modal";
+import Navigation from "../shared/navigation";
+import MultiView from "./multiView";
 
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL
 
@@ -127,6 +127,7 @@ const VideosApp = (props: VideosAppProps) => {
 
   const updateActor = async (actor: IActor) => {
     const res = await fetch(`${apiBaseUrl}/actors/${actor.id}/update`, {
+      method: 'post',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(actor)
     })

@@ -1,7 +1,7 @@
-import React, { Component, useState } from "react";
+import { useState } from "react";
 import BooksApp from "./components/books/booksApp";
-import { AppMode } from "./util/enums";
 import VideosApp from "./components/videos/videosApp";
+import { AppMode } from "./util/enums";
 
 interface AppProps { } //empty
 

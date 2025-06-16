@@ -1,7 +1,7 @@
-import React, { Component, useState, useRef, useEffect } from "react";
-import { getAlphabet } from "../../../util/helpers";
-import { VideosSortOrder } from "../../../util/enums";
+import { useEffect, useState } from "react";
 import IVideo from "../../../interfaces/video";
+import { VideosSortOrder } from "../../../util/enums";
+import { getAlphabet } from "../../../util/helpers";
 
 interface VideoSortControlsProps {
     sortOrder: VideosSortOrder,
@@ -11,31 +11,26 @@ interface VideoSortControlsProps {
     setPage(pageNum: number): void
 }
 
-const isAlphaSort = (sortOrder: VideosSortOrder) => {
-    return sortOrder.toString().includes("Alpha")
-}
-
-const getSortIndex = (sortOrder: VideosSortOrder): string[] | null => {
-    let sortIndex = null
-    if (!sortOrder) return sortIndex
-    if (isAlphaSort(sortOrder)) {
-        return getAlphabet()
-    }
-    return sortIndex
-}
-
 const VideoSortControls = (props: VideoSortControlsProps) => {
-    const mountedRef = useRef(false)
-    const [sortIndex, setSortIndex] = useState<string[] | null>(getSortIndex(props.sortOrder))
+    const [sortIndex, setSortIndex] = useState<string[] | null>(null)
     const [selectedIndex, setSelectedIndex] = useState<string | null>(null)
 
     useEffect(() => {
-        if (mountedRef.current) {
-            setSortIndex(getSortIndex(props.sortOrder))
-        } else {
-            mountedRef.current = true
-        }
+        setSortIndex(getSortIndex(props.sortOrder))
     }, [props.sortOrder])
+
+    const isAlphaSort = (sortOrder: VideosSortOrder) => {
+        return sortOrder.toString().includes("Alpha")
+    }
+
+    const getSortIndex = (sortOrder: VideosSortOrder): string[] | null => {
+        let sortIndex = null
+        if (!sortOrder) return sortIndex
+        if (isAlphaSort(sortOrder)) {
+            return getAlphabet()
+        }
+        return sortIndex
+    }
 
     const firstGalleryMatchForIndex = (indexKey: string): number => {
         let firstMatch = 0
@@ -73,6 +68,7 @@ const VideoSortControls = (props: VideoSortControlsProps) => {
         }
         let pageNum = Math.floor(firstMatch / props.pageSize)
         props.setPage(pageNum)
+        setSelectedIndex(indexKey)
     }
 
     return (

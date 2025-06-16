@@ -1,8 +1,7 @@
-import { Component } from "react";
-import { NavLogo } from "./navLogo";
 import INavItem from "../../interfaces/navItem";
-import NavSearch from "./navSearch";
 import { IBookSearchQuery } from "../../interfaces/searchQuery";
+import { NavLogo } from "./navLogo";
+import NavSearch from "./navSearch";
 
 interface NavProps {
   viewMode: string,
@@ -13,52 +12,50 @@ interface NavProps {
   viewSearchResults(query?: IBookSearchQuery): void
 }
 
-interface NavState {}
+const Navigation = (props: NavProps) => {
 
-class Navigation extends Component<NavProps, NavState>  {
-  render() {
-    const searchProps = {
-      displayToggle: this.props.showSearch,
-      viewSearchResults: this.props.viewSearchResults
-    }
-
-    return (
-      <nav role="navigation">
-        <div className="logo" onClick={this.props.logoClick}>
-          <NavLogo cssClass=""/>
-        </div>
-        <div className="nav-items">
-          {
-            this.props.leftNavItems.map((n, i) => {
-              return (
-                <div key={i} className="nav-item" onClick={() => n.clickHandler()} hidden={n.displayCheck ? !n.displayCheck() : false}>
-                  <div className={`nav-item-inner ${n.viewMode && this.props.viewMode === n.viewMode ? "selected" : ""}`}>
-                    {n.text}
-                    {n.counter ? <span className="slideshow-count">{n.counter}</span> : null}
-                  </div> 
-                </div>
-              )
-            })
-          }
-        </div>
-        <div className="nav-items right">
-          <NavSearch {...searchProps}></NavSearch>
-          {
-            this.props.rightNavItems.map((n, i) => {
-              return (
-                <div key={i} className="nav-item" onClick={() => n.clickHandler()} hidden={n.displayCheck ? n.displayCheck() : false}>
-                  <div className={`nav-item-inner ${n.viewMode && this.props.viewMode === n.viewMode ? "selected" : ""}`}>
-                    {n.text}
-                    {n.counter ? <span className="slideshow-count">{n.counter}</span> : null}
-                  </div>
-                </div>
-              )
-            })
-          }
-        </div>
-      </nav>
-    )
+  const searchProps = {
+    displayToggle: props.showSearch,
+    viewSearchResults: props.viewSearchResults
   }
+
+  return (
+    <nav role="navigation">
+      <div className="logo" onClick={props.logoClick}>
+        <NavLogo cssClass="" />
+      </div>
+      <div className="nav-items">
+        {
+          props.leftNavItems.map((n, i) => {
+            return (
+              <div key={i} className="nav-item" onClick={() => n.clickHandler()} hidden={n.displayCheck ? !n.displayCheck() : false}>
+                <div className={`nav-item-inner ${n.viewMode && props.viewMode === n.viewMode ? "selected" : ""}`}>
+                  {n.text}
+                  {n.counter ? <span className="slideshow-count">{n.counter}</span> : null}
+                </div>
+              </div>
+            )
+          })
+        }
+      </div>
+      <div className="nav-items right">
+        <NavSearch {...searchProps}></NavSearch>
+        {
+          props.rightNavItems.map((n, i) => {
+            return (
+              <div key={i} className="nav-item" onClick={() => n.clickHandler()} hidden={n.displayCheck ? n.displayCheck() : false}>
+                <div className={`nav-item-inner ${n.viewMode && props.viewMode === n.viewMode ? "selected" : ""}`}>
+                  {n.text}
+                  {n.counter ? <span className="slideshow-count">{n.counter}</span> : null}
+                </div>
+              </div>
+            )
+          })
+        }
+      </div>
+    </nav>
+  )
+
 }
 
 export default Navigation

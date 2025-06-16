@@ -1,10 +1,8 @@
-import React, { Component } from "react";
-import { GetCoverPath } from "../../../util/helpers";
+import React from "react";
+import MinusImg from "../../../img/svg/minus-symbol.svg";
+import PlusImg from "../../../img/svg/plus-symbol.svg";
+import StarsImage from "../../../img/svg/stars.svg";
 import IBook from "../../../interfaces/book";
-import StarsImage from "../../../img/svg/stars.svg"
-import PlusImg from "../../../img/svg/plus-symbol.svg"
-import MinusImg from "../../../img/svg/minus-symbol.svg"
-import GalleryItemOverlay from "./galleryItemOverlay";
 
 interface GalleryItemProps {
   index: number,
@@ -20,87 +18,83 @@ interface GalleryItemProps {
   overlayIcon?: React.FunctionComponent<React.SVGAttributes<SVGElement>>
 }
 
-interface GalleryItemState { }
-
-class GalleryItem extends Component<GalleryItemProps, GalleryItemState> {
-  bodyClick = (e: React.MouseEvent) => {
-    if (this.props.bodyClickHandler)
-      this.props.bodyClickHandler(this.props.book, this.props.index)
+const GalleryItem = (props: GalleryItemProps) => {
+  const bodyClick = (e: React.MouseEvent) => {
+    if (props.bodyClickHandler)
+      props.bodyClickHandler(props.book, props.index)
   }
 
-  addButtonClick = (e: React.MouseEvent) => {
-    if (this.props.addButtonHandler) {
+  const addButtonClick = (e: React.MouseEvent) => {
+    if (props.addButtonHandler) {
       e.stopPropagation()
-      this.props.addButtonHandler(this.props.book)
+      props.addButtonHandler(props.book)
     }
   }
 
-  removeButtonClick = (e: React.MouseEvent) => {
-    if (this.props.removeButtonHandler) {
+  const removeButtonClick = (e: React.MouseEvent) => {
+    if (props.removeButtonHandler) {
       e.stopPropagation()
-      this.props.removeButtonHandler(this.props.index)
+      props.removeButtonHandler(props.index)
     }
   }
 
-  subtitleClick = (e: React.MouseEvent) => {
-    if (this.props.subTitleClickHandler) {
+  const subtitleClick = (e: React.MouseEvent) => {
+    if (props.subTitleClickHandler) {
       e.stopPropagation()
-      this.props.subTitleClickHandler(this.props.book)
+      props.subTitleClickHandler(props.book)
     }
   }
 
-  favoriteClick = (e: React.MouseEvent) => {
-    if (this.props.favoriteClickHandler) {
+  const favoriteClick = (e: React.MouseEvent) => {
+    if (props.favoriteClickHandler) {
       e.stopPropagation()
-      this.props.favoriteClickHandler(this.props.book)
+      props.favoriteClickHandler(props.book)
     }
   }
 
-  render() {
-    return (
-      <div className="gallery" key={this.props.book.title}>
-        {
-          this.props.overlayIcon ?
-            <div className="gallery-overlay">
-              <img className="svg-icon" src={this.props.overlayIcon.toString()}></img>
-            </div> : null
-        }
-        <div className="gallery-inner" onClick={this.props.bodyClickHandler ? this.bodyClick : undefined}>
-          <img className="gallery-image" src={this.props.coverUrl} alt={`${this.props.book.title} cover`}></img>
-          <div className={this.props.book.isFavorite ? "caption favorite" : "caption"}>
-            <div className="caption-text">
-              <span className="subtitle" onClick={this.props.subTitleClickHandler ? this.subtitleClick : undefined}>
-                {this.props.subtitle}
-              </span>
-              <span className="title">{this.props.book.title}</span>
-            </div>
-            <div className="favorite-icon" onClick={this.props.favoriteClickHandler ? this.favoriteClick : undefined} hidden={this.props.hideFavorites}>
-              {
-                this.props.book.isFavorite ?
-                  <img className="svg-icon-favorite" src={StarsImage.toString()} alt="remove from favorites"></img>
-                  :
-                  <img className="svg-icon-disabled test" src={StarsImage.toString()} alt="add to favorites"></img>
-              }
-            </div>
+  return (
+    <div className="gallery" key={props.book.title}>
+      {
+        props.overlayIcon ?
+          <div className="gallery-overlay">
+            <img className="svg-icon" src={props.overlayIcon.toString()}></img>
+          </div> : null
+      }
+      <div className="gallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
+        <img className="gallery-image" src={props.coverUrl} alt={`${props.book.title} cover`}></img>
+        <div className={props.book.isFavorite ? "caption favorite" : "caption"}>
+          <div className="caption-text">
+            <span className="subtitle" onClick={props.subTitleClickHandler ? subtitleClick : undefined}>
+              {props.subtitle}
+            </span>
+            <span className="title">{props.book.title}</span>
           </div>
-          {
-            this.props.addButtonHandler ? (
-              <button className="add-button" onClick={this.addButtonClick}>
-                <img className="svg-icon" src={PlusImg.toString()} alt="add to slideshow"></img>
-              </button>
-            ) : null
-          }
-          {
-            this.props.removeButtonHandler ? (
-              <button className="add-button" onClick={this.removeButtonClick}>
-                <img className="svg-icon" src={MinusImg.toString()} alt="remove from slideshow"></img>
-              </button>
-            ) : null
-          }
+          <div className="favorite-icon" onClick={props.favoriteClickHandler ? favoriteClick : undefined} hidden={props.hideFavorites}>
+            {
+              props.book.isFavorite ?
+                <img className="svg-icon-favorite" src={StarsImage.toString()} alt="remove from favorites"></img>
+                :
+                <img className="svg-icon-disabled test" src={StarsImage.toString()} alt="add to favorites"></img>
+            }
+          </div>
         </div>
+        {
+          props.addButtonHandler ? (
+            <button className="add-button" onClick={addButtonClick}>
+              <img className="svg-icon" src={PlusImg.toString()} alt="add to slideshow"></img>
+            </button>
+          ) : null
+        }
+        {
+          props.removeButtonHandler ? (
+            <button className="add-button" onClick={removeButtonClick}>
+              <img className="svg-icon" src={MinusImg.toString()} alt="remove from slideshow"></img>
+            </button>
+          ) : null
+        }
       </div>
-    )
-  }
+    </div>
+  )
 }
 
 export default GalleryItem

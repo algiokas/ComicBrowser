@@ -1,8 +1,8 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
+import coverIcon from "../../../img/svg/book-half.svg";
 import ISlideshow from "../../../interfaces/slideshow";
 import { GetCoverPath } from "../../../util/helpers";
 import GalleryItem from "../coverGallery/galleryItem";
-import coverIcon from "../../../img/svg/book-half.svg"
 
 interface SavePanelProps {
     currentSlideshow: ISlideshow,
@@ -10,74 +10,57 @@ interface SavePanelProps {
     createCollection(collectionName: string, coverBookId: number): void
 }
 
-interface SavePanelState {
-    collectionName: string,
-    selectedCoverIndex: number
-}
+const SavePanel = (props: SavePanelProps) => {
+    const [ collectionName, setCollectionName ] = useState<string>(props.currentSlideshow.id !== null ? props.currentSlideshow.name : "")
+    const [ selectedCoverIndex, setSelectedCoverIndex ] = useState<number>(0)
 
-class SavePanel extends Component<SavePanelProps, SavePanelState> {
-    constructor(props: SavePanelProps) {
-        super(props)
-
-        this.state = {
-            collectionName: this.props.currentSlideshow.id !== null ? this.props.currentSlideshow.name : "",
-            selectedCoverIndex: 0
-        }
+    const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCollectionName(e.target.value)
     }
 
-    handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        this.setState({ collectionName: e.target.value })
-    }
-
-    handleTextInputKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleTextInputKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            this.saveCollection()
-            this.props.toggleDisplay()
+            saveCollection()
+            props.toggleDisplay()
         }
     }
 
-    selectCover = (index: number) => {
-        this.setState({ selectedCoverIndex: index })
+    const saveCollection = () => {
+        const coverBook = props.currentSlideshow.books[selectedCoverIndex]
+        props.createCollection(collectionName, coverBook.id)
     }
 
-    saveCollection = () => {
-        const coverBook = this.props.currentSlideshow.books[this.state.selectedCoverIndex]
-        this.props.createCollection(this.state.collectionName, coverBook.id)
-    }
-
-    render(): React.ReactNode {
-        return (
+    return (
             <div className="savepanel">
-                <h3>{this.props.currentSlideshow.id === null ? "Create New Collection" : "Update Collection"}</h3>
+                <h3>{props.currentSlideshow.id === null ? "Create New Collection" : "Update Collection"}</h3>
                 <div className="savepanel-inner">
                     <div className="savepanel-row">
                         <span>Collection Name: </span>
                         <input type="text"
-                            value={this.state.collectionName}
-                            onChange={this.handleTextInputChange}
-                            onKeyDown={this.handleTextInputKey}></input>
+                            value={collectionName}
+                            onChange={handleTextInputChange}
+                            onKeyDown={handleTextInputKey}></input>
                     </div>
                     <div className="savepanel-covers">
                         {
-                            this.props.currentSlideshow.books.map((book, index) => {
+                            props.currentSlideshow.books.map((book, index) => {
                                 return <GalleryItem
                                     key={index}
                                     index={index}
                                     book={book}
                                     coverUrl={GetCoverPath(book)}
-                                    bodyClickHandler={() => this.selectCover(index)}
+                                    bodyClickHandler={() => setSelectedCoverIndex(index)}
                                     subtitle=""
-                                    overlayIcon={index === this.state.selectedCoverIndex ? coverIcon : undefined} />
+                                    overlayIcon={index === selectedCoverIndex ? coverIcon : undefined} />
                             })
                         }
                     </div>
                     <div className="savepanel-controls">
-                        <button type="button" onClick={() => this.saveCollection()}>Save</button>
+                        <button type="button" onClick={() => saveCollection()}>Save</button>
                     </div>
                 </div>
             </div>
         )
-    }
 }
 
 export default SavePanel

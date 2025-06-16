@@ -4,8 +4,8 @@ import { ActorsSortOrder } from "../../../util/enums"
 import PageSelect from "../../shared/pageSelect"
 import ActorGalleryItem from "./actorGalleryItem"
 import ActorSortControls from "./actorSortControls"
-import BaseGallery, { BaseGalleryProps, BaseGalleryState } from "../../shared/baseGallery"
-import { useEffect, useRef, useState } from "react"
+import { BaseGalleryProps } from "../../shared/baseGallery"
+import { useEffect, useState } from "react"
 
 
 interface ActorGalleryProps extends BaseGalleryProps<IActor> {
@@ -16,8 +16,6 @@ interface ActorGalleryProps extends BaseGalleryProps<IActor> {
 }
 
 const ActorGallery = (props: ActorGalleryProps) => {
-
-
     const initialSortOrder = props.sortOrder ?? ActorsSortOrder.Favorite
 
     const [items, setItems] = useState<IActor[]>([])
@@ -36,7 +34,8 @@ const ActorGallery = (props: ActorGalleryProps) => {
         setGalleryPage(0)
         setSortOrder(initialSortOrder)
     }
-        const getSortedActors = (actors: IActor[], sortOrder: ActorsSortOrder): IActor[] => {
+
+    const getSortedActors = (actors: IActor[], sortOrder: ActorsSortOrder): IActor[] => {
         let sortedCopy = [...actors]
         switch (sortOrder) {
             case ActorsSortOrder.Name:
@@ -73,11 +72,11 @@ const ActorGallery = (props: ActorGalleryProps) => {
         return 1
     }
 
-    const sortActors = (order: ActorsSortOrder) => {
-        if (sortOrder !== order || order === ActorsSortOrder.Random || order === ActorsSortOrder.Favorite) {
+    const sortActors = (newOrder: ActorsSortOrder) => {
+        if (sortOrder !== newOrder || newOrder === ActorsSortOrder.Random || newOrder === ActorsSortOrder.Favorite) {
+            setItems(getSortedActors(props.allItems, newOrder))
+            setSortOrder(newOrder)
             setGalleryPage(0)
-            setItems(getSortedActors(props.allItems, order))
-            setSortOrder(sortOrder)
         }
     }
 
