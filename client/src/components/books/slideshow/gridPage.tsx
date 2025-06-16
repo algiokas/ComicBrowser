@@ -1,12 +1,12 @@
 import React from 'react'
 import { GetPagePathByID } from '../../../util/helpers'
-import { IGridPage } from './slideshow'
+import type { IGridPage } from './slideshow'
 
 interface GridPageProps extends IGridPage {
     index: number
     currentPage: number
     gridClick(n: number): void
-    pageRef: React.RefObject<HTMLDivElement>
+    pageRef: React.RefObject<HTMLDivElement | null>
 }
 
 const GridPage = (props: GridPageProps) => {

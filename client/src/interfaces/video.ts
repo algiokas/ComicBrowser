@@ -1,5 +1,5 @@
-import IActor from "./actor";
-import IVideoSource from "./videoSource";
+import type IActor from "./actor";
+import type IVideoSource from "./videoSource";
 
 export default interface IVideo {
     id: number,

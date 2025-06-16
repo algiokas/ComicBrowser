@@ -1,5 +1,5 @@
 import { useState } from "react";
-import IBook from "../../../interfaces/book";
+import type IBook from "../../../interfaces/book";
 import { BooksEditField } from "../../../util/enums";
 import EditPanelRow from "./editPanel-row";
 import EditPanelRowMulti from "./editPanel-row-multi";

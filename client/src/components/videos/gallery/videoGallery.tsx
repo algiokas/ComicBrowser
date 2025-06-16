@@ -1,16 +1,16 @@
-import { IVideoSearchQuery } from "../../../interfaces/searchQuery"
-import IVideo from "../../../interfaces/video"
+import type { IVideoSearchQuery } from "../../../interfaces/searchQuery"
+import type IVideo from "../../../interfaces/video"
 import { VideosSortOrder } from "../../../util/enums"
 import PageSelect from "../../shared/pageSelect"
 import VideoGalleryItem from "./videoGalleryItem"
-import { BaseGalleryProps } from "../../shared/baseGallery"
-import IActor from "../../../interfaces/actor"
+import type { BaseGalleryProps } from "../../shared/baseGallery"
+import type IActor from "../../../interfaces/actor"
 import VideoSortControls from "./videoSortControls"
 import ActorDetail from "./actorDetail"
 import { getVideoThumbnailUrl } from "../../../util/helpers"
 import { useEffect, useState } from "react"
 
-export interface VideoGalleryProps extends BaseGalleryProps<IVideo> {
+interface VideoGalleryProps extends BaseGalleryProps<IVideo> {
     sortOrder?: VideosSortOrder,
     query?: IVideoSearchQuery,
     watchVideo(Video: IVideo): void,

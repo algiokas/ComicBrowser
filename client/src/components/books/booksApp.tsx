@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-import { SubAppProps } from "../../App";
-import IBook from "../../interfaces/book";
-import INavItem from "../../interfaces/navItem";
-import { IBookSearchQuery } from "../../interfaces/searchQuery";
-import ISlideshow, { ICollection } from "../../interfaces/slideshow";
+import type { SubAppProps } from "../../App";
+import type IBook from "../../interfaces/book";
+import type INavItem from "../../interfaces/navItem";
+import type { IBookSearchQuery } from "../../interfaces/searchQuery";
+import type ISlideshow from "../../interfaces/slideshow";
+import type { ICollection } from "../../interfaces/slideshow";
 import { BooksViewMode } from "../../util/enums";
 import { filterAlphanumeric, isAlphanumeric } from "../../util/helpers";
 import Navigation from "../shared/navigation";
 import MultiView from "./multiView";
 
-const apiBaseUrl = process.env.REACT_APP_API_BASE_URL
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
 interface BooksAppProps extends SubAppProps {
 }

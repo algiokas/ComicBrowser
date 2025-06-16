@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import IVideo from "../../../interfaces/video";
+import type IVideo from "../../../interfaces/video";
 import { VideosSortOrder } from "../../../util/enums";
 import { getAlphabet } from "../../../util/helpers";
 

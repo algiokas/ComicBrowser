@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import IActor from "../../../interfaces/actor";
+import type IActor from "../../../interfaces/actor";
 import { ActorsSortOrder } from "../../../util/enums";
 import { getAlphabet } from "../../../util/helpers";
 

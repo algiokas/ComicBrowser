@@ -1,66 +1,74 @@
-export enum AppMode {
-    Books = "Books",
-    Videos = "Videos"
-}
+export const AppMode = {
+  Books: "Books",
+  Videos: "Videos",
+} as const;
+export type AppMode = (typeof AppMode)[keyof typeof AppMode];
 
-export enum BooksViewMode {
-    Loading = "Loading",
-    Listing = "Listing",
-    SingleBook = "SingleBook",
-    Slideshow = "Slideshow",
-    Collections = "Collections",
-    SearchResults = "SearchResults"
-}
+export const BooksViewMode = {
+  Loading: "Loading",
+  Listing: "Listing",
+  SingleBook: "SingleBook",
+  Slideshow: "Slideshow",
+  Collections: "Collections",
+  SearchResults: "SearchResults",
+} as const;
+export type BooksViewMode = (typeof BooksViewMode)[keyof typeof BooksViewMode];
 
-export enum VideosViewMode {
-    Loading = "Loading",
-    Listing = "Listing",
-    Actors = "Actors",
-    Sources = "Sources",
-    Player = "Player",
-    SearchResults = "SearchResults"
-}
+export const VideosViewMode = {
+  Loading: "Loading",
+  Listing: "Listing",
+  Actors: "Actors",
+  Sources: "Sources",
+  Player: "Player",
+  SearchResults: "SearchResults",
+} as const;
+export type VideosViewMode = (typeof VideosViewMode)[keyof typeof VideosViewMode];
 
-export enum BooksSortOrder {
-    Favorite = "Favorite",
-    Random = "Random",
-    Title = "AlphaTitle",
-    Author = "AlphaAuthor",
-    Artist = "AlphaArtist",
-    ID = "ID",
-    Date = "Date"
-}
+export const BooksSortOrder = {
+  Favorite: "Favorite",
+  Random: "Random",
+  Title: "AlphaTitle",
+  Author: "AlphaAuthor",
+  Artist: "AlphaArtist",
+  ID: "ID",
+  Date: "Date",
+} as const;
+export type BooksSortOrder = (typeof BooksSortOrder)[keyof typeof BooksSortOrder];
 
-export enum VideosSortOrder {
-    Favorite = "Favorite",
-    Random = "Random",
-    Title = "AlphaTitle",
-    Actor = "AlphaActor",
-    Source = "AlphaSource",
-    ID = "ID",
-    Date = "Date"
-}
+export const VideosSortOrder = {
+  Favorite: "Favorite",
+  Random: "Random",
+  Title: "AlphaTitle",
+  Actor: "AlphaActor",
+  Source: "AlphaSource",
+  ID: "ID",
+  Date: "Date",
+} as const;
+export type VideosSortOrder = (typeof VideosSortOrder)[keyof typeof VideosSortOrder];
 
-export enum ActorsSortOrder {
-    ID = "ID",
-    Name = "AlphaName",
-    Favorite = "Favorite",
-    Random = "Random",
-    NumVideos = "NumVideos"
-}
+export const ActorsSortOrder = {
+  ID: "ID",
+  Name: "AlphaName",
+  Favorite: "Favorite",
+  Random: "Random",
+  NumVideos: "NumVideos",
+} as const;
+export type ActorsSortOrder = (typeof ActorsSortOrder)[keyof typeof ActorsSortOrder];
 
-export enum BooksEditField {
-    Title = "Title",
-    Group = "Group",
-    Artists = "Artists",
-    Tags = "Tags",
-    Prefix = "Prefix",
-    HiddenPages = "HiddenPages"
-}
+export const BooksEditField = {
+  Title: "Title",
+  Group: "Group",
+  Artists: "Artists",
+  Tags: "Tags",
+  Prefix: "Prefix",
+  HiddenPages: "HiddenPages",
+} as const;
+export type BooksEditField = (typeof BooksEditField)[keyof typeof BooksEditField];
 
-export enum VideosEditField {
-    Title = "Title",
-    Source = "Source",
-    Actors = "Actors",
-    Tags = "Tags",
-}
+export const VideosEditField = {
+  Title: "Title",
+  Source: "Source",
+  Actors: "Actors",
+  Tags: "Tags",
+} as const;
+export type VideosEditField = (typeof VideosEditField)[keyof typeof VideosEditField];

@@ -1,8 +1,8 @@
 import React from "react";
 import StarsImage from "../../../img/svg/stars.svg";
-import IActor from "../../../interfaces/actor";
-import IVideo from "../../../interfaces/video";
-import { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
+import type IActor from "../../../interfaces/actor";
+import type IVideo from "../../../interfaces/video";
+import type { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
 
 
 

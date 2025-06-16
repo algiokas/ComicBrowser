@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import IBook from "../../../interfaces/book";
-import { IBookSearchQuery } from "../../../interfaces/searchQuery";
+import type IBook from "../../../interfaces/book";
+import type { IBookSearchQuery } from "../../../interfaces/searchQuery";
 import { GetCoverPath } from "../../../util/helpers";
 import Modal from "../../shared/modal";
 import GalleryItem from "../coverGallery/galleryItem";

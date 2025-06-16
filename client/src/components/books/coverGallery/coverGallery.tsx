@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import IBook from "../../../interfaces/book";
-import { IBookSearchQuery } from "../../../interfaces/searchQuery";
+import type IBook from "../../../interfaces/book";
+import type { IBookSearchQuery } from "../../../interfaces/searchQuery";
 import { BooksSortOrder } from "../../../util/enums";
 import { GetCoverPath, getBookAuthor } from "../../../util/helpers";
 import PageSelect from "../../shared/pageSelect";

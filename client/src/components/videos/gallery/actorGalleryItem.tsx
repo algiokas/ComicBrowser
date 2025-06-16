@@ -1,5 +1,5 @@
-import IActor from "../../../interfaces/actor";
-import { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
+import type IActor from "../../../interfaces/actor";
+import type { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
 import StarsImage from "../../../img/svg/stars.svg"
 
 

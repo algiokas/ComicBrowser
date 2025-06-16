@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import IBook from "../../../interfaces/book";
-import { IBookSearchQuery } from "../../../interfaces/searchQuery";
-import ISlideshow from "../../../interfaces/slideshow";
+import type IBook from "../../../interfaces/book";
+import type { IBookSearchQuery } from "../../../interfaces/searchQuery";
+import type ISlideshow from "../../../interfaces/slideshow";
 import { BooksViewMode } from "../../../util/enums";
 import { GetPagePathMulti } from "../../../util/helpers";
 import GridPage from "./gridPage";
@@ -22,21 +22,10 @@ interface SlideshowProps {
     createCollection(collectionName: string, coverBookId: number): void
 }
 
-interface SlideshowState {
-    showSidebar: boolean,
-    gridView: boolean,
-    playing: boolean,
-    intervalId: number,
-    intervalCounter: number,
-    intervalLength: number,
-    gridPages: IGridPage[]
-}
-
 export interface IGridPage {
     bookId: number,
     bookPageNum: number,
     slideNum: number
-
 }
 
 const Slideshow = (props: SlideshowProps) => {

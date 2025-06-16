@@ -1,6 +1,6 @@
-import { IBookSearchQuery } from "../../../interfaces/searchQuery";
+import type { IBookSearchQuery } from "../../../interfaces/searchQuery";
 
-const baseURL = process.env.REACT_APP_BOOK_SOURCE_URL
+const baseURL = import.meta.env.VITE_BOOK_SOURCE_URL
 
 interface FilterInfoProps {
     filterQuery: IBookSearchQuery

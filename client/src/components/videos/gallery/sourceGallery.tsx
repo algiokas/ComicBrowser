@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import IVideoSource from "../../../interfaces/videoSource";
-import { BaseGalleryProps } from "../../shared/baseGallery";
+import type IVideoSource from "../../../interfaces/videoSource";
+import type { BaseGalleryProps } from "../../shared/baseGallery";
 import PageSelect from "../../shared/pageSelect";
 import SourceGalleryItem from "./sourceGalleryItem";
-import { IVideoSearchQuery } from "../../../interfaces/searchQuery";
+import type { IVideoSearchQuery } from "../../../interfaces/searchQuery";
 
-export interface SourceGalleryProps extends BaseGalleryProps<IVideoSource> {
+interface SourceGalleryProps extends BaseGalleryProps<IVideoSource> {
     viewSearchResults(query?: IVideoSearchQuery): void,
 }
-
 
 const SourceGallery = (props: SourceGalleryProps) => {
     const getTotalPages = (items: IVideoSource[]): number => {

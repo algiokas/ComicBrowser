@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
-import { SubAppProps } from "../../App";
-import IActor from "../../interfaces/actor";
-import INavItem from "../../interfaces/navItem";
-import { IVideoSearchQuery } from "../../interfaces/searchQuery";
-import IVideo from "../../interfaces/video";
-import IVideoSource from "../../interfaces/videoSource";
+import type { SubAppProps } from "../../App";
+import type IActor from "../../interfaces/actor";
+import type INavItem from "../../interfaces/navItem";
+import type { IVideoSearchQuery } from "../../interfaces/searchQuery";
+import type IVideo from "../../interfaces/video";
+import type IVideoSource from "../../interfaces/videoSource";
 import { VideosViewMode } from "../../util/enums";
 import { getActorImageUrl, getVideoThumbnailUrl } from "../../util/helpers";
 import Modal from "../shared/modal";
 import Navigation from "../shared/navigation";
 import MultiView from "./multiView";
 
-const apiBaseUrl = process.env.REACT_APP_API_BASE_URL
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
 interface VideosAppProps extends SubAppProps {
 

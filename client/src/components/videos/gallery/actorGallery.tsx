@@ -1,10 +1,10 @@
-import IActor from "../../../interfaces/actor"
-import { IVideoSearchQuery } from "../../../interfaces/searchQuery"
+import type IActor from "../../../interfaces/actor"
+import type { IVideoSearchQuery } from "../../../interfaces/searchQuery"
 import { ActorsSortOrder } from "../../../util/enums"
 import PageSelect from "../../shared/pageSelect"
 import ActorGalleryItem from "./actorGalleryItem"
 import ActorSortControls from "./actorSortControls"
-import { BaseGalleryProps } from "../../shared/baseGallery"
+import type { BaseGalleryProps } from "../../shared/baseGallery"
 import { useEffect, useState } from "react"
 
 

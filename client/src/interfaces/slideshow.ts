@@ -1,4 +1,4 @@
-import IBook from "./book"
+import type IBook from "./book"
 
 export default interface ISlideshow {
     id: number | null,

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { ICollection } from "../../../interfaces/slideshow";
+import type { ICollection } from "../../../interfaces/slideshow";
 import PageSelect from "../../shared/pageSelect"
-import { BaseGalleryProps } from "../../shared/baseGallery"
+import type { BaseGalleryProps } from "../../shared/baseGallery"
 import CollectionGalleryItem from "./collectionGalleryItem";
 import { GetCoverPath, GetPagePathByID } from "../../../util/helpers";
 
@@ -14,7 +14,6 @@ const CollectionGallery = (props: CollectionGalleryProps) => {
     const [items, setItems] = useState<ICollection[]>(props.allItems)
     const [galleryPage, setGalleryPage] = useState<number>(0)
     const [totalPages, setTotalPages] = useState<number>(0)
-    const [currentPageSize, setCurrentPageSize] = useState<number>(0)
 
     const getTotalPages = (items: ICollection[]): number => {
         if (items) {

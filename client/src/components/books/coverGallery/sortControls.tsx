@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import IBook from "../../../interfaces/book";
+import type IBook from "../../../interfaces/book";
 import { BooksSortOrder } from "../../../util/enums";
 import { getAlphabet, getBookAuthor } from "../../../util/helpers";
 

@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-import { useRef } from "react";
-import IVideo from "../../../interfaces/video";
-import { IVideoSearchQuery } from "../../../interfaces/searchQuery";
-import IActor from "../../../interfaces/actor";
-import StarsIcon from "../../../img/svg/stars.svg"
-import CameraIcon from "../../../img/svg/camera.svg"
+import CameraIcon from "../../../img/svg/camera.svg";
+import StarsIcon from "../../../img/svg/stars.svg";
+import type IActor from "../../../interfaces/actor";
+import type { IVideoSearchQuery } from "../../../interfaces/searchQuery";
+import type IVideo from "../../../interfaces/video";
+import type IVideoSource from "../../../interfaces/videoSource";
 import Modal from "../../shared/modal";
 import EditPanel from "../editPanel/editPanel";
-import IVideoSource from "../../../interfaces/videoSource";
 
 interface PlayerProps {
     video: IVideo | null,
@@ -30,7 +29,7 @@ const Player = (props: PlayerProps) => {
 
     const videoUrl = () => {
         if (!props.video) return ""
-        const apiBaseUrl = process.env.REACT_APP_API_BASE_URL
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
         return `${apiBaseUrl}/videos/${props.video.id}`
     }
 

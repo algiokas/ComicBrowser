@@ -1,5 +1,5 @@
-import INavItem from "../../interfaces/navItem";
-import { IBookSearchQuery } from "../../interfaces/searchQuery";
+import type INavItem from "../../interfaces/navItem";
+import type { IBookSearchQuery } from "../../interfaces/searchQuery";
 import { NavLogo } from "./navLogo";
 import NavSearch from "./navSearch";
 

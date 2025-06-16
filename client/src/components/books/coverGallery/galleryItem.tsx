@@ -2,7 +2,7 @@ import React from "react";
 import MinusImg from "../../../img/svg/minus-symbol.svg";
 import PlusImg from "../../../img/svg/plus-symbol.svg";
 import StarsImage from "../../../img/svg/stars.svg";
-import IBook from "../../../interfaces/book";
+import type IBook from "../../../interfaces/book";
 
 interface GalleryItemProps {
   index: number,

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import ChevronRightImg from "../../../img/svg/chevron-right.svg";
-import IBook from "../../../interfaces/book";
-import { IBookSearchQuery } from "../../../interfaces/searchQuery";
-import ISlideshow from "../../../interfaces/slideshow";
+import type IBook from "../../../interfaces/book";
+import type { IBookSearchQuery } from "../../../interfaces/searchQuery";
+import type ISlideshow from "../../../interfaces/slideshow";
 import { BooksViewMode } from "../../../util/enums";
 import { GetCoverPath } from "../../../util/helpers";
 import Modal from "../../shared/modal";

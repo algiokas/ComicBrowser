@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import coverIcon from "../../../img/svg/book-half.svg";
-import ISlideshow from "../../../interfaces/slideshow";
+import type ISlideshow from "../../../interfaces/slideshow";
 import { GetCoverPath } from "../../../util/helpers";
 import GalleryItem from "../coverGallery/galleryItem";
 

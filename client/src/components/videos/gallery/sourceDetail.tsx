@@ -1,4 +1,4 @@
-import IVideoSource from "../../../interfaces/videoSource";
+import type IVideoSource from "../../../interfaces/videoSource";
 
 interface SourceDetailProps {
     source: IVideoSource

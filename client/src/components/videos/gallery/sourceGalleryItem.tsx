@@ -1,21 +1,12 @@
-import IVideoSource from "../../../interfaces/videoSource";
-import { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
+import type IVideoSource from "../../../interfaces/videoSource";
+import type { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
 
-export interface SourceGalleryItemProps extends BaseGalleryItemProps<IVideoSource> {
-
-}
+interface SourceGalleryItemProps extends BaseGalleryItemProps<IVideoSource> {}
 
 const SourceGalleryItem = (props: SourceGalleryItemProps) => {
     const bodyClick = (e: React.MouseEvent) => {
         if (props.bodyClickHandler)
             props.bodyClickHandler(props.data, props.index)
-    }
-
-    const favoriteClick = (e: React.MouseEvent) => {
-        if (props.favoriteClickHandler) {
-            e.stopPropagation()
-            props.favoriteClickHandler(props.data)
-        }
     }
 
     return (

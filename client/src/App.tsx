@@ -3,15 +3,9 @@ import BooksApp from "./components/books/booksApp";
 import VideosApp from "./components/videos/videosApp";
 import { AppMode } from "./util/enums";
 
-interface AppProps { } //empty
-
 export interface SubAppProps {
   viewBooksApp(): void
   viewVideosApp(): void
-}
-
-export interface AppState {
-  appMode: AppMode
 }
 
 const App = () => {

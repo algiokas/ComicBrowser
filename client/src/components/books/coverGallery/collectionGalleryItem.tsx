@@ -1,6 +1,6 @@
 
-import { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
-import { ICollection } from "../../../interfaces/slideshow";
+import type { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
+import type { ICollection } from "../../../interfaces/slideshow";
 
 const CollectionGalleryItem = (props: BaseGalleryItemProps<ICollection>) => {
   const bodyClick = (e: React.MouseEvent) => {

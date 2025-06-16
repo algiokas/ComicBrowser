@@ -1,15 +1,13 @@
-import React, { Component } from "react";
 import CoverGallery from "./coverGallery/coverGallery";
 import Slideshow from "./slideshow/slideshow";
 import LoadingView from "./loadingView";
 import { BooksViewMode } from "../../util/enums";
 import { BooksSortOrder } from "../../util/enums";
-import { AppState } from "../../App";
-import IBook from "../../interfaces/book";
-import { IBookSearchQuery } from "../../interfaces/searchQuery";
-import { BooksAppState } from "./booksApp";
+import type IBook from "../../interfaces/book";
+import type { IBookSearchQuery } from "../../interfaces/searchQuery";
+import type { BooksAppState } from "./booksApp";
 import CollectionGallery from "./coverGallery/collectionGallery";
-import { ICollection } from "../../interfaces/slideshow";
+import type { ICollection } from "../../interfaces/slideshow";
 
 interface MultiViewProps extends BooksAppState {
     viewBook(book: IBook): void,

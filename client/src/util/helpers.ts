@@ -1,10 +1,9 @@
-import path from "path";
-import IActor from "../interfaces/actor";
-import IBook from "../interfaces/book"
-import IVideo from "../interfaces/video";
+import type IActor from "../interfaces/actor";
+import type IBook from "../interfaces/book"
+import type IVideo from "../interfaces/video";
 
 export function GetCoverPath(book: IBook): string {
-    const basePath = process.env.REACT_APP_API_BASE_URL
+    const basePath = import.meta.env.VITE_API_BASE_URL
     if (basePath) {
         return basePath + `/books/${book.id}/page/0`
     }
@@ -13,7 +12,7 @@ export function GetCoverPath(book: IBook): string {
 }
 
 export function GetPagePathByID(bookId: number, pageNum: number): string {
-    const basePath = process.env.REACT_APP_API_BASE_URL
+    const basePath = import.meta.env.VITE_API_BASE_URL
     if (basePath) {
         return basePath + `/books/${bookId}/page/${pageNum}`
     }
@@ -22,12 +21,12 @@ export function GetPagePathByID(bookId: number, pageNum: number): string {
 }
 
 export function getVideoThumbnailUrl(video: IVideo): string {
-    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
     return `${apiBaseUrl}/videos/thumbnail/${video.id}`
 }
 
 export function getActorImageUrl(actor: IActor): string {
-    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
     return `${apiBaseUrl}/actors/${actor.id}/image`
 }
 

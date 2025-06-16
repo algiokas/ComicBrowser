@@ -1,8 +1,4 @@
-import Logo from '../logo.svg';
-
-interface loadingViewProps{}
-
-const LoadingView = (props: loadingViewProps) => {
+const LoadingView = () => {
     return (
         <div className="container dark-theme">
             <div className="loading-container">
