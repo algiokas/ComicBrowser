@@ -16,22 +16,21 @@
         "cwd": "${workspaceFolder}\\client",
         "runtimeExecutable": "npm",
         "runtimeArgs": [
-            "run-script", "start"
+            "run-script", "dev"
         ]
       },
       {
         "name": "WebBrowser",
         "type": "chrome",
         "request": "launch",
-        "url": "http://localhost:3000",
+        "url": "http://localhost:5173",
         "webRoot": "${workspaceFolder}/dist",
         "sourceMaps": true, 
         "presentation": {
           "hidden": true,
           "group": "",
           "order": 1
-        },
-        "preLaunchTask": "Sleepdelay"
+        }
       }
     ],
     "compounds": [
