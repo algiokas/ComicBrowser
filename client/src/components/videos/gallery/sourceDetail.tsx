@@ -10,6 +10,17 @@ const SourceDetail = (props: SourceDetailProps) => {
             <div className="sourcedetail-header">
                 <h2 className="sourcedetail-name">{props.source.name}</h2>
             </div>
+            <div className="sourcedetail-inner">
+                {
+                    props.source.imageFileLarge ?
+                    <div className="sourcedetail-image">
+                        <img src={props.source.imageFileLarge}></img>
+                    </div>
+                    : null
+                }
+            </div>
         </div>
     )
 }
+
+export default SourceDetail

@@ -9,6 +9,8 @@ import VideoSortControls from "./videoSortControls"
 import ActorDetail from "./actorDetail"
 import { getVideoThumbnailUrl } from "../../../util/helpers"
 import { useEffect, useState } from "react"
+import type IVideoSource from "../../../interfaces/videoSource"
+import SourceDetail from "./sourceDetail"
 
 interface VideoGalleryProps extends BaseGalleryProps<IVideo> {
     sortOrder?: VideosSortOrder,
@@ -28,7 +30,8 @@ const VideoGallery = (props: VideoGalleryProps) => {
     const [ totalPages, setTotalPages ] = useState<number>(0)
     const [ sortOrder, setSortOrder ] = useState<VideosSortOrder>(initialSortOrder)
     const [ actorListingActor, setActorListingActor ] = useState<IActor | null>(null)
-    const [ currentPageSize, setCurrentPageSize ] = useState<number>(props.allItems.length < props.pageSize ? props.allItems.length : props.pageSize)
+    const [ sourceListingSource, setSourceListingSource ] = useState<IVideoSource | null>(null)
+    //const [ currentPageSize, setCurrentPageSize ] = useState<number>(props.allItems.length < props.pageSize ? props.allItems.length : props.pageSize)
 
     useEffect(() => {
         updateItems(props.allItems, props.query)
@@ -42,12 +45,14 @@ const VideoGallery = (props: VideoGalleryProps) => {
             setTotalPages(getTotalPages(sortedVideos))
             setGalleryPage(0)
             updateActorListingActor(sortedVideos)
+            updateSourceListingSource(sortedVideos)
         } else {
             const sortedVideos = getSortedVideos(videos, sortOrder)
             setItems(getSortedVideos(videos, sortOrder))
             setTotalPages(getTotalPages(videos))
             setGalleryPage(0)  
             updateActorListingActor(sortedVideos)
+            updateSourceListingSource(sortedVideos)
         }
     }
 
@@ -78,12 +83,12 @@ const VideoGallery = (props: VideoGalleryProps) => {
                 })
                 break
             case VideosSortOrder.Random:
-                sortedCopy.sort((a, b) => {
+                sortedCopy.sort(() => {
                     return 0.5 - Math.random()
                 })
                 break
             case VideosSortOrder.Favorite:
-                sortedCopy.sort((a, b) => {
+                sortedCopy.sort(() => {
                     return 0.5 - Math.random()
                 })
                 let favorites = sortedCopy.filter(b => b.isFavorite)
@@ -157,7 +162,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
         return videos.slice(pageStart, pageEnd)
     }
 
-    const bodyClick = (Video: IVideo, VideoIndex: number) => {
+    const bodyClick = (Video: IVideo) => {
         props.watchVideo(Video)
     }
 
@@ -185,6 +190,18 @@ const VideoGallery = (props: VideoGalleryProps) => {
         setActorListingActor(listingActor)
     }
 
+    const updateSourceListingSource = (videos: IVideo[]) => {
+        const isSourceListing = props.query &&
+            props.query.filled &&
+            props.query.source &&
+            !props.query.actor &&
+            !props.query.tag
+        if (!isSourceListing) return
+        const firstVideo = getCurrentGalleryPage(videos)[0]
+        const listingSource = firstVideo.source
+        setSourceListingSource(listingSource)
+    }
+
     return (
         <div className="videogallery-container dark-theme">
             {
@@ -193,6 +210,11 @@ const VideoGallery = (props: VideoGalleryProps) => {
                         getActorImageUrl={props.getActorImageUrl}
                         updateActor={props.updateActor} />
                     : null
+            }
+            {
+                sourceListingSource ? 
+                <SourceDetail source={sourceListingSource}/>
+                : null
             }
             <div className="videogallery-container-header">
                 <PageSelect
