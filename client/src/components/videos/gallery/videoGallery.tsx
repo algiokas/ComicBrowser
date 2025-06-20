@@ -19,7 +19,8 @@ interface VideoGalleryProps extends BaseGalleryProps<IVideo> {
     viewSearchResults(query?: IVideoSearchQuery): void,
     updateVideo?: (Video: IVideo) => void,
     updateActor?: (actor: IActor) => void,
-    getActorImageUrl(actor: IActor): string
+    getActorImageUrl(actor: IActor): string,
+    uploadSourceImage(sourceId: number, imageSize: 'small' | 'large', fileData: any): void
 }
 
 const VideoGallery = (props: VideoGalleryProps) => {
@@ -184,7 +185,10 @@ const VideoGallery = (props: VideoGalleryProps) => {
             props.query.actor &&
             !props.query.source &&
             !props.query.tag
-        if (!isActorListing) return
+        if (!isActorListing) {
+            setActorListingActor(null)
+            return
+        }
         const firstVideo = getCurrentGalleryPage(videos)[0]
         const listingActor = firstVideo.actors.find(a => a.name == props.query!.actor) ?? null
         setActorListingActor(listingActor)
@@ -196,7 +200,10 @@ const VideoGallery = (props: VideoGalleryProps) => {
             props.query.source &&
             !props.query.actor &&
             !props.query.tag
-        if (!isSourceListing) return
+        if (!isSourceListing) {
+            setSourceListingSource(null)
+            return
+        } 
         const firstVideo = getCurrentGalleryPage(videos)[0]
         const listingSource = firstVideo.source
         setSourceListingSource(listingSource)
@@ -213,7 +220,10 @@ const VideoGallery = (props: VideoGalleryProps) => {
             }
             {
                 sourceListingSource ? 
-                <SourceDetail source={sourceListingSource}/>
+                <SourceDetail 
+                source={sourceListingSource}
+                uploadSourceImage={props.uploadSourceImage}
+                />
                 : null
             }
             <div className="videogallery-container-header">

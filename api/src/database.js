@@ -1,11 +1,11 @@
+import Database from 'better-sqlite3';
+
 const BOOKS_DBSOURCE = "data/books.sqlite"
 const VIDEO_DBSOURCE = "data/videos.sqlite"
-const Database = require('better-sqlite3');
+
 
 const books_db = new Database(BOOKS_DBSOURCE); //, { verbose: console.log });
 const videos_db = new Database(VIDEO_DBSOURCE);
-
-require('dotenv').config()
 
 function initBooks() {
     // try {
@@ -265,5 +265,8 @@ function initVideos() {
 initBooks();
 initVideos();
 
-exports.books_db = books_db
-exports.videos_db = videos_db
+const _books_db = books_db;
+export { _books_db as books_db };
+const _videos_db = videos_db;
+export { _videos_db as videos_db };
+

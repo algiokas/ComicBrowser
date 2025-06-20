@@ -20,7 +20,8 @@ interface MultiViewProps extends VideosAppState {
     setThumbnailToTime(videoId: number, timeMs: number): void,
     updateActor(actor: IActor): void,
     getActorImageUrl(actor: IActor): string,
-    generateImageForActor(videoId: number, actorId: number, timeMs: number): void
+    generateImageForActor(videoId: number, actorId: number, timeMs: number): void,
+    uploadSourceImage(sourceId: number, imageSize: 'small' | 'large', fileData: any): void
 }
 
 const MultiView = (props: MultiViewProps) => {
@@ -29,7 +30,8 @@ const MultiView = (props: MultiViewProps) => {
         updateVideo: props.updateVideo,
         updateActor: props.updateActor,
         viewSearchResults: props.viewSearchResults,
-        getActorImageUrl: props.getActorImageUrl
+        getActorImageUrl: props.getActorImageUrl,
+        uploadSourceImage: props.uploadSourceImage
     }
 
     const actorGalleryHandlers = {
@@ -48,7 +50,8 @@ const MultiView = (props: MultiViewProps) => {
         viewSearchResults: props.viewSearchResults,
         getActorImageUrl: props.getActorImageUrl,
         setThumbnailToTime: props.setThumbnailToTime,
-        generateImageForActor: props.generateImageForActor
+        generateImageForActor: props.generateImageForActor,
+        uploadSourceImage: props.uploadSourceImage
     }
 
     switch (props.viewMode) {

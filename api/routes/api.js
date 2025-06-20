@@ -1,8 +1,8 @@
-var express = require('express');
-var router = express.Router({mergeParams:true});
-const booksRouter = require('./books')
-const actorsRouter = require('./actors')
-const videosRouter = require('./videos')
+import { Router } from 'express';
+var router = Router({mergeParams:true});
+import booksRouter from './books.js';
+import actorsRouter from './actors.js';
+import videosRouter from './videos.js';
 
 router.get('/', function (req, res, next) {
   res.send("API Root");
@@ -12,6 +12,6 @@ router.use("/books", booksRouter)
 router.use("/actors", actorsRouter)
 router.use("/videos", videosRouter)
 
-module.exports = router;
+export default router;
 
 

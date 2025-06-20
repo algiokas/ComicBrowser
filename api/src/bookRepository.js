@@ -1,11 +1,13 @@
-const languages = ["Japanese", "English", "Chinese"]
-const db = require('../src/bookDatabase')
-const fs = require('fs');
-const path = require('path');
+import * as bookDatabase from '../src/bookDatabase.js';
+import { readdir, statSync, readdirSync } from 'fs';
+import path from 'path';
 
+import 'dotenv/config';
+
+const languages = ["Japanese", "English", "Chinese"]
 const imageDirectory = process.env.BOOKS_IMAGE_DIR
 
-exports.getFileName = function (id, book) {
+export function getFileName (id, book) {
     return String(id).padStart(4, '0') + ' - ' + book.title
 }
 
@@ -73,11 +75,11 @@ function folderToJSON(folderName, contents, fileStats) {
     return output
 }
 
-exports.importBooks = function (res, callback) {
+export function importBooks (res, callback) {
     let count = 0;
     
     console.log(`Checking for books in Directory: ${imageDirectory}`)
-    fs.readdir(imageDirectory, function (err, files) {
+    readdir(imageDirectory, function (err, files) {
         if (err) {
             return console.log('Unable to scan directory: ' + err);
         }
@@ -92,7 +94,7 @@ exports.importBooks = function (res, callback) {
         
         let dbrows = [];
         bookData.forEach((book) => {
-            let addResult = db.addBook(book)
+            let addResult = bookDatabase.addBook(book)
             if (addResult) {
                 if (addResult.lastInsertRowid) {
                     book.id = addResult.lastInsertRowid
@@ -111,10 +113,10 @@ exports.importBooks = function (res, callback) {
 
 function getBookData(file) {
     let fullpath = path.join(imageDirectory, file);
-    let fileStats = fs.statSync(fullpath)
+    let fileStats = statSync(fullpath)
     if (fileStats.isDirectory()) {
         try {
-            const files = fs.readdirSync(fullpath);
+            const files = readdirSync(fullpath);
             let folderContents = [];
             files.forEach((file) => {
                 folderContents.push(file);
@@ -139,15 +141,15 @@ function fillBook(booksRow) {
             console.log(e);
         }
     }
-    if (!booksRow.artists) book.artists = db.getBookArtists(booksRow.id)
-    if (!booksRow.tags) book.tags = db.getBookTags(booksRow.id)
+    if (!booksRow.artists) book.artists = bookDatabase.getBookArtists(booksRow.id)
+    if (!booksRow.tags) book.tags = bookDatabase.getBookTags(booksRow.id)
 
     return book;
 }
 
-exports.getBooks = function () {
+export function getBooks () {
     console.log("/allbooks")
-    let booksRow = db.getBooks()
+    let booksRow = bookDatabase.getBooks()
     if (!booksRow || booksRow.length < 1) {
         console.log("no books found")
         return booksRow
@@ -159,8 +161,8 @@ exports.getBooks = function () {
     return books
 }
 
-exports.getBookPage = function (id, pageNum) {
-    let book = db.getBookByID(id)
+export function getBookPage (id, pageNum) {
+    let book = bookDatabase.getBookByID(id)
     if (book && book.pages) {
         //console.log(row.title + " page " + req.params.pageNum)
         let pageList = JSON.parse(book.pages)
@@ -174,27 +176,27 @@ exports.getBookPage = function (id, pageNum) {
     }
 }
 
-exports.getBook = function (id) {
-    let book = db.getBookByID(id)
+export function getBook (id) {
+    let book = bookDatabase.getBookByID(id)
     return fillBook(book)
 }
 
-exports.updateBook = function(id, newBookData) {
+export function updateBook(id, newBookData) {
     console.log("updating book with id " + id)
     let response = { success: false, errors: "" }
-    let bookData = exports.getBook(id);
+    let bookData = getBook(id);
     if (newBookData.title !== bookData.title) {
-        db.setTitle(id, newBookData.title)
+        bookDatabase.setTitle(id, newBookData.title)
     }
     if (newBookData.artGroup !== bookData.artGroup) {
-        db.setArtGroup(id, newBookData.artGroup)
+        bookDatabase.setArtGroup(id, newBookData.artGroup)
     }
     if (newBookData.artists && bookData.artists) {
         let artistsToAdd = newBookData.artists.filter(t => !bookData.artists.includes(t))
         let artistsToRemove = bookData.artists.filter(t => !newBookData.artists.includes(t))
 
         if (artistsToAdd.length) {
-            let addResult = db.addArtists(id, artistsToAdd)
+            let addResult = bookDatabase.addArtists(id, artistsToAdd)
             if (addResult.length === artistsToAdd.length) {
                 response.success = true;
             } else {
@@ -202,7 +204,7 @@ exports.updateBook = function(id, newBookData) {
             }
         } 
         if (artistsToRemove.length) {
-            let removeResult = db.removeArtists(id, artistsToRemove)
+            let removeResult = bookDatabase.removeArtists(id, artistsToRemove)
             if (removeResult.length === artistsToRemove.length) {
                 response.success = true;
             } else {
@@ -215,7 +217,7 @@ exports.updateBook = function(id, newBookData) {
         let tagsToRemove = bookData.tags.filter(t => !newBookData.tags.includes(t))
 
         if (tagsToAdd.length) {
-            let addResult = db.addTags(id, tagsToAdd)
+            let addResult = bookDatabase.addTags(id, tagsToAdd)
             if (addResult.length === tagsToAdd.length) {
                 response.success = true;
             } else {
@@ -223,7 +225,7 @@ exports.updateBook = function(id, newBookData) {
             }
         } 
         if (tagsToRemove.length) {
-            let removeResult = db.removeTags(id, tagsToRemove)
+            let removeResult = bookDatabase.removeTags(id, tagsToRemove)
             if (removeResult.length === tagsToRemove.length) {
                 response.success = true;
             } else {
@@ -234,7 +236,7 @@ exports.updateBook = function(id, newBookData) {
     if (newBookData.hiddenPages && bookData.hiddenPages) {
         if (JSON.stringify(newBookData.hiddenPages) !== JSON.stringify(bookData.hiddenPages)) {
             try {
-                let updateResult = db.setHiddenPages(id, newBookData.hiddenPages)
+                let updateResult = bookDatabase.setHiddenPages(id, newBookData.hiddenPages)
                 if (updateResult) response.success = true
             } catch (err) {
                 response.errors = response.errors + err.message
@@ -244,29 +246,29 @@ exports.updateBook = function(id, newBookData) {
     }
     if (newBookData.isFavorite !== bookData.isFavorite) {
         try {
-            let updateResult = db.setFavoriteValue(id, newBookData.isFavorite)
+            let updateResult = bookDatabase.setFavoriteValue(id, newBookData.isFavorite)
             if (updateResult) response.success = true
         } catch (err) {
             response.errors = response.errors + err.message
         } 
     }
     if (response.errors) response.success = false
-    response.book = exports.getBook(id)
+    response.book = getBook(id)
     return response
 }
 
-exports.deleteBook = function(id) {
-    return db.deleteBook(id)
+export function deleteBook(id) {
+    return bookDatabase.deleteBook(id)
 }
 
-exports.createCollection = function(createCollectionRequest) {
-    return db.createCollection(
+export function createCollection(createCollectionRequest) {
+    return bookDatabase.createCollection(
         createCollectionRequest.name, 
         createCollectionRequest.books, 
         createCollectionRequest.coverBookId
     )
 }
 
-exports.getCollections = function() {
-    return db.getAllCollections()
+export function getCollections() {
+    return bookDatabase.getAllCollections()
 }

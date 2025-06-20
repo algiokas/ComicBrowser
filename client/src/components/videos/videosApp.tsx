@@ -10,6 +10,7 @@ import { getActorImageUrl, getVideoThumbnailUrl } from "../../util/helpers";
 import Modal from "../shared/modal";
 import Navigation from "../shared/navigation";
 import MultiView from "./multiView";
+import type { FileWithData } from "./gallery/sourceDetail";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
@@ -224,6 +225,28 @@ const VideosApp = (props: VideosAppProps) => {
     }
   }
 
+  const uploadSourceImage = async (sourceId: number, imageSize: 'small' | 'large', fileData: FileWithData) => {
+    toggleLoadingModal(`Uploading image for source: ${sourceId}`)
+    const res = await fetch(`${apiBaseUrl}/videos/upload/sourceimage/${sourceId}/${imageSize}`, {
+      method: 'post',
+      headers: {
+        "Content-Type": fileData.file.type
+      },
+      body: fileData.data
+    })
+    const data = await res.json()
+    if (data.success) {
+      for (let i = 0; i < allSources.length; i++) {
+        if (allSources[i] && allSources[i].id === data.source.id) {
+          let sources = allSources
+          sources[i] = data.source as IVideoSource
+          setAllSources(sources)
+          setShowLoadingModal(false)
+        }
+      }
+    }
+  }
+
   const watchVideo = (video: IVideo) => {
     setCurrentVideo(video)
     setViewMode(VideosViewMode.Player)
@@ -234,8 +257,6 @@ const VideosApp = (props: VideosAppProps) => {
       setViewMode(VideosViewMode.Player)
     }
   }
-
-
 
   const viewSearchResults = (query?: IVideoSearchQuery) => {
     if (query) {
@@ -337,7 +358,8 @@ const VideosApp = (props: VideosAppProps) => {
     setThumbnailToTime: setThumbnailToTime,
     updateActor: updateActor,
     getActorImageUrl: getActorImageUrlWithFallback,
-    generateImageForActor: generateImageForActor
+    generateImageForActor: generateImageForActor,
+    uploadSourceImage: uploadSourceImage
   }
 
   const appState: VideosAppState = {

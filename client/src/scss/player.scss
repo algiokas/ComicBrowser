@@ -12,7 +12,7 @@
         border-radius: 5px;
         width: 90%;
         background-color: $gray-2;
-        display:flex;
+        display: flex;
         flex-direction: row-reverse;
     }
 
@@ -21,7 +21,7 @@
 
         &-container {
             display: flex;
-            padding: 25px;  
+            padding: 25px;
         }
 
         &-info {
@@ -39,6 +39,11 @@
 
             &-id {
                 color: rgba(211, 211, 211, 0.616);
+                font-weight: bold;
+            }
+
+            &-source {
+                margin: 0.5em;
                 font-weight: bold;
             }
 
@@ -62,7 +67,7 @@
                 overflow-x: hidden;
                 overflow-y: auto;
 
-                & > .player-actor {
+                &>.player-actor {
                     margin: 0.6em auto;
                     cursor: pointer;
 
@@ -70,8 +75,8 @@
                         width: 290px;
                     }
 
-                    & span{
-                        margin:auto;
+                    & span {
+                        margin: auto;
                     }
 
                     &-screenshot {

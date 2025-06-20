@@ -1,6 +1,7 @@
 import type IActor from "../interfaces/actor";
 import type IBook from "../interfaces/book"
 import type IVideo from "../interfaces/video";
+import type IVideoSource from "../interfaces/videoSource";
 
 export function GetCoverPath(book: IBook): string {
     const basePath = import.meta.env.VITE_API_BASE_URL
@@ -28,6 +29,11 @@ export function getVideoThumbnailUrl(video: IVideo): string {
 export function getActorImageUrl(actor: IActor): string {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
     return `${apiBaseUrl}/actors/${actor.id}/image`
+}
+
+export function getSourceImageUrl(source: IVideoSource, small?: boolean) {
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
+    return `${apiBaseUrl}/videos/sources/${source.id}/image${small ? 'small' : 'large'}`
 }
 
 export function GetPagePath(book: IBook, pageNum: number): string {

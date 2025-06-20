@@ -1,5 +1,6 @@
-const db = require('../src/database').videos_db
+import { videos_db as db } from '../src/database.js'
 
+//#region queries
 const _VIDEOS = Object.freeze({
     insert: db.prepare('INSERT INTO videos (title, thumbnailId, filePath, fileExt, addedDate, isFavorite, originalTitle, sourceId) VALUES (?,?,?,?,?,?,?,?)'),
     delete: db.prepare('DELETE FROM videos WHERE id = ?'),
@@ -39,8 +40,12 @@ const _SOURCES = Object.freeze({
     insert: db.prepare('INSERT INTO sources (name, imageFileSmall, imageFileLarge, siteUrl) VALUES (?,?,?,?)'),
     selectAll: db.prepare('SELECT * FROM sources'),
     selectById: db.prepare('SELECT * FROM sources WHERE id = ?'),
-    selectByName: db.prepare('SELECT * FROM sources WHERE name = ?')
+    selectByName: db.prepare('SELECT * FROM sources WHERE name = ?'),
+    updateImageSmall: db.prepare('UPDATE sources SET imageFileSmall = ? WHERE id = ?'),
+    updateImageLarge: db.prepare('UPDATE sources SET imageFileLarge = ? WHERE id = ?'),
+    updateSiteUrl: db.prepare('UPDATE sources SET siteUrl = ? WHERE id = ?')
 })
+//#endregion
 
 
 function insertVideoFromJson(videoJson) {
@@ -138,7 +143,7 @@ function removeActorsFromVideo(videoId, actorNames) {
     return actorIds
 }
 
-exports.insertSourceIfMissing = function(sourceName) {
+export function insertSourceIfMissing(sourceName) {
     if (!sourceName) {
         console.log('cannot input blank actor name')
         return null
@@ -152,7 +157,7 @@ exports.insertSourceIfMissing = function(sourceName) {
 }
 
 function addVideoToDb(videoJson) {
-    let sourceId = exports.insertSourceIfMissing(videoJson.source)
+    let sourceId = insertSourceIfMissing(videoJson.source)
     videoJson.sourceId = sourceId.existingRowId ?? sourceId.lastInsertRowid
     let insertResult = insertVideoFromJson(videoJson)
     let actorIds = insertActorsForVideo(insertResult.lastInsertRowid, videoJson.actors)
@@ -169,13 +174,13 @@ function removeVideoFromDb(videoId) {
     return insertResult
 }
 
-exports.deleteVideo = function(videoId) {
+export function deleteVideo(videoId) {
     let videoData = _VIDEOS.selectById.get(videoId)
     if (!videoData) return { success: false, error: 'video not found' }
     return removeVideoFromDb(videoId, videoData)
 }
 
-exports.addVideo = function(videoJson, replace = false) {
+export function addVideo(videoJson, replace = false) {
     if (!replace) {
         let existing = _VIDEOS.selectByFilePath.get(videoJson.filePath)
         if (existing) {
@@ -192,79 +197,93 @@ exports.addVideo = function(videoJson, replace = false) {
     }
 }
 
-exports.getVideos = function() {
+export function getVideos() {
     return _VIDEOS.selectAll.all()
 }
 
-exports.getVideoById = function(id) {
+export function getVideoById(id) {
     return _VIDEOS.selectById.get(id)
 }
 
-exports.getVideoFilePathById = function(id) {
+export function getVideoFilePathById(id) {
     return _VIDEOS.selectFilePathById.get(id)
 }
 
-exports.getVideoThumbnailById = function(id) {
+export function getVideoThumbnailById(id) {
     return _VIDEOS.selectThumbnailById.get(id)
 }
 
-exports.updateThumbnail = function(id, thumbnail) {
+export function updateThumbnail(id, thumbnail) {
     return _VIDEOS.updateThumbnailId.run(thumbnail, id)
 }
 
-exports.getVideoActors = function(videoId) {
+export function getVideoActors(videoId) {
     return _ACTORS.selectByVideoId.all(videoId)
 }
 
-exports.getActorById = function(id) {
+export function getActorById(id) {
     return _ACTORS.selectById.get(id)
 }
 
-exports.getAllActors = function() {
+export function getAllActors() {
     return _ACTORS.selectAll.all()
 }
 
-exports.updateActorImage = function(id, imageFile) {
+export function updateActorImage(id, imageFile) {
     return _ACTORS.updateImage.run(imageFile, id)
 }
 
-exports.setVideoTitle = function(id, newTitle) {
+export function setVideoTitle(id, newTitle) {
     return updateVideoTitle.run(newTitle, id)
 }
 
-exports.addActors = function(id, actors) {
+export function addActors(id, actors) {
     return insertActorsForVideo(id, actors)
 }
 
-exports.removeActors = function(id, actors) {
+export function removeActors(id, actors) {
     return removeActorsFromVideo(id, actors)
 }
 
-exports.setVideoFavoriteValue = function(id, value) {
+export function setVideoFavoriteValue(id, value) {
     if (typeof value !== "boolean") {
         throw new Error("TypeError - Favorite value must be boolean")    
     }
     return _VIDEOS.updateFavorite.run(value ? 1 : 0, id)
 }
 
-exports.getAllSources = function() {
+//#region sources
+export function getAllSources() {
     return _SOURCES.selectAll.all()
 }
 
-exports.getSourceById = function(id) {
+export function getSourceById(id) {
     if (!id) return null
     return _SOURCES.selectById.get(id)
 }
 
-exports.setVideoSourceId = function(videoId, sourceId) {
+export function updateSourceImageSmall(id, imageSmall) {
+    return _SOURCES.updateImageSmall.run(imageSmall, id)
+}
+
+export function updateSourceImageLarge(id, imageLarge) {
+    return _SOURCES.updateImageLarge.run(imageLarge, id)
+}
+
+export function updateSourceSiteUrl(id, siteUrl) {
+    return _SOURCES.updateSiteUrl.run(siteUrl, id)
+}
+//#endregion
+
+export function setVideoSourceId(videoId, sourceId) {
     return _VIDEOS.updateSource.run(sourceId, videoId)
 }
 
-exports.setActorName = function(id, name) {
+export function setActorName(id, name) {
     return _ACTORS.updateName.run(name, id)
 }
 
-exports.setFavorite = function(id, value) {
+export function setFavorite(id, value) {
     if (typeof value !== "boolean") {
         throw new Error("TypeError - Favorite value must be boolean")    
     }

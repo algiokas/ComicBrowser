@@ -1,14 +1,14 @@
-var express = require('express');
-var router = express.Router();
-const bookRepo = require('../src/bookRepository')
+import { Router } from 'express';
+import { createCollection, deleteBook, getBookPage, getBooks, getCollections, importBooks, updateBook } from '../src/bookRepository.js';
+var router = Router();
 
 router.get('/', function (req, res, next) {
-    let books = bookRepo.getBooks()
+    let books = getBooks()
     res.json(books)
 });
 
 router.get('/import', function (req, res, next) {
-    bookRepo.importBooks(res, (res, importResult) => {
+    importBooks(res, (res, importResult) => {
 
         console.log("imported " + importResult.importCount + " books")
         res.json(importResult)
@@ -17,7 +17,7 @@ router.get('/import', function (req, res, next) {
 
 
 router.get('/:bookId/page/:pageNum', function (req, res, next) {
-    let fpath = bookRepo.getBookPage(req.params.bookId, req.params.pageNum);
+    let fpath = getBookPage(req.params.bookId, req.params.pageNum);
     if (fpath) res.sendFile(fpath, { root: process.env.BOOKS_IMAGE_DIR });
     else {
         res.sendStatus(404).end();
@@ -30,23 +30,23 @@ router.post('/:bookId/update', function (req, res, next) {
         console.log("invalid book data")
     } 
     if (req.body.id.toString() === req.params.bookId) {
-        res.json(bookRepo.updateBook(req.params.bookId, req.body))
+        res.json(updateBook(req.params.bookId, req.body))
     }
 })
 
 router.delete('/:bookId', function (req, res) {
     console.log('delete book id: ' + req.params.bookId)
-    res.json(bookRepo.deleteBook(req.params.bookId))
+    res.json(deleteBook(req.params.bookId))
 })
 
 router.get('/collections/all', function (req, res) {
     console.log('get all collections')
-    res.json(bookRepo.getCollections())
+    res.json(getCollections())
 })
 
 router.post('/collections/create', function (req, res) {
     console.log('new collection: ' + req.body.name)
-    res.json(bookRepo.createCollection(req.body))
+    res.json(createCollection(req.body))
 })
 
 router.post('/collections/update/:collectionId', function (req, res) {
@@ -58,4 +58,4 @@ router.delete('/collections/delete/:collectionId', function (req, res) {
     console.log('delete collection: ' + req.params.collectionId)
 })
 
-module.exports = router
+export default router

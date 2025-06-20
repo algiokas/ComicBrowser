@@ -4,6 +4,7 @@ import type { BaseGalleryProps } from "../../shared/baseGallery";
 import PageSelect from "../../shared/pageSelect";
 import SourceGalleryItem from "./sourceGalleryItem";
 import type { IVideoSearchQuery } from "../../../interfaces/searchQuery";
+import { getSourceImageUrl } from "../../../util/helpers";
 
 interface SourceGalleryProps extends BaseGalleryProps<IVideoSource> {
     viewSearchResults(query?: IVideoSearchQuery): void,
@@ -53,7 +54,7 @@ const SourceGallery = (props: SourceGalleryProps) => {
                             key={i}
                             index={i}
                             data={source}
-                            imageUrl="https://picsum.photos/480/270"
+                            imageUrl={source.imageFileLarge ? getSourceImageUrl(source) : "https://picsum.photos/480/270"}
                             bodyClickHandler={bodyClick}/>
                     })
                 }

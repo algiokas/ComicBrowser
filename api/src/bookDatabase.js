@@ -1,4 +1,4 @@
-const db = require('../src/database').books_db
+import { books_db as db } from '../src/database.js';
 
 const insertBook = db.prepare('INSERT INTO books (title, folderName, artGroup, prefix, language, pageCount, coverIndex, addedDate, pages, hiddenPages, isFavorite, originalTitle) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)');
 const insertArtist = db.prepare('INSERT INTO artists (name) VALUES (?)')
@@ -223,7 +223,7 @@ function removeBookFromDb(bookId, bookData) {
     return insertResult
 }
 
-exports.addBook = function(bookJson, replace = false) {
+export function addBook(bookJson, replace = false) {
     if (!replace) {
         let existing = getBookByTitle.get(bookJson.title)
         if (existing && existing.folderName === bookJson.folderName) {
@@ -240,81 +240,83 @@ exports.addBook = function(bookJson, replace = false) {
     }
 }
 
-exports.deleteBook = function(bookId) {
-    let bookData = getBookByID.get(bookId)
-    if (!bookData) return { success: false, error: 'book not found' }
-    return removeBookFromDb(bookId, bookData)
-}
+const _deleteBook = function (bookId) {
+    let bookData = getBookByID.get(bookId);
+    if (!bookData) return { success: false, error: 'book not found' };
+    return removeBookFromDb(bookId, bookData);
+};
+export { _deleteBook as deleteBook };
 
-exports.getBookArtists = function(bookId) {
+export function getBookArtists(bookId) {
     return getArtistsByBookId.all(bookId).map(a => a.name)
 }
 
-exports.getBookTags = function(bookId) {
+export function getBookTags(bookId) {
     return getTagsByBookId.all(bookId).map(t => t.name)
 }
 
-exports.getBooks = function() {
+export function getBooks() {
     return selectBooks.all()
 }
 
-exports.getBookByID = function(id) {
-    return getBookByID.get(id)
-}
+const _getBookByID = function (id) {
+    return getBookByID.get(id);
+};
+export { _getBookByID as getBookByID };
 
-exports.addTags = function(bookId, tags) {
+export function addTags(bookId, tags) {
     return insertTagsForBook(bookId, tags)
 }
 
-exports.removeTags = function(bookId, tags) {
+export function removeTags(bookId, tags) {
     return removeTagsFromBook(bookId, tags)
 }
 
-exports.addArtists = function(bookId, artists) {
+export function addArtists(bookId, artists) {
     return insertArtistsForBook(bookId, artists)
 }
 
-exports.removeArtists = function(bookId, artists) {
+export function removeArtists(bookId, artists) {
     return removeArtistsFromBook(bookId, artists)
 }
 
-exports.setHiddenPages = function(bookId, hiddenPages) {
+export function setHiddenPages(bookId, hiddenPages) {
     return updateHiddenPages.run(JSON.stringify(hiddenPages), bookId)
 }
 
-exports.setTitle = function(bookId, title) {
+export function setTitle(bookId, title) {
     return updateTitle.run(title, bookId)
 }
 
-exports.setArtGroup = function(bookId, groupName) {
+export function setArtGroup(bookId, groupName) {
     return updateArtGroup.run(groupName, bookId)
 }
 
-exports.setFavoriteValue = function(bookId, value) {
+export function setFavoriteValue(bookId, value) {
     if (typeof value !== "boolean") {
         throw new Error("TypeError - Favorite value must be boolean")    
     }
     return updateFavoriteValue.run(value ? 1 : 0, bookId)
 }
 
-exports.getAllCollections = function() {
+export function getAllCollections() {
     const collectionRows = selectCollections.all()
     return collectionRows.map(row => fillCollection(row))
 }
 
-exports.getCollectionById = function(id) {
+export function getCollectionById(id) {
     const collectionRow = selectCollectionById.get(id)
     return fillCollection(collectionRow)
 }
 
-fillCollection = function(collectionRow) {
+const fillCollection = function(collectionRow) {
     const collectionId = collectionRow.id
     const books = selectCollectionBooks.all(collectionId)
     collectionRow.books = books
     return collectionRow
 }
 
-exports.createCollection = function(cName, books, coverBookId) {
+export function createCollection(cName, books, coverBookId) {
     const collectionInsertResult = insertCollection.run(cName, '', coverBookId, 0)
     const collectionRowId = collectionInsertResult.lastInsertRowid ?? collectionInsertResult.existingRowId
     const collectionRow = selectCollectionByRow.get(collectionRowId)
