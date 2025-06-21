@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import path from 'path';
 import { statSync, createReadStream } from 'fs';
 import * as videoRepository from '../src/videoRepository.js';
+import mime from 'mime';
 
 router.get('/', function (req, res, next) {
     let videos = videoRepository.getVideos()
@@ -109,30 +110,25 @@ router.get('/:videoId', function (req, res) {
         const stat = statSync(videoData.path)
         const fileSize = stat.size
         const range = req.headers.range
+        let start = 0
+        let end = fileSize - 1;
         if (range) {
             const parts = range.replace(/bytes=/, '').split('-');
-            const start = parseInt(parts[0], 10);
-            const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-            const chunkSize = end - start + 1;
-            const file = createReadStream(videoData.path, { start, end });
-            const head = {
-                'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-                'Accept-Ranges': 'bytes',
-                'Content-Length': chunkSize,
-                'Content-Type': 'video/' + videoData.ext,
-            };
-
-            res.writeHead(206, head);
-            file.pipe(res);
-        } else {
-            const head = {
-                'Content-Length': fileSize,
-                'Content-Type': 'video/' + videoData.ext,
-            };
-
-            res.writeHead(200, head);
-            createReadStream(videoData.path).pipe(res);
+            start = parseInt(parts[0], 10);
+            end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
         }
+        const chunkSize = end - start + 1;
+        const file = createReadStream(videoData.path, { start, end });
+        const mimeType = mime.getType(videoData.ext)
+        const head = {
+            'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': chunkSize,
+            'Content-Type': mimeType,
+        };
+
+        res.writeHead(206, head);
+        file.pipe(res);
     }
     else {
         res.sendStatus(404).end();
