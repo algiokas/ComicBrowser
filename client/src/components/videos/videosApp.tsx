@@ -6,18 +6,16 @@ import type { IVideoSearchQuery } from "../../interfaces/searchQuery";
 import type IVideo from "../../interfaces/video";
 import type IVideoSource from "../../interfaces/videoSource";
 import { VideosViewMode } from "../../util/enums";
-import { getActorImageUrl, getVideoThumbnailUrl } from "../../util/helpers";
+import { actorFromJson, actorsFromJson, getActorImageUrlWithFallback, videosFromJson } from "../../util/videoUtils";
 import Modal from "../shared/modal";
 import Navigation from "../shared/navigation";
-import MultiView from "./multiView";
 import type { FileWithData } from "./gallery/sourceDetail";
+import MultiView from "./multiView";
 import { VideosAppContext, type VideosAppState } from "./videosAppContext";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
-interface VideosAppProps extends SubAppProps {
-
-}
+interface VideosAppProps extends SubAppProps { }
 
 const getEmptyQuery = (): IVideoSearchQuery => {
   return {
@@ -39,6 +37,7 @@ const VideosApp = (props: VideosAppProps) => {
   const [loadingModalText, setLoadingModalText] = useState<string>("")
   const [galleryPageSize, setGalleryPageSize] = useState<number>(16)
 
+  //#region Initialization
   useEffect(() => {
     const init = async () => {
       await fillData()
@@ -46,55 +45,6 @@ const VideosApp = (props: VideosAppProps) => {
     }
     init();
   }, [])
-
-
-  const videosFromJson = (videoJson: any): IVideo[] => {
-    let videoList: IVideo[] = []
-    if (!videoJson || videoJson.length < 1) console.log("videosFromJson - no videos in input")
-    videoJson.forEach((e: any): any => {
-      let newVideo = e as IVideo
-      if (e.addedDate) {
-        newVideo.addedDate = new Date(e.addedDate)
-      }
-      videoList.push(newVideo)
-    });
-    return videoList
-  }
-
-  const getActorImageUrlWithFallback = async (actor: IActor, videos: IVideo[]): Promise<string> => {
-    if (actor.imageFile) return getActorImageUrl(actor)
-    let matchingVideos = videos.filter((v) => v.actors.some((a) => a.id === actor.id) && v.thumbnailId)
-    if (matchingVideos.length > 0) return getVideoThumbnailUrl(matchingVideos[0])
-    return ""
-  }
-
-  const actorFromJson = async (actorJson: any, videos: IVideo[]): Promise<IActor> => {
-      let newActor = actorJson as IActor
-      newActor.isFavorite = actorJson.isFavorite != null && actorJson.isFavorite > 0
-      newActor.videos = videos.filter((v: any) => v.actors.some((a: any) => a.id === newActor.id)).map((v: any) => v.id)
-      newActor.imageUrl = await getActorImageUrlWithFallback(newActor, videos)
-      return newActor
-  }
-
-  const actorsFromJson = async (actorJson: any, videoJson: IVideo[]): Promise<IActor[]> => {
-    let actorList: IActor[] = []
-    if (!actorJson || actorJson.length < 1) console.log("actorsFromJson - no actors in input")
-    for (const a of actorJson) {
-      const newActor = await actorFromJson(a, videoJson)
-      actorList.push(newActor)
-    }
-    return actorList
-  }
-
-  const updateVideoActors = (videos: IVideo[], actors: IActor[]): void => {
-    const newVideosList = videos
-    newVideosList.forEach((v: IVideo) => {
-      if (v.actors.length > 0) {
-        v.actors = v.actors.map((a: IActor) => actors.find(x => x.id === a.id)).filter(a => a !== undefined)
-      }
-    })
-    setAllVideos(newVideosList)
-  }
 
   const fillData = async () => {
     const res = await fetch(`${apiBaseUrl}/videos`)
@@ -112,6 +62,16 @@ const VideosApp = (props: VideosAppProps) => {
     setAllActors(actors)
     updateVideoActors(videos, actors)
   }
+  
+  const updateVideoActors = (videos: IVideo[], actors: IActor[]): void => {
+    const newVideosList = videos
+    newVideosList.forEach((v: IVideo) => {
+      if (v.actors.length > 0) {
+        v.actors = v.actors.map((a: IActor) => actors.find(x => x.id === a.id)).filter(a => a !== undefined)
+      }
+    })
+    setAllVideos(newVideosList)
+  }
 
   const fillSources = async () => {
     const res = await fetch(`${apiBaseUrl}/videos/sources`)
@@ -119,7 +79,9 @@ const VideosApp = (props: VideosAppProps) => {
     const sources = data.map((s: any) => s as IVideoSource)
     setAllSources(sources)
   }
+  //#endregion
 
+  //#region API
   const updateVideo = async (video: IVideo) => {
     const res = await fetch(`${apiBaseUrl}/videos/${video.id}/update`, {
       method: 'post',
@@ -129,7 +91,7 @@ const VideosApp = (props: VideosAppProps) => {
     const data = await res.json()
     if (data.success) {
       console.log("Video " + video.id + " Updated")
-      const newVideos = allVideos.map(v => { return v.id === data.video.id ? data.video as IVideo : v})
+      const newVideos = allVideos.map(v => { return v.id === data.video.id ? data.video as IVideo : v })
       setAllVideos(newVideos)
     }
   }
@@ -254,6 +216,7 @@ const VideosApp = (props: VideosAppProps) => {
     }
   }
 
+  //#region View Mode
   const watchVideo = (video: IVideo) => {
     setCurrentVideo(video)
     setViewMode(VideosViewMode.Player)
@@ -288,6 +251,13 @@ const VideosApp = (props: VideosAppProps) => {
     setViewMode(VideosViewMode.Sources)
   }
 
+  const toggleLoadingModal = (text?: string) => {
+    setLoadingModalText(text ?? "")
+    setShowLoadingModal(!showLoadingModal)
+  }
+  //#endregion
+
+  //#region Nav Items
   const getLeftNavItems = (): INavItem[] => {
     return [
       {
@@ -329,11 +299,7 @@ const VideosApp = (props: VideosAppProps) => {
         clickHandler: props.viewBooksApp
       }]
   }
-
-  const toggleLoadingModal = (text?: string) => {
-    setLoadingModalText(text ?? "")
-    setShowLoadingModal(!showLoadingModal)
-  }
+  //#endregion
 
   const navProps = {
     viewMode: viewMode,

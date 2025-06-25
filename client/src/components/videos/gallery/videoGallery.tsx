@@ -40,7 +40,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
     const previousQuery = useRef({} as IVideoSearchQuery | undefined)
     useEffect(() => {
         updateItems(appContext.allVideos, props.query)
-    }, [appContext.allVideos, props.query])
+    }, [appContext.allVideos, props.query])  
 
     const updateItems = (videos: IVideo[], query?: IVideoSearchQuery) => {
         if (query) {
