@@ -21,19 +21,35 @@ export function GetPagePathByID(bookId: number, pageNum: number): string {
     return ''
 }
 
-export function getVideoThumbnailUrl(video: IVideo): string {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-    return `${apiBaseUrl}/videos/thumbnail/${video.id}`
+async function shortNumericHash(input: string, digits = 8): Promise<number> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(input);
+    const buffer = await crypto.subtle.digest('SHA-256', data);
+    const bytes = new Uint8Array(buffer);
+
+    let num = 0;
+    for (let i = 0; i < 6; i++) {
+        num = (num << 8) | bytes[i];
+    }
+    return num % (10 ** digits);
 }
 
-export function getActorImageUrl(actor: IActor): string {
+export async function getVideoThumbnailUrl(video: IVideo): Promise<string> {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-    return `${apiBaseUrl}/actors/${actor.id}/image`
+    const versionHash = await shortNumericHash(video.thumbnailId)
+    return `${apiBaseUrl}/videos/thumbnail/${video.id}?v=${versionHash}`
 }
 
-export function getSourceImageUrl(source: IVideoSource, small?: boolean) {
+export async function getActorImageUrl(actor: IActor): Promise<string> {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-    return `${apiBaseUrl}/videos/sources/${source.id}/image${small ? 'small' : 'large'}`
+    const versionHash = await shortNumericHash(actor.imageFile)
+    return `${apiBaseUrl}/actors/${actor.id}/image?v=${versionHash}`
+}
+
+export async function getSourceImageUrl(source: IVideoSource, small?: boolean): Promise<string> {
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
+    const versionHash = await shortNumericHash(small ? source.imageFileSmall : source.imageFileLarge)
+    return `${apiBaseUrl}/videos/sources/${source.id}/image${small ? 'small' : 'large'}?v=${versionHash}`
 }
 
 export function GetPagePath(book: IBook, pageNum: number): string {
@@ -86,7 +102,7 @@ export function getBookAuthor(book: IBook) {
 //compare two arrays with elements that can be compared using === 
 //returns true if arrays are identical, false otherwise
 //arrays are compared in order, so arrays with identical elements but different order will return false
-export function scalarArrayCompare(array1: any[], array2: any[]) {
+export function scalarArrayCompare(array1: any[], array2: any[]): boolean {
     if (!array1 && !array2) return true
     if (!array1 || !array2) return false
     return array1.length === array2.length && array1.every(function (value, index) { return value === array2[index] })

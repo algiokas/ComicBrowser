@@ -84,7 +84,7 @@ export function importBooks (res, callback) {
             return console.log('Unable to scan directory: ' + err);
         }
 
-        bookData = []
+        const bookData = []
         files.forEach((file) => {
             let json = getBookData(file)
             if (json && !json.error) {

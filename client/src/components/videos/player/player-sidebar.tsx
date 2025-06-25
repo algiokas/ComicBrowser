@@ -4,6 +4,8 @@ import EditPanel from "../editPanel/editPanel"
 import CameraIcon from "../../../img/svg/camera.svg";
 import StarsIcon from "../../../img/svg/stars.svg";
 import type { PlayerProps } from "./player"
+import { useContext } from "react";
+import { VideosAppContext } from "../videosAppContext";
 
 export interface PlayerSidebarProps extends PlayerProps {
     videoRef: React.RefObject<HTMLVideoElement | null>
@@ -12,6 +14,8 @@ export interface PlayerSidebarProps extends PlayerProps {
 }
 
 const PlayerSidebar = (props: PlayerSidebarProps) => {
+    const appContext = useContext(VideosAppContext)
+    
     const searchActor = (a: string): void => {
         props.viewSearchResults({
             actor: a
@@ -31,10 +35,10 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
     }
 
     const setThumbToCurrentTime = (): void => {
-        if (props.video && props.videoRef.current) {
+        if (appContext.currentVideo && props.videoRef.current) {
             let timeMs = Math.round(props.videoRef.current.currentTime * 1000)
             console.log('set thumbnail at ' + timeMs + 'ms')
-            props.setThumbnailToTime(props.video.id, timeMs)
+            props.setThumbnailToTime(appContext.currentVideo.id, timeMs)
         }
     }
 
@@ -48,11 +52,11 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
     }
 
     const generateActorImage = (e: React.MouseEvent, actor: IActor): void => {
-        if (actor && props.video && props.videoRef.current) {
+        if (actor && appContext.currentVideo && props.videoRef.current) {
             e.stopPropagation()
             let timeMs = Math.round(props.videoRef.current.currentTime * 1000)
             console.log('generate actor image at ' + timeMs + 'ms')
-            props.generateImageForActor(props.video.id, actor.id, timeMs)
+            props.generateImageForActor(appContext.currentVideo.id, actor.id, timeMs)
         }
     }
 
@@ -64,20 +68,20 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
 
     return (
         <div className="player-video-info">
-            <h3 className="player-video-info-title">{props.video?.title}</h3>
-            <span className="player-video-info-id">{props.video?.id}</span>
+            <h3 className="player-video-info-title">{appContext.currentVideo?.title}</h3>
+            <span className="player-video-info-id">{appContext.currentVideo?.id}</span>
             <div className="player-video-info-source">
-                <span className="info-item clickable" onClick={() => searchSource(props.video!.source.name)}>{props.video?.source.name}</span>
+                <span className="info-item clickable" onClick={() => searchSource(appContext.currentVideo!.source.name)}>{appContext.currentVideo?.source.name}</span>
             </div>
             {
-                props.video && props.video.actors.length > 0 ?
+                appContext.currentVideo && appContext.currentVideo.actors.length > 0 ?
                     <div className="player-video-info-actors">
                         {
-                            props.video.actors.map((actor, i) => {
+                            appContext.currentVideo.actors.map((actor, i) => {
                                 return (
                                     <div key={i} className="player-actor" onClick={() => searchActor(actor.name)}>
                                         <div className="player-actor-image">
-                                            <img className="actorgallery-image" src={props.getActorImageUrl(actor)} alt={`${actor.name}`}></img>
+                                            <img className="actorgallery-image" src={actor.imageUrl} alt={`${actor.name}`}></img>
                                         </div>
                                         <div className="caption">
                                             <div className="player-actorimagegen-icon" onClick={(e) => generateActorImage(e, actor)}>
@@ -115,16 +119,14 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
                     </button>
                 </div>
                 {
-                    props.video !== null ?
+                    appContext.currentVideo !== null ?
                         <div className="player-video-controls-row">
                             <button type="button" onClick={() => { props.toggleEditModal() }}>
                                 Edit Video
                             </button>
                             <Modal modalId={"bookinfo-edit-modal"} displayModal={props.showEditModal} toggleModal={props.toggleEditModal}>
                                 <EditPanel
-                                    video={props.video}
-                                    allActors={props.allActors}
-                                    allSources={props.allSources}
+                                    video={appContext.currentVideo}
                                     updateVideo={props.updateVideo}
                                     deleteVideo={props.deleteVideo}
                                     toggleDisplay={props.toggleEditModal}

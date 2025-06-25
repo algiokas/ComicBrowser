@@ -13,10 +13,18 @@ export interface FileWithData {
 }
 
 const SourceDetail = (props: SourceDetailProps) => {
-    const [ currentFile, setCurrentFile ] = useState<FileWithData | null>(null)
+    const [currentFile, setCurrentFile] = useState<FileWithData | null>(null)
+    const [primaryImageUrl, setPrimaryImageUrl] = useState<string>('')
+
+
+
     useEffect(() => {
-        console.log(JSON.stringify(props.source))
-    }, [ props.source ])
+        const updatePrimaryImage = async () => {
+            const thumbnailUrl = await getSourceImageUrl(props.source)
+            setPrimaryImageUrl(thumbnailUrl)
+        }
+        updatePrimaryImage()
+    }, [props.source])
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -48,13 +56,13 @@ const SourceDetail = (props: SourceDetailProps) => {
             <div className="sourcedetail-inner">
                 {
                     props.source.imageFileLarge ?
-                    <div className="sourcedetail-image">
-                        <img src={getSourceImageUrl(props.source)}></img>
-                    </div>
-                    : null
+                        <div className="sourcedetail-image">
+                            <img src={primaryImageUrl}></img>
+                        </div>
+                        : null
                 }
                 <div className="sourcedetail-upload">
-                    <input type="file" name="imageLarge" accept="image/*" onChange={handleFileChange}/>
+                    <input type="file" name="imageLarge" accept="image/*" onChange={handleFileChange} />
                     <button type="button" onClick={() => uploadSmall()}>Upload Small</button>
                     <button type="button" onClick={() => uploadLarge()}>Upload Large</button>
                 </div>

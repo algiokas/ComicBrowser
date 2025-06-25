@@ -1,19 +1,14 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import type IActor from "../../../interfaces/actor";
 import type { IVideoSearchQuery } from "../../../interfaces/searchQuery";
 import type IVideo from "../../../interfaces/video";
-import type IVideoSource from "../../../interfaces/videoSource";
 import PlayerSidebar, { type PlayerSidebarProps } from "./player-sidebar";
+import { VideosAppContext } from "../videosAppContext";
 
 export interface PlayerProps {
-    video: IVideo | null,
-    allActors: IActor[],
-    allSources: IVideoSource[],
-
     updateVideo(video: IVideo): void,
     deleteVideo(videoId: number): void,
     viewSearchResults(query?: IVideoSearchQuery): void,
-    getActorImageUrl(actor: IActor): string,
     setThumbnailToTime(videoId: number, timeMs: number): void,
     generateImageForActor(videoId: number, actorId: number, timeMs: number): void,
     videoFavoriteClick?: (video: IVideo) => void,
@@ -21,13 +16,14 @@ export interface PlayerProps {
 }
 
 const Player = (props: PlayerProps) => {
+    const appContext = useContext(VideosAppContext)
     const videoRef = React.createRef<HTMLVideoElement>()
     const [showEditModal, setShowEditModal] = useState<boolean>(false)
 
     const videoUrl = () => {
-        if (!props.video) return ""
+        if (!appContext.currentVideo) return ""
         const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-        return `${apiBaseUrl}/videos/${props.video.id}`
+        return `${apiBaseUrl}/videos/${appContext.currentVideo.id}`
     }
 
     const toggleEditModal = (): void => {

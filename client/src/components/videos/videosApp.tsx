@@ -11,23 +11,12 @@ import Modal from "../shared/modal";
 import Navigation from "../shared/navigation";
 import MultiView from "./multiView";
 import type { FileWithData } from "./gallery/sourceDetail";
+import { VideosAppContext, type VideosAppState } from "./videosAppContext";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
 interface VideosAppProps extends SubAppProps {
 
-}
-
-export interface VideosAppState {
-  galleryPageSize: number,
-  allVideos: IVideo[],
-  allActors: IActor[],
-  allSources: IVideoSource[],
-  viewMode: VideosViewMode,
-  currentVideo: IVideo | null,
-  currentSearchQuery: IVideoSearchQuery,
-  showLoadingModal: boolean,
-  loadingModalText: string
 }
 
 const getEmptyQuery = (): IVideoSearchQuery => {
@@ -72,16 +61,39 @@ const VideosApp = (props: VideosAppProps) => {
     return videoList
   }
 
-  const actorsFromJson = (actorJson: any, videoJson: any): IActor[] => {
+  const getActorImageUrlWithFallback = async (actor: IActor, videos: IVideo[]): Promise<string> => {
+    if (actor.imageFile) return getActorImageUrl(actor)
+    let matchingVideos = videos.filter((v) => v.actors.some((a) => a.id === actor.id) && v.thumbnailId)
+    if (matchingVideos.length > 0) return getVideoThumbnailUrl(matchingVideos[0])
+    return ""
+  }
+
+  const actorFromJson = async (actorJson: any, videos: IVideo[]): Promise<IActor> => {
+      let newActor = actorJson as IActor
+      newActor.isFavorite = actorJson.isFavorite != null && actorJson.isFavorite > 0
+      newActor.videos = videos.filter((v: any) => v.actors.some((a: any) => a.id === newActor.id)).map((v: any) => v.id)
+      newActor.imageUrl = await getActorImageUrlWithFallback(newActor, videos)
+      return newActor
+  }
+
+  const actorsFromJson = async (actorJson: any, videoJson: IVideo[]): Promise<IActor[]> => {
     let actorList: IActor[] = []
     if (!actorJson || actorJson.length < 1) console.log("actorsFromJson - no actors in input")
-    actorJson.forEach((e: any): any => {
-      let newActor = e as IActor
-      newActor.isFavorite = e.isFavorite != null && e.isFavorite > 0
-      newActor.videos = videoJson.filter((v: any) => v.actors.some((a: any) => a.id === newActor.id)).map((v: any) => v.id)
+    for (const a of actorJson) {
+      const newActor = await actorFromJson(a, videoJson)
       actorList.push(newActor)
-    });
+    }
     return actorList
+  }
+
+  const updateVideoActors = (videos: IVideo[], actors: IActor[]): void => {
+    const newVideosList = videos
+    newVideosList.forEach((v: IVideo) => {
+      if (v.actors.length > 0) {
+        v.actors = v.actors.map((a: IActor) => actors.find(x => x.id === a.id)).filter(a => a !== undefined)
+      }
+    })
+    setAllVideos(newVideosList)
   }
 
   const fillData = async () => {
@@ -93,11 +105,12 @@ const VideosApp = (props: VideosAppProps) => {
     await fillSources()
   }
 
-  const fillActors = async (videoJson: any) => {
+  const fillActors = async (videos: IVideo[]) => {
     const res = await fetch(`${apiBaseUrl}/actors`)
     const data = await res.json()
-    const actors = actorsFromJson(data, videoJson)
+    const actors = await actorsFromJson(data, videos)
     setAllActors(actors)
+    updateVideoActors(videos, actors)
   }
 
   const fillSources = async () => {
@@ -116,13 +129,8 @@ const VideosApp = (props: VideosAppProps) => {
     const data = await res.json()
     if (data.success) {
       console.log("Video " + video.id + " Updated")
-      for (let i = 0; i < allVideos.length; i++) {
-        if (allVideos[i] && allVideos[i].id === data.video.id) {
-          const videos = allVideos
-          videos[i] = data.video
-          setAllVideos(videos)
-        }
-      }
+      const newVideos = allVideos.map(v => { return v.id === data.video.id ? data.video as IVideo : v})
+      setAllVideos(newVideos)
     }
   }
 
@@ -138,9 +146,7 @@ const VideosApp = (props: VideosAppProps) => {
       for (let i = 0; i < allActors.length; i++) {
         if (allActors[i] && allActors[i].id === data.actor.id) {
           let actors = allActors
-          let newActor = data.actor as IActor
-          newActor.isFavorite = data.actor.isFavorite != null && data.actor.isFavorite > 0
-          newActor.videos = allVideos.filter((v: any) => v.actors.some((a: any) => a.id === newActor.id)).map((v: any) => v.id)
+          let newActor = await actorFromJson(data.actor, allVideos)
           actors[i] = newActor
           setAllActors(actors)
         }
@@ -218,6 +224,7 @@ const VideosApp = (props: VideosAppProps) => {
         if (allActors[i] && allActors[i].id === data.actor.id) {
           let actors = allActors
           actors[i].imageFile = data.actor.imageFile
+          actors[i].imageUrl = await getActorImageUrlWithFallback(actors[i], allVideos)
           setAllActors(actors)
           setShowLoadingModal(false)
         }
@@ -279,15 +286,6 @@ const VideosApp = (props: VideosAppProps) => {
 
   const viewSources = () => {
     setViewMode(VideosViewMode.Sources)
-  }
-
-  const getActorImageUrlWithFallback = (actor: IActor): string => {
-    let matchingActor = allActors.find((a) => a.id === actor.id)
-    if (!matchingActor) return ""
-    if (matchingActor.imageFile) return getActorImageUrl(actor)
-    let matchingVideos = allVideos.filter((v) => v.actors.some((a) => a.id === actor.id) && v.thumbnailId)
-    if (matchingVideos.length > 0) return getVideoThumbnailUrl(matchingVideos[0])
-    return ""
   }
 
   const getLeftNavItems = (): INavItem[] => {
@@ -357,7 +355,6 @@ const VideosApp = (props: VideosAppProps) => {
     importVideos: importVideos,
     setThumbnailToTime: setThumbnailToTime,
     updateActor: updateActor,
-    getActorImageUrl: getActorImageUrlWithFallback,
     generateImageForActor: generateImageForActor,
     uploadSourceImage: uploadSourceImage
   }
@@ -371,21 +368,23 @@ const VideosApp = (props: VideosAppProps) => {
     currentVideo: currentVideo,
     currentSearchQuery: currentSearchQuery,
     showLoadingModal: showLoadingModal,
-    loadingModalText: loadingModalText
+    loadingModalText: loadingModalText,
   }
 
   return (
-    <div className="VideosApp">
-      <Modal
-        modalId="loading-modal"
-        displayModal={showLoadingModal}
-        toggleModal={toggleLoadingModal}>
-        <span className="loading-modal-text">{loadingModalText}</span>
-      </Modal>
-      <Navigation {...navProps}>
-      </Navigation>
-      <MultiView {...appState} {...handlers}></MultiView>
-    </div>
+    <VideosAppContext value={appState}>
+      <div className="VideosApp">
+        <Modal
+          modalId="loading-modal"
+          displayModal={showLoadingModal}
+          toggleModal={toggleLoadingModal}>
+          <span className="loading-modal-text">{loadingModalText}</span>
+        </Modal>
+        <Navigation {...navProps}>
+        </Navigation>
+        <MultiView {...appState} {...handlers}></MultiView>
+      </div>
+    </VideosAppContext>
   )
 }
 

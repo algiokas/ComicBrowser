@@ -9,7 +9,6 @@ router.get('/', function (req, res, next) {
 
 router.get('/import', function (req, res, next) {
     importBooks(res, (res, importResult) => {
-
         console.log("imported " + importResult.importCount + " books")
         res.json(importResult)
     })

@@ -3,58 +3,71 @@ import type IVideo from "../../../interfaces/video"
 import { VideosSortOrder } from "../../../util/enums"
 import PageSelect from "../../shared/pageSelect"
 import VideoGalleryItem from "./videoGalleryItem"
-import type { BaseGalleryProps } from "../../shared/baseGallery"
 import type IActor from "../../../interfaces/actor"
 import VideoSortControls from "./videoSortControls"
 import ActorDetail from "./actorDetail"
-import { getVideoThumbnailUrl } from "../../../util/helpers"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import type IVideoSource from "../../../interfaces/videoSource"
 import SourceDetail from "./sourceDetail"
+import { VideosAppContext } from "../videosAppContext"
+import { scalarArrayCompare } from "../../../util/helpers"
 
-interface VideoGalleryProps extends BaseGalleryProps<IVideo> {
+interface VideoGalleryProps {
+    pageSize: number,
+    showFilters?: boolean,
     sortOrder?: VideosSortOrder,
     query?: IVideoSearchQuery,
     watchVideo(Video: IVideo): void,
     viewSearchResults(query?: IVideoSearchQuery): void,
     updateVideo?: (Video: IVideo) => void,
     updateActor?: (actor: IActor) => void,
-    getActorImageUrl(actor: IActor): string,
     uploadSourceImage(sourceId: number, imageSize: 'small' | 'large', fileData: any): void
 }
 
 const VideoGallery = (props: VideoGalleryProps) => {
     const initialSortOrder = props.sortOrder ?? VideosSortOrder.Favorite
 
-    const [ items, setItems ] = useState<IVideo[]>([])
-    const [ galleryPage, setGalleryPage ] = useState<number>(0)
-    const [ totalPages, setTotalPages ] = useState<number>(0)
-    const [ sortOrder, setSortOrder ] = useState<VideosSortOrder>(initialSortOrder)
-    const [ actorListingActor, setActorListingActor ] = useState<IActor | null>(null)
-    const [ sourceListingSource, setSourceListingSource ] = useState<IVideoSource | null>(null)
-    //const [ currentPageSize, setCurrentPageSize ] = useState<number>(props.allItems.length < props.pageSize ? props.allItems.length : props.pageSize)
+    const appContext = useContext(VideosAppContext)
 
+    const [items, setItems] = useState<IVideo[]>([])
+    const [galleryPage, setGalleryPage] = useState<number>(0)
+    const [totalPages, setTotalPages] = useState<number>(0)
+    const [sortOrder, setSortOrder] = useState<VideosSortOrder>(initialSortOrder)
+    const [actorListingActor, setActorListingActor] = useState<IActor | null>(null)
+    const [sourceListingSource, setSourceListingSource] = useState<IVideoSource | null>(null)
+
+    const previousVideos = useRef([] as IVideo[])
+    const previousQuery = useRef({} as IVideoSearchQuery | undefined)
     useEffect(() => {
-        updateItems(props.allItems, props.query)
-    }, [props.allItems, props.query])
+        updateItems(appContext.allVideos, props.query)
+    }, [appContext.allVideos, props.query])
 
     const updateItems = (videos: IVideo[], query?: IVideoSearchQuery) => {
         if (query) {
-            const filteredVideos = getFilteredVideos(videos, query)
-            const sortedVideos = getSortedVideos(filteredVideos, sortOrder)
-            setItems(sortedVideos)
-            setTotalPages(getTotalPages(sortedVideos))
-            setGalleryPage(0)
-            updateActorListingActor(sortedVideos)
-            updateSourceListingSource(sortedVideos)
+            const newIds = videos.map(v => v.id)
+            const oldIds = previousVideos.current.map(v => v.id)
+            if (!previousQuery.current || !scalarArrayCompare(newIds, oldIds)) {
+                const filteredVideos = getFilteredVideos(videos, query)
+                const sortedVideos = getSortedVideos(filteredVideos, sortOrder)
+                setItems(sortedVideos)
+                setTotalPages(getTotalPages(sortedVideos))
+                setGalleryPage(0)
+                updateActorListingActor()
+                updateSourceListingSource()
+            }
         } else {
-            const sortedVideos = getSortedVideos(videos, sortOrder)
-            setItems(getSortedVideos(videos, sortOrder))
-            setTotalPages(getTotalPages(videos))
-            setGalleryPage(0)  
-            updateActorListingActor(sortedVideos)
-            updateSourceListingSource(sortedVideos)
+            const newIds = videos.map(v => v.id)
+            const oldIds = previousVideos.current.map(v => v.id)
+            if (previousQuery.current || !scalarArrayCompare(newIds, oldIds)) {
+                setItems(getSortedVideos(videos, initialSortOrder))
+                setTotalPages(getTotalPages(videos))
+                setGalleryPage(0)
+                updateActorListingActor()
+                updateSourceListingSource()
+            }
         }
+        previousVideos.current = videos
+        previousQuery.current = query
     }
 
     const getSortedVideos = (Videos: IVideo[], sortOrder: VideosSortOrder): IVideo[] => {
@@ -140,7 +153,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
 
     const sortVideos = (order: VideosSortOrder) => {
         if (sortOrder !== order || order === VideosSortOrder.Random || order === VideosSortOrder.Favorite) {
-            setItems(getSortedVideos(props.allItems, order))
+            setItems(getSortedVideos(appContext.allVideos, order))
             setSortOrder(order)
             setGalleryPage(0)
         }
@@ -179,7 +192,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
         }
     }
 
-    const updateActorListingActor = (videos: IVideo[]) => {
+    const updateActorListingActor = () => {
         const isActorListing = props.query &&
             props.query.filled &&
             props.query.actor &&
@@ -189,12 +202,11 @@ const VideoGallery = (props: VideoGalleryProps) => {
             setActorListingActor(null)
             return
         }
-        const firstVideo = getCurrentGalleryPage(videos)[0]
-        const listingActor = firstVideo.actors.find(a => a.name == props.query!.actor) ?? null
-        setActorListingActor(listingActor)
+        const matchingActor = appContext.allActors.find(a => a.name == props.query!.actor) ?? null
+        setActorListingActor(matchingActor)
     }
 
-    const updateSourceListingSource = (videos: IVideo[]) => {
+    const updateSourceListingSource = () => {
         const isSourceListing = props.query &&
             props.query.filled &&
             props.query.source &&
@@ -203,28 +215,25 @@ const VideoGallery = (props: VideoGalleryProps) => {
         if (!isSourceListing) {
             setSourceListingSource(null)
             return
-        } 
-        const firstVideo = getCurrentGalleryPage(videos)[0]
-        const listingSource = firstVideo.source
-        setSourceListingSource(listingSource)
+        }
+        const matchingSource = appContext.allSources.find(s => s.name === props.query!.source) ?? null
+        setSourceListingSource(matchingSource)
     }
 
     return (
         <div className="videogallery-container dark-theme">
             {
                 actorListingActor ?
-                    <ActorDetail actor={actorListingActor}
-                        getActorImageUrl={props.getActorImageUrl}
-                        updateActor={props.updateActor} />
+                    <ActorDetail actor={actorListingActor} updateActor={props.updateActor} />
                     : null
             }
             {
-                sourceListingSource ? 
-                <SourceDetail 
-                source={sourceListingSource}
-                uploadSourceImage={props.uploadSourceImage}
-                />
-                : null
+                sourceListingSource ?
+                    <SourceDetail
+                        source={sourceListingSource}
+                        uploadSourceImage={props.uploadSourceImage}
+                    />
+                    : null
             }
             <div className="videogallery-container-header">
                 <PageSelect
@@ -245,8 +254,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
                     return <VideoGalleryItem
                         key={i}
                         index={i}
-                        data={video}
-                        imageUrl={getVideoThumbnailUrl(video)}
+                        video={video}
                         bodyClickHandler={bodyClick}
                         subTitleItemClickHandler={subtitleClick}
                         favoriteClickHandler={favoriteClick}

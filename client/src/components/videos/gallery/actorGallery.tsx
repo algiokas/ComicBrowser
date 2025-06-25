@@ -4,29 +4,30 @@ import { ActorsSortOrder } from "../../../util/enums"
 import PageSelect from "../../shared/pageSelect"
 import ActorGalleryItem from "./actorGalleryItem"
 import ActorSortControls from "./actorSortControls"
-import type { BaseGalleryProps } from "../../shared/baseGallery"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
+import { VideosAppContext } from "../videosAppContext"
 
 
-interface ActorGalleryProps extends BaseGalleryProps<IActor> {
+interface ActorGalleryProps {
+    showFilters?: boolean,
     sortOrder?: ActorsSortOrder,
     updateActor(actor: IActor): void,
-    getActorImageUrl(actor: IActor): string,
     viewSearchResults(query?: IVideoSearchQuery): void,
 }
 
 const ActorGallery = (props: ActorGalleryProps) => {
-    const initialSortOrder = props.sortOrder ?? ActorsSortOrder.Favorite
+    const initialSortOrder = props.sortOrder ?? ActorsSortOrder.Name
 
+    const appContext = useContext(VideosAppContext)
+    
     const [items, setItems] = useState<IActor[]>([])
     const [sortOrder, setSortOrder] = useState<ActorsSortOrder>(initialSortOrder)
     const [galleryPage, setGalleryPage] = useState<number>(0)
     const [totalPages, setTotalPages] = useState<number>(0)
-    const [currentPageSize, setCurrentPageSize] = useState<number>(props.allItems.length < props.pageSize ? props.allItems.length : props.pageSize)
 
     useEffect(() => {
-        updateItems(props.allItems)
-    }, [props.allItems])
+        updateItems(appContext.allActors)
+    }, [ appContext.allActors ])
 
     const updateItems = (actors: IActor[]) => {
         setItems(getSortedActors(actors, initialSortOrder))
@@ -67,24 +68,16 @@ const ActorGallery = (props: ActorGalleryProps) => {
 
     const getTotalPages = (Actors: IActor[]): number => {
         if (Actors) {
-            return Math.max(1, Math.ceil(Actors.length / props.pageSize))
+            return Math.max(1, Math.ceil(Actors.length / appContext.galleryPageSize))
         }
         return 1
     }
 
     const sortActors = (newOrder: ActorsSortOrder) => {
         if (sortOrder !== newOrder || newOrder === ActorsSortOrder.Random || newOrder === ActorsSortOrder.Favorite) {
-            setItems(getSortedActors(props.allItems, newOrder))
+            setItems(getSortedActors(appContext.allActors, newOrder))
             setSortOrder(newOrder)
             setGalleryPage(0)
-        }
-    }
-
-    const getPageSize = (pageNum: number): number => {
-        if (pageNum < totalPages - 1) {
-            return props.pageSize
-        } else {
-            return items.length % props.pageSize
         }
     }
 
@@ -93,8 +86,8 @@ const ActorGallery = (props: ActorGalleryProps) => {
     }
 
     const getCurrentgalleryPage = (): IActor[] => {
-        let pageStart = galleryPage * props.pageSize;
-        let pageEnd = (galleryPage + 1) * props.pageSize;
+        let pageStart = galleryPage * appContext.galleryPageSize;
+        let pageEnd = (galleryPage + 1) * appContext.galleryPageSize;
         return items.slice(pageStart, pageEnd)
     }
 
@@ -117,7 +110,7 @@ const ActorGallery = (props: ActorGalleryProps) => {
                     currentPage={galleryPage} />
                 <ActorSortControls sortOrder={sortOrder}
                     actorList={items}
-                    pageSize={props.pageSize}
+                    pageSize={appContext.galleryPageSize}
                     sortVideos={sortActors}
                     setPage={setPage} />
             </div>
@@ -126,8 +119,7 @@ const ActorGallery = (props: ActorGalleryProps) => {
                     return <ActorGalleryItem
                         key={i}
                         index={i}
-                        data={actor}
-                        imageUrl={props.getActorImageUrl(actor)}
+                        actor={actor}
                         bodyClickHandler={bodyClick}
                         favoriteClickHandler={favoriteClick}
                     ></ActorGalleryItem>

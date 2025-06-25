@@ -1,21 +1,37 @@
+import { useEffect, useState } from "react";
 import type IVideoSource from "../../../interfaces/videoSource";
-import type { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
+import { getSourceImageUrl } from "../../../util/helpers";
 
-interface SourceGalleryItemProps extends BaseGalleryItemProps<IVideoSource> {}
+interface SourceGalleryItemProps {
+    index: number,
+    source: IVideoSource,
+    bodyClickHandler?: (data: IVideoSource, index: number) => void,
+    favoriteClickHandler?: (data: IVideoSource) => void,
+}
 
 const SourceGalleryItem = (props: SourceGalleryItemProps) => {
+    const [sourceImageUrl, setSourceImageUrl] = useState<string>('')
+
+    useEffect(() => {
+        const updateThumbnail = async () => {
+            const thumbnailUrl = await getSourceImageUrl(props.source)
+            setSourceImageUrl(thumbnailUrl)
+        }
+        updateThumbnail()
+    }, [props.source])
+
     const bodyClick = (e: React.MouseEvent) => {
         if (props.bodyClickHandler)
-            props.bodyClickHandler(props.data, props.index)
+            props.bodyClickHandler(props.source, props.index)
     }
 
     return (
-        <div className="sourcegallery" key={props.data.id}>
+        <div className="sourcegallery" key={props.source.id}>
             <div className="sourcegallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
-                <img className="sourcegallery-image" src={props.imageUrl} alt={`${props.data.name} thumbnail`}></img>
+                <img className="sourcegallery-image" src={sourceImageUrl} alt={`${props.source.name} thumbnail`}></img>
                 <div className="caption">
                     <div className="caption-text">
-                        <span className="title">{props.data.name}</span>
+                        <span className="title">{props.source.name}</span>
                     </div>
                 </div>
             </div>

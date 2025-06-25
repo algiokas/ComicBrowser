@@ -4,5 +4,6 @@ export default interface IActor {
     imageFile: string,
     imageFallbackVideoId: number,
     isFavorite: boolean,
-    videos: number[]
+    videos: number[],
+    imageUrl: string
 }

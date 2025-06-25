@@ -1,15 +1,15 @@
-import { useState } from "react";
+import { useContext } from "react";
 import StarsImage from "../../../img/svg/stars.svg";
 import type IActor from "../../../interfaces/actor";
+import { VideosAppContext } from "../videosAppContext";
 
 interface ActorDetailProps {
     actor: IActor,
-    getActorImageUrl(actor: IActor): string,
     updateActor?: (actor: IActor) => void,
 }
 
 const ActorDetail = (props: ActorDetailProps) => {
-    const [ primaryImageUrl, setPrimaryImageUrl ] = useState<string>(props.getActorImageUrl(props.actor))
+    const appContext = useContext(VideosAppContext)
 
     const favoriteClick = () => {
         if (props.updateActor) {
@@ -36,7 +36,13 @@ const ActorDetail = (props: ActorDetailProps) => {
                 </div>
                 <div className="actordetail-inner">
                     <div className="actordetail-image">
-                        <img src={primaryImageUrl}></img>
+                        <img src={props.actor.imageUrl}></img>
+                    </div>
+                    <div className="actordetail-info">
+                        <div className="actordetail-info-row">
+                            <span className="actordetail-info-label">Videos: </span>
+                            <span className="actordetail-info-value">{props.actor.videos.length}</span>
+                        </div>
                     </div>
                 </div>
             </div>

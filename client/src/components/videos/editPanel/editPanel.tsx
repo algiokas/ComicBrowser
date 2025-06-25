@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import type IActor from "../../../interfaces/actor";
 import type IVideo from "../../../interfaces/video";
 import type IVideoSource from "../../../interfaces/videoSource";
@@ -6,11 +6,10 @@ import { VideosEditField } from "../../../util/enums";
 import EditPanelRow from "./editPanel-row";
 import EditPanelRowMulti from "./editPanel-row-multi";
 import EditPanelRowStatic from "./editPanel-row-static";
+import { VideosAppContext } from "../videosAppContext";
 
 interface EditPanelProps {
     video: IVideo,
-    allActors: IActor[],
-    allSources: IVideoSource[],
 
     updateVideo(video: IVideo): void,
     deleteVideo(videoId: number): void,
@@ -29,6 +28,7 @@ interface EditFields {
 }
 
 const EditPanel = (props: EditPanelProps) => {
+    const appContext = useContext(VideosAppContext)
     const [tempFields, setTempFields] = useState<EditFields>({
         title: props.video.title,
         actors: props.video.actors,
@@ -125,10 +125,10 @@ const EditPanel = (props: EditPanelProps) => {
                 <EditPanelRowMulti<IActor> editField={VideosEditField.Actors}
                     tempValue={tempFields.actors}
                     updateTempValue={updateTempValue}
-                    valueRange={props.allActors.sort((a, b) => a.name.localeCompare(b.name))}
+                    valueRange={appContext.allActors.sort((a, b) => a.name.localeCompare(b.name))}
                     valueClick={props.searchActor}
                     getDisplayString={(a) => a?.name ?? ''}
-                    getValueFromDisplayString={(str) => { return props.allActors.find((a) => a.name == str) ?? null }} />
+                    getValueFromDisplayString={(str) => { return appContext.allActors.find((a) => a.name == str) ?? null }} />
                 <EditPanelRowMulti<string> editField={VideosEditField.Tags}
                     tempValue={tempFields.tags}
                     updateTempValue={updateTempValue}
@@ -138,10 +138,10 @@ const EditPanel = (props: EditPanelProps) => {
                 <EditPanelRow<IVideoSource> editField={VideosEditField.Source}
                     tempValue={tempFields.source}
                     updateTempValue={updateTempValue}
-                    valueRange={props.allSources.sort((a, b) => a.name.localeCompare(b.name))}
+                    valueRange={appContext.allSources.sort((a, b) => a.name.localeCompare(b.name))}
                     valueClick={props.searchSource}
                     getDisplayString={(source) => source.name}
-                    getValueFromDisplayString={(sName) => props.allSources.find((s) => s.name == sName)!} />
+                    getValueFromDisplayString={(sName) => appContext.allSources.find((s) => s.name == sName)!} />
             </div>
             <div className="edit-panel-controls">
                 <button className="delete-button" onClick={deleteVideo} type="button">DELETE BOOK</button>

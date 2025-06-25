@@ -1,27 +1,26 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import type IVideoSource from "../../../interfaces/videoSource";
-import type { BaseGalleryProps } from "../../shared/baseGallery";
 import PageSelect from "../../shared/pageSelect";
 import SourceGalleryItem from "./sourceGalleryItem";
 import type { IVideoSearchQuery } from "../../../interfaces/searchQuery";
 import { getSourceImageUrl } from "../../../util/helpers";
+import { VideosAppContext } from "../videosAppContext";
 
-interface SourceGalleryProps extends BaseGalleryProps<IVideoSource> {
+interface SourceGalleryProps {
     viewSearchResults(query?: IVideoSearchQuery): void,
 }
 
 const SourceGallery = (props: SourceGalleryProps) => {
+    const [galleryPage, setGalleryPage] = useState<number>(0)
+
+    const appContext = useContext(VideosAppContext)
+
     const getTotalPages = (items: IVideoSource[]): number => {
         if (items) {
-            return Math.max(1, Math.ceil(items.length / props.pageSize))
+            return Math.max(1, Math.ceil(items.length / appContext.galleryPageSize))
         }
         return 1
     }
-
-    const [galleryPage, setGalleryPage] = useState<number>(0)
-    //const [currentPageSize, setCurrentPageSize] = useState<number>(props.allItems.length < props.pageSize ? props.allItems.length : props.pageSize)
-    const [totalPages, setTotalPages] = useState<number>(getTotalPages(props.allItems))
-    const [items, setItems] = useState<IVideoSource[]>(props.allItems)
 
     const mountedRef = useRef(false)
     useEffect(() => {
@@ -30,12 +29,12 @@ const SourceGallery = (props: SourceGalleryProps) => {
         } else {
             mountedRef.current = true
         }
-    }, [props.allItems])
+    }, [appContext.allSources])
 
     const getCurrentGalleryPage = (): IVideoSource[] => {
-        let pageStart = galleryPage * props.pageSize;
-        let pageEnd = (galleryPage + 1) * props.pageSize;
-        return items.slice(pageStart, pageEnd)
+        let pageStart = galleryPage * appContext.galleryPageSize;
+        let pageEnd = (galleryPage + 1) * appContext.galleryPageSize;
+        return appContext.allSources.slice(pageStart, pageEnd)
     }
 
     const bodyClick = (s: IVideoSource) => {
@@ -45,7 +44,7 @@ const SourceGallery = (props: SourceGalleryProps) => {
     return (
         <div className="sourcegallery-container dark-theme">
             <div className="sourcegallery-container-header">
-                <PageSelect setPage={(n: number) => { setGalleryPage(n) }} totalPages={totalPages} currentPage={galleryPage} />
+                <PageSelect setPage={(n: number) => { setGalleryPage(n) }} totalPages={getTotalPages(appContext.allSources)} currentPage={galleryPage} />
             </div>
             <div className="sourcegallery-container-inner">
                 {
@@ -53,9 +52,8 @@ const SourceGallery = (props: SourceGalleryProps) => {
                         return <SourceGalleryItem
                             key={i}
                             index={i}
-                            data={source}
-                            imageUrl={source.imageFileLarge ? getSourceImageUrl(source) : "https://picsum.photos/480/270"}
-                            bodyClickHandler={bodyClick}/>
+                            source={source}
+                            bodyClickHandler={bodyClick} />
                     })
                 }
             </div>
