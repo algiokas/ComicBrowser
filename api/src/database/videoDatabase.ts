@@ -1,4 +1,4 @@
-import { videos_db as db } from '../src/database.js'
+import { videos_db as db } from './database'
 
 //#region queries
 const _VIDEOS = Object.freeze({

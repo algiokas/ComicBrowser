@@ -1,12 +1,13 @@
-import * as videoDatabase from '../src/videoDatabase.js';
 import fs from 'fs';
 import path from 'path';
 import ffmpeg from 'fluent-ffmpeg';
 import mime from 'mime';
+import * as videoDatabase from '../src/database/videoDatabase'
 
 import 'dotenv/config';
+import { FileJsonOutput } from './types/video';
 
-const dataDir = process.env.VIDEOS_DATA_DIR
+const dataDir = process.env.VIDEOS_DATA_DIR!
 const videosDir = path.join(dataDir, '/videos');
 const thumbnailDir = path.join(dataDir, '/images/thumbnails');
 const actorImageDir = path.join(dataDir, '/images/actors')
@@ -14,8 +15,15 @@ const sourceImageDir = path.join(dataDir, '/images/sources')
 
 //Import video file with the format:
 // ActorName1, ActorName2 - VideoTitle
-function fileToJson(parentDir, fileName, fileStats) {
-    let output = {}
+function fileToJson(parentDir: string, fileName: string, fileStats: fs.Stats) {
+    let output: FileJsonOutput = {
+        filePath: '',
+        title: '',
+        source: '',
+        addedDate: 0,
+        actors: []
+    }
+
     if (!parentDir || !fileName) {
         return
     }
@@ -27,7 +35,7 @@ function fileToJson(parentDir, fileName, fileStats) {
             fileNameWithoutExt = fileNameAndExt[0]
         } else if (fileNameAndExt.length > 2) {
             const parts = fileNameAndExt.slice(0, fileNameAndExt.length - 1)
-            fileNameWithoutExt = parts.path.join('.')
+            fileNameWithoutExt = parts.join('.')
         }
         output.fileExt = fileNameAndExt[fileNameAndExt.length - 1]
     }
@@ -35,7 +43,7 @@ function fileToJson(parentDir, fileName, fileStats) {
     if (fileNameWithoutExt.includes('-')) {
         const nameParts = fileNameWithoutExt.split('-')
         const actors = nameParts[0]
-        const title = nameParts.slice(1).path.join('-')
+        const title = nameParts.slice(1).join('-')
 
         output.title = title.trim()
         output.actors = []
@@ -54,8 +62,8 @@ function fileToJson(parentDir, fileName, fileStats) {
     return output
 }
 
-function wrapQuotes(string) {
-    return '"' + string + '"'
+function wrapQuotes(str: string) {
+    return '"' + str + '"'
 }
 
 function fillVideo(videoRow) {
@@ -69,7 +77,7 @@ function fillVideo(videoRow) {
     return video
 }
 
-function generateImageFromVideo(videoPath, timestamp, outputDir, outputFile, callback) {
+function generateImageFromVideo(videoPath: string, timestamp, outputDir, outputFile, callback) {
     new ffmpeg(videoPath).screenshots({
         count: 1,
         timestamps: [timestamp],
