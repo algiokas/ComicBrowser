@@ -4,8 +4,9 @@ import { ActorsSortOrder } from "../../../util/enums"
 import PageSelect from "../../shared/pageSelect"
 import ActorGalleryItem from "./actorGalleryItem"
 import ActorSortControls from "./actorSortControls"
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { VideosAppContext } from "../videosAppContext"
+import { scalarArrayCompare } from "../../../util/helpers"
 
 
 interface ActorGalleryProps {
@@ -19,7 +20,7 @@ const ActorGallery = (props: ActorGalleryProps) => {
     const initialSortOrder = props.sortOrder ?? ActorsSortOrder.Name
 
     const appContext = useContext(VideosAppContext)
-    
+
     const [items, setItems] = useState<IActor[]>([])
     const [sortOrder, setSortOrder] = useState<ActorsSortOrder>(initialSortOrder)
     const [galleryPage, setGalleryPage] = useState<number>(0)
@@ -27,13 +28,22 @@ const ActorGallery = (props: ActorGalleryProps) => {
 
     useEffect(() => {
         updateItems(appContext.allActors)
-    }, [ appContext.allActors ])
+    }, [appContext.allActors])
+
+    const previousActors = useRef([] as IActor[])
 
     const updateItems = (actors: IActor[]) => {
-        setItems(getSortedActors(actors, initialSortOrder))
-        setTotalPages(getTotalPages(actors))
-        setGalleryPage(0)
-        setSortOrder(initialSortOrder)
+        const newIds = actors.map(a => a.id)
+        const oldIds = previousActors.current.map(a => a.id)
+        if (!scalarArrayCompare(newIds, oldIds)) {
+            setItems(getSortedActors(actors, initialSortOrder))
+            setTotalPages(getTotalPages(actors))
+            setGalleryPage(0)
+            setSortOrder(initialSortOrder)
+        }
+
+
+        previousActors.current = actors
     }
 
     const getSortedActors = (actors: IActor[], sortOrder: ActorsSortOrder): IActor[] => {

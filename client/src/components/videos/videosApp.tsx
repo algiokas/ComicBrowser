@@ -105,14 +105,16 @@ const VideosApp = (props: VideosAppProps) => {
     const data = await res.json()
     if (data.success) {
       console.log("Actor " + actor.id + " Updated")
-      for (let i = 0; i < allActors.length; i++) {
-        if (allActors[i] && allActors[i].id === data.actor.id) {
-          let actors = allActors
-          let newActor = await actorFromJson(data.actor, allVideos)
-          actors[i] = newActor
-          setAllActors(actors)
+      const newActors: IActor[] = []
+      for (const a of allActors) {
+        if (a.id === data.actor.id) {
+          const newActor = await actorFromJson(data.actor, allVideos)
+          newActors.push(newActor)
+        } else {
+          newActors.push(a)
         }
       }
+      setAllActors(newActors)
     }
   }
 
