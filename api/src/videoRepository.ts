@@ -104,7 +104,7 @@ function getNewThumbnailFileName(videoId) {
 export function getThumbnailFilePath (videoId) {
     var thumbFile = videoDatabase.getVideoThumbnailById(videoId)
     if (!thumbFile) return null
-    return path.join(thumbnailDir, thumbFile.thumbnailId + ".png")
+    return path.join(thumbnailDir, thumbFile + ".png")
 }
 
 function generateThumbnail(video, options, callback) {
@@ -180,7 +180,7 @@ export function generateThumbnailExisting (videoId, timeMs, callback) {
     }
 }
 
-export function generateImageForActor (actorId, videoId, timeMs, callback) {
+export function generateImageForActor (actorId: number, videoId, timeMs: number, callback) {
     const video = videoDatabase.getVideoById(videoId)
     const actor = videoDatabase.getActorById(actorId)
     if (actor && video) {

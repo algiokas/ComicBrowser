@@ -8,18 +8,6 @@ const books_db = new Database(BOOKS_DBSOURCE); //, { verbose: console.log });
 const videos_db = new Database(VIDEO_DBSOURCE);
 
 function initBooks() {
-    // try {
-    //     books_db.prepare(`DROP TABLE videos`).run()
-    //     books_db.prepare(`DROP TABLE sources`).run()
-    //     books_db.prepare(`DROP TABLE actors`).run()
-    //     books_db.prepare(`DROP TABLE videoActors`).run()
-    //     books_db.prepare(`DROP TABLE actorTags`).run()
-    //     books_db.prepare(`DROP TABLE videoTags`).run()
-    //     books_db.prepare(`DROP TABLE actorTagsRef`).run()
-    //     books_db.prepare(`DROP TABLE videoTagsRef`).run()
-    // } catch (err) {
-    //     console.error(err)
-    // }
     try {
         books_db.prepare(`CREATE TABLE books (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,7 +24,7 @@ function initBooks() {
             isFavorite INTEGER,
             originalTitle TEXT)`).run()
         console.log('created table: books')
-    } catch (err) {
+    } catch (err: any) {
         if (err.message === 'table books already exists') {
             console.log(err.message)
         } else {
@@ -49,7 +37,7 @@ function initBooks() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT UNIQUE)`).run()
         console.log('created table: artists')
-    } catch (err) {
+    } catch (err: any) {
         if (err.message === 'table artists already exists') {
             console.log(err.message)
         } else {
@@ -64,7 +52,7 @@ function initBooks() {
         FOREIGN KEY(bookId) REFERENCES books(id),
         FOREIGN KEY(artistId) REFERENCES artists(id))`).run()
         console.log('created table: bookArtists')
-    } catch (err) {
+    } catch (err: any) {
         if (err.message === 'table bookArtists already exists') {
             console.log(err.message)
         } else {
@@ -77,7 +65,7 @@ function initBooks() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE)`).run()
         console.log('created table: tags')
-    } catch (err) {
+    } catch (err: any) {
         if (err.message === 'table tags already exists') {
             console.log(err.message)
         } else {
@@ -92,7 +80,7 @@ function initBooks() {
         FOREIGN KEY(bookId) REFERENCES books(id),
         FOREIGN KEY(tagId) REFERENCES tags(id))`).run()
         console.log('created table: bookTags')
-    } catch (err) {
+    } catch (err: any) {
         if (err.message === 'table bookTags already exists') {
             console.log(err.message)
         } else {
@@ -101,8 +89,6 @@ function initBooks() {
     }
 
     try {
-        // books_db.prepare(`DROP TABLE collectionBooks`).run()
-        // books_db.prepare(`DROP TABLE collections`).run()
         books_db.prepare(`CREATE TABLE collections (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT UNIQUE,
@@ -111,7 +97,7 @@ function initBooks() {
             coverPage INTEGER,
             FOREIGN KEY(coverBook) REFERENCES books(id))`).run()
         console.log('created table: collections')
-    } catch (err) {
+    } catch (err: any) {
         if (err.message === 'table collections already exists') {
             console.log(err.message)
         } else {
@@ -127,7 +113,7 @@ function initBooks() {
             FOREIGN KEY(collectionId) REFERENCES collections(id),
             FOREIGN KEY(bookId) REFERENCES books(id))`).run()
         console.log('created table: collectionBooks')
-    } catch (err) {
+    } catch (err: any) {
         if (err.message === 'table collectionBooks already exists') {
             console.log(err.message)
         } else {
@@ -149,7 +135,7 @@ function initVideos() {
             originalTitle TEXT,
             sourceId INTEGER)`).run()
         console.log('created table: videos')
-    } catch (err) {
+    } catch (err: any) {
         if (err.message === 'table videos already exists') {
             console.log(err.message)
         } else {
@@ -165,7 +151,7 @@ function initVideos() {
             siteUrl TEXT,
             name TEXT UNIQUE)`).run()
         console.log('created table: sources')
-    } catch (err) {
+    } catch (err: any) {
         if (err.message === 'table sources already exists') {
             console.log(err.message)
         } else {
@@ -182,7 +168,7 @@ function initVideos() {
             isFavorite INTEGER,
             FOREIGN KEY(imageFallbackVideoId) REFERENCES videos(id))`).run()
         console.log('created table: actors')
-    } catch (err) {
+    } catch (err: any) {
         if (err.message === 'table actors already exists') {
             console.log(err.message)
         } else {
@@ -197,7 +183,7 @@ function initVideos() {
             FOREIGN KEY(videoId) REFERENCES videos(id),
             FOREIGN KEY(actorId) REFERENCES actors(id))`).run()
         console.log('created table: videoActors')
-    } catch (err) {
+    } catch (err: any) {
         if (err.message === 'table videoActors already exists') {
             console.log(err.message)
         } else {
@@ -210,7 +196,7 @@ function initVideos() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE)`).run()
         console.log('created table: actorTags')
-    } catch (err) {
+    } catch (err: any) {
         if (err.message === 'table actorTags already exists') {
             console.log(err.message)
         } else {
@@ -223,7 +209,7 @@ function initVideos() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE)`).run()
         console.log('created table: videoTags')
-    } catch (err) {
+    } catch (err: any) {
         if (err.message === 'table videoTags already exists') {
             console.log(err.message)
         } else {
@@ -238,7 +224,7 @@ function initVideos() {
         FOREIGN KEY(actorId) REFERENCES actors(id),
         FOREIGN KEY(tagId) REFERENCES actorTags(id))`).run()
         console.log('created table: actorTagsRef')
-    } catch (err) {
+    } catch (err: any) {
         if (err.message === 'table actorTagsRef already exists') {
             console.log(err.message)
         } else {
@@ -253,7 +239,7 @@ function initVideos() {
         FOREIGN KEY(videoId) REFERENCES videos(id),
         FOREIGN KEY(tagId) REFERENCES videoTags(id))`).run()
         console.log('created table: videoTagsRef')
-    } catch (err) {
+    } catch (err: any) {
         if (err.message === 'table videoTagsRef already exists') {
             console.log(err.message)
         } else {

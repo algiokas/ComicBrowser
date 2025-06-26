@@ -1,18 +1,17 @@
-import { Router } from 'express';
-const router = Router();
 import bodyParser from 'body-parser';
-import path from 'path';
-import { statSync, createReadStream } from 'fs';
-import * as videoRepository from '../src/videoRepository.js';
+import { Router } from 'express';
+import { createReadStream, statSync } from 'fs';
 import mime from 'mime';
+import * as videoRepository from "../videoRepository";
+const router = Router();
 
 router.get('/', function (req, res, next) {
     let videos = videoRepository.getVideos()
     res.json(videos)
 });
 
-router.get('/import', function (req, res, next) {
-    videoRepository.importVideos(res, (res, importResult) => {
+router.get('/import', (req, res, next) => {
+    videoRepository.importVideos(res, (res: any, importResult) => {
         console.log("imported " + importResult.importCount + " videos")
         res.json(importResult)
     })
