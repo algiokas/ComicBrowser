@@ -6,6 +6,7 @@ import StarsIcon from "../../../img/svg/stars.svg";
 import type { PlayerProps } from "./player"
 import { useContext } from "react";
 import { VideosAppContext } from "../videosAppContext";
+import type IVideo from "../../../interfaces/video";
 
 export interface PlayerSidebarProps extends PlayerProps {
     videoRef: React.RefObject<HTMLVideoElement | null>
@@ -15,21 +16,21 @@ export interface PlayerSidebarProps extends PlayerProps {
 
 const PlayerSidebar = (props: PlayerSidebarProps) => {
     const appContext = useContext(VideosAppContext)
-    
+
     const searchActor = (a: string): void => {
-        props.viewSearchResults({
+        appContext.viewSearchResults({
             actor: a
         })
     }
 
     const searchSource = (g: string): void => {
-        props.viewSearchResults({
+        appContext.viewSearchResults({
             source: g
         })
     }
 
     const searchTag = (t: string): void => {
-        props.viewSearchResults({
+        appContext.viewSearchResults({
             tag: t
         })
     }
@@ -38,7 +39,7 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
         if (appContext.currentVideo && props.videoRef.current) {
             let timeMs = Math.round(props.videoRef.current.currentTime * 1000)
             console.log('set thumbnail at ' + timeMs + 'ms')
-            props.setThumbnailToTime(appContext.currentVideo.id, timeMs)
+            appContext.setThumbnailToTime(appContext.currentVideo.id, timeMs)
         }
     }
 
@@ -56,8 +57,22 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
             e.stopPropagation()
             let timeMs = Math.round(props.videoRef.current.currentTime * 1000)
             console.log('generate actor image at ' + timeMs + 'ms')
-            props.generateImageForActor(appContext.currentVideo.id, actor.id, timeMs)
+            appContext.generateImageForActor(appContext.currentVideo.id, actor.id, timeMs)
         }
+    }
+
+    const videoFavoriteClick = (e: React.MouseEvent) => {
+        if (appContext.currentVideo) {
+            e.stopPropagation()
+            const tempVideo: IVideo = { ...appContext.currentVideo, isFavorite: !appContext.currentVideo.isFavorite }
+            appContext.updateVideo(tempVideo)
+        }
+    }
+
+    const actorFavoriteClick = (e: React.MouseEvent, a: IActor) => {
+        e.stopPropagation()
+        a.isFavorite = !a.isFavorite; //toggle value
+        appContext.updateActor(a)
     }
 
     const searchHandlers = {
@@ -69,6 +84,14 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
     return (
         <div className="player-video-info">
             <h3 className="player-video-info-title">{appContext.currentVideo?.title}</h3>
+            <div className="player-video-favorite" onClick={(e) => videoFavoriteClick(e)}>
+                {
+                    appContext.currentVideo?.isFavorite ?
+                        <img className="svg-icon-favorite" src={StarsIcon.toString()} alt="remove from favorites"></img>
+                        :
+                        <img className="svg-icon-disabled test" src={StarsIcon.toString()} alt="add to favorites"></img>
+                }
+            </div>
             <span className="player-video-info-id">{appContext.currentVideo?.id}</span>
             <div className="player-video-info-source">
                 <span className="info-item clickable" onClick={() => searchSource(appContext.currentVideo!.source.name)}>{appContext.currentVideo?.source.name}</span>
@@ -83,12 +106,12 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
                                         <div className="player-actor-image">
                                             <img className="actorgallery-image" src={actor.imageUrl} alt={`${actor.name}`}></img>
                                         </div>
-                                        <div className="caption">
+                                        <div className={`caption ${(actor.isFavorite ? 'favorite' : '')}`}>
                                             <div className="player-actorimagegen-icon" onClick={(e) => generateActorImage(e, actor)}>
                                                 <img className="svg-icon-favorite" src={CameraIcon.toString()} alt={"Generate image for " + actor.name}></img>
                                             </div>
                                             <span>{actor.name}</span>
-                                            <div className="player-favorite-icon">
+                                            <div className="player-actor-favorite" onClick={(e) => actorFavoriteClick(e, actor)}>
                                                 {
                                                     actor.isFavorite ?
                                                         <img className="svg-icon-favorite" src={StarsIcon.toString()} alt="remove from favorites"></img>
@@ -127,8 +150,6 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
                             <Modal modalId={"bookinfo-edit-modal"} displayModal={props.showEditModal} toggleModal={props.toggleEditModal}>
                                 <EditPanel
                                     video={appContext.currentVideo}
-                                    updateVideo={props.updateVideo}
-                                    deleteVideo={props.deleteVideo}
                                     toggleDisplay={props.toggleEditModal}
                                     {...searchHandlers} />
                             </Modal>

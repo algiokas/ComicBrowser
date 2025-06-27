@@ -10,9 +10,6 @@ import { VideosAppContext } from "../videosAppContext";
 
 interface EditPanelProps {
     video: IVideo,
-
-    updateVideo(video: IVideo): void,
-    deleteVideo(videoId: number): void,
     toggleDisplay(): void
 
     searchActor(a: string): void,
@@ -102,12 +99,12 @@ const EditPanel = (props: EditPanelProps) => {
 
         console.log(tempVideo)
 
-        props.updateVideo(tempVideo)
+        appContext.updateVideo(tempVideo)
         props.toggleDisplay()
     }
 
     const deleteVideo = () => {
-        props.deleteVideo(props.video.id)
+        appContext.deleteVideo(props.video.id)
     }
 
     return (
@@ -144,7 +141,7 @@ const EditPanel = (props: EditPanelProps) => {
                     getValueFromDisplayString={(sName) => appContext.allSources.find((s) => s.name == sName)!} />
             </div>
             <div className="edit-panel-controls">
-                <button className="delete-button" onClick={deleteVideo} type="button">DELETE BOOK</button>
+                <button className="delete-button" onClick={deleteVideo} type="button">DELETE VIDEO</button>
                 <button disabled={!changesPending} onClick={saveVideoChanges} type="button">Confirm Changes</button>
                 <button disabled={!changesPending} onClick={resetPendingChanges} type="button">Reset Changes</button>
             </div>

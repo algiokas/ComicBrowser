@@ -2,13 +2,9 @@ import { useContext, useEffect, useRef, useState } from "react";
 import type IVideoSource from "../../../interfaces/videoSource";
 import PageSelect from "../../shared/pageSelect";
 import SourceGalleryItem from "./sourceGalleryItem";
-import type { IVideoSearchQuery } from "../../../interfaces/searchQuery";
-import { getSourceImageUrl } from "../../../util/helpers";
 import { VideosAppContext } from "../videosAppContext";
 
-interface SourceGalleryProps {
-    viewSearchResults(query?: IVideoSearchQuery): void,
-}
+interface SourceGalleryProps { }
 
 const SourceGallery = (props: SourceGalleryProps) => {
     const [galleryPage, setGalleryPage] = useState<number>(0)
@@ -38,7 +34,7 @@ const SourceGallery = (props: SourceGalleryProps) => {
     }
 
     const bodyClick = (s: IVideoSource) => {
-        props.viewSearchResults({ source: s.name })
+        appContext.viewSearchResults({ source: s.name })
     }
 
     return (

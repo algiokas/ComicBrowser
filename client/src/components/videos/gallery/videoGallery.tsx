@@ -17,11 +17,6 @@ interface VideoGalleryProps {
     showFilters?: boolean,
     sortOrder?: VideosSortOrder,
     query?: IVideoSearchQuery,
-    watchVideo(Video: IVideo): void,
-    viewSearchResults(query?: IVideoSearchQuery): void,
-    updateVideo?: (Video: IVideo) => void,
-    updateActor?: (actor: IActor) => void,
-    uploadSourceImage(sourceId: number, imageSize: 'small' | 'large', fileData: any): void
 }
 
 const VideoGallery = (props: VideoGalleryProps) => {
@@ -40,7 +35,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
     const previousQuery = useRef({} as IVideoSearchQuery | undefined)
     useEffect(() => {
         updateItems(appContext.allVideos, props.query)
-    }, [appContext.allVideos, props.query])  
+    }, [appContext.allVideos, props.query])
 
     const updateItems = (videos: IVideo[], query?: IVideoSearchQuery) => {
         if (query) {
@@ -167,29 +162,36 @@ const VideoGallery = (props: VideoGalleryProps) => {
     }
 
     const setPage = (pageNum: number) => {
-        setGalleryPage(pageNum)
+        if (props.query) {
+            setGalleryPage(pageNum)
+        } else {
+            appContext.setVideoListingPage(pageNum)
+        }
     }
 
-    const getCurrentGalleryPage = (videos: IVideo[]): IVideo[] => {
-        let pageStart = galleryPage * props.pageSize;
-        let pageEnd = (galleryPage + 1) * props.pageSize;
+    const getGalleryPage = () => {
+        return props.query ? galleryPage : appContext.videoListingPage
+    }
+
+    const getCurrentGalleryPageItems = (videos: IVideo[]): IVideo[] => {
+        let pageStart = getGalleryPage() * props.pageSize;
+        let pageEnd = (getGalleryPage() + 1) * props.pageSize;
         return videos.slice(pageStart, pageEnd)
     }
 
     const bodyClick = (Video: IVideo) => {
-        props.watchVideo(Video)
+        appContext.watchVideo(Video)
     }
 
     const subtitleClick = (a: IActor) => {
-        props.viewSearchResults({ actor: a.name })
+        appContext.viewSearchResults({ actor: a.name })
     }
 
     const favoriteClick = (video: IVideo) => {
         console.log("toggle favorite for video: " + video.id)
-        if (props.updateVideo) {
-            video.isFavorite = !video.isFavorite; //toggle value
-            props.updateVideo(video)
-        }
+
+        video.isFavorite = !video.isFavorite; //toggle value
+        appContext.updateVideo(video)
     }
 
     const updateActorListingActor = () => {
@@ -224,14 +226,13 @@ const VideoGallery = (props: VideoGalleryProps) => {
         <div className="videogallery-container dark-theme">
             {
                 actorListingActor ?
-                    <ActorDetail actor={actorListingActor} updateActor={props.updateActor} />
+                    <ActorDetail actor={actorListingActor} />
                     : null
             }
             {
                 sourceListingSource ?
                     <SourceDetail
                         source={sourceListingSource}
-                        uploadSourceImage={props.uploadSourceImage}
                     />
                     : null
             }
@@ -239,7 +240,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
                 <PageSelect
                     setPage={setPage}
                     totalPages={totalPages}
-                    currentPage={galleryPage} />
+                    currentPage={getGalleryPage()} />
                 {
                     props.sortOrder ? null :
                         <VideoSortControls sortOrder={sortOrder}
@@ -250,21 +251,21 @@ const VideoGallery = (props: VideoGalleryProps) => {
                 }
             </div>
             <div className="videogallery-container-inner">
-                {getCurrentGalleryPage(items).map((video, i) => {
-                    return <VideoGalleryItem
-                        key={i}
-                        index={i}
-                        video={video}
-                        bodyClickHandler={bodyClick}
-                        subTitleItemClickHandler={subtitleClick}
-                        favoriteClickHandler={favoriteClick}
-                    ></VideoGalleryItem>
-                })
-
+                {
+                    getCurrentGalleryPageItems(items).map((video, i) => {
+                        return <VideoGalleryItem
+                            key={i}
+                            index={i}
+                            video={video}
+                            bodyClickHandler={bodyClick}
+                            subTitleItemClickHandler={subtitleClick}
+                            favoriteClickHandler={favoriteClick}
+                        ></VideoGalleryItem>
+                    })
                 }
             </div>
             <div className="videogallery-container-footer">
-                <PageSelect setPage={setPage} totalPages={totalPages} currentPage={galleryPage}></PageSelect>
+                <PageSelect setPage={setPage} totalPages={totalPages} currentPage={getGalleryPage()}></PageSelect>
             </div>
         </div>
     )

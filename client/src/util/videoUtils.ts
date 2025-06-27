@@ -1,17 +1,31 @@
 import type IActor from "../interfaces/actor";
+import type { IVideoSearchQuery } from "../interfaces/searchQuery";
 import type IVideo from "../interfaces/video";
 import { getActorImageUrl, getVideoThumbnailUrl } from "./helpers";
 
-export const videosFromJson = (videoJson: any): IVideo[] => {
+export const getEmptyQuery = (): IVideoSearchQuery => {
+  return {
+    filled: false,
+    actor: '',
+    source: '',
+    tag: '',
+  }
+}
+
+export const videoFromJson = (videoJson: any): IVideo => {
+    let newVideo = videoJson as IVideo
+    if (videoJson.addedDate) {
+        newVideo.addedDate = new Date(videoJson.addedDate)
+    }
+    return newVideo
+}
+
+export const videosFromJson = (videosJson: any): IVideo[] => {
     let videoList: IVideo[] = []
-    if (!videoJson || videoJson.length < 1) console.log("videosFromJson - no videos in input")
-    videoJson.forEach((e: any): any => {
-        let newVideo = e as IVideo
-        if (e.addedDate) {
-            newVideo.addedDate = new Date(e.addedDate)
-        }
-        videoList.push(newVideo)
-    });
+    if (!videosJson || videosJson.length < 1) console.log("videosFromJson - no videos in input")
+    for (const v of videosJson) {
+        videoList.push(videoFromJson(v))
+    }
     return videoList
 }
 

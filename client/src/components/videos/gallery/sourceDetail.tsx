@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import type IVideoSource from "../../../interfaces/videoSource";
 import { getSourceImageUrl } from "../../../util/helpers";
+import { VideosAppContext } from "../videosAppContext";
 
 interface SourceDetailProps {
     source: IVideoSource,
-    uploadSourceImage(sourceId: number, imageSize: 'small' | 'large', fileData: any): void
 }
 
 export interface FileWithData {
@@ -16,7 +16,7 @@ const SourceDetail = (props: SourceDetailProps) => {
     const [currentFile, setCurrentFile] = useState<FileWithData | null>(null)
     const [primaryImageUrl, setPrimaryImageUrl] = useState<string>('')
 
-
+    const appContext = useContext(VideosAppContext)
 
     useEffect(() => {
         const updatePrimaryImage = async () => {
@@ -40,12 +40,10 @@ const SourceDetail = (props: SourceDetailProps) => {
         }
     }
 
-    const uploadSmall = () => {
-        props.uploadSourceImage(props.source.id, 'small', currentFile)
-    }
-
-    const uploadLarge = () => {
-        props.uploadSourceImage(props.source.id, 'large', currentFile)
+    const upload = (imageSize: 'small' | 'large') => {
+        if (currentFile) {
+            appContext.uploadSourceImage(props.source.id, imageSize, currentFile)
+        }
     }
 
     return (
@@ -63,8 +61,8 @@ const SourceDetail = (props: SourceDetailProps) => {
                 }
                 <div className="sourcedetail-upload">
                     <input type="file" name="imageLarge" accept="image/*" onChange={handleFileChange} />
-                    <button type="button" onClick={() => uploadSmall()}>Upload Small</button>
-                    <button type="button" onClick={() => uploadLarge()}>Upload Large</button>
+                    <button type="button" onClick={() => upload('small')}>Upload Small</button>
+                    <button type="button" onClick={() => upload('large')}>Upload Large</button>
                 </div>
             </div>
         </div>

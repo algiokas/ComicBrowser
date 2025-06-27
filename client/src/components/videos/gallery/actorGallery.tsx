@@ -1,5 +1,4 @@
 import type IActor from "../../../interfaces/actor"
-import type { IVideoSearchQuery } from "../../../interfaces/searchQuery"
 import { ActorsSortOrder } from "../../../util/enums"
 import PageSelect from "../../shared/pageSelect"
 import ActorGalleryItem from "./actorGalleryItem"
@@ -12,8 +11,6 @@ import { scalarArrayCompare } from "../../../util/helpers"
 interface ActorGalleryProps {
     showFilters?: boolean,
     sortOrder?: ActorsSortOrder,
-    updateActor(actor: IActor): void,
-    viewSearchResults(query?: IVideoSearchQuery): void,
 }
 
 const ActorGallery = (props: ActorGalleryProps) => {
@@ -23,7 +20,6 @@ const ActorGallery = (props: ActorGalleryProps) => {
 
     const [items, setItems] = useState<IActor[]>([])
     const [sortOrder, setSortOrder] = useState<ActorsSortOrder>(initialSortOrder)
-    const [galleryPage, setGalleryPage] = useState<number>(0)
     const [totalPages, setTotalPages] = useState<number>(0)
 
     useEffect(() => {
@@ -38,7 +34,7 @@ const ActorGallery = (props: ActorGalleryProps) => {
         if (!scalarArrayCompare(newIds, oldIds)) {
             setItems(getSortedActors(actors, initialSortOrder))
             setTotalPages(getTotalPages(actors))
-            setGalleryPage(0)
+            setPage(0)
             setSortOrder(initialSortOrder)
         }
 
@@ -87,28 +83,28 @@ const ActorGallery = (props: ActorGalleryProps) => {
         if (sortOrder !== newOrder || newOrder === ActorsSortOrder.Random || newOrder === ActorsSortOrder.Favorite) {
             setItems(getSortedActors(appContext.allActors, newOrder))
             setSortOrder(newOrder)
-            setGalleryPage(0)
+            setPage(0)
         }
     }
 
     const setPage = (pageNum: number) => {
-        setGalleryPage(pageNum)
+        appContext.setActorListingPage(pageNum)
     }
 
     const getCurrentgalleryPage = (): IActor[] => {
-        let pageStart = galleryPage * appContext.galleryPageSize;
-        let pageEnd = (galleryPage + 1) * appContext.galleryPageSize;
+        let pageStart = appContext.actorListingPage * appContext.galleryPageSize;
+        let pageEnd = (appContext.actorListingPage + 1) * appContext.galleryPageSize;
         return items.slice(pageStart, pageEnd)
     }
 
     const bodyClick = (a: IActor) => {
-        props.viewSearchResults({ actor: a.name })
+        appContext.viewSearchResults({ actor: a.name })
     }
 
     const favoriteClick = (a: IActor) => {
         console.log("toggle favorite for actor: " + a.id)
         a.isFavorite = !a.isFavorite; //toggle value
-        props.updateActor(a)
+        appContext.updateActor(a)
     }
 
     return (
@@ -117,7 +113,7 @@ const ActorGallery = (props: ActorGalleryProps) => {
                 <PageSelect
                     setPage={setPage}
                     totalPages={totalPages}
-                    currentPage={galleryPage} />
+                    currentPage={appContext.actorListingPage} />
                 <ActorSortControls sortOrder={sortOrder}
                     actorList={items}
                     pageSize={appContext.galleryPageSize}
@@ -138,7 +134,7 @@ const ActorGallery = (props: ActorGalleryProps) => {
                 }
             </div>
             <div className="actorgallery-container-footer">
-                <PageSelect setPage={setPage} totalPages={totalPages} currentPage={galleryPage}></PageSelect>
+                <PageSelect setPage={setPage} totalPages={totalPages} currentPage={appContext.actorListingPage}></PageSelect>
             </div>
         </div>
     )

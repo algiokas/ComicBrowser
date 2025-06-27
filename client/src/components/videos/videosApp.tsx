@@ -6,25 +6,16 @@ import type { IVideoSearchQuery } from "../../interfaces/searchQuery";
 import type IVideo from "../../interfaces/video";
 import type IVideoSource from "../../interfaces/videoSource";
 import { VideosViewMode } from "../../util/enums";
-import { actorFromJson, actorsFromJson, getActorImageUrlWithFallback, videosFromJson } from "../../util/videoUtils";
+import { actorFromJson, actorsFromJson, getActorImageUrlWithFallback, getEmptyQuery, videoFromJson, videosFromJson } from "../../util/videoUtils";
 import Modal from "../shared/modal";
 import Navigation from "../shared/navigation";
 import type { FileWithData } from "./gallery/sourceDetail";
 import MultiView from "./multiView";
-import { VideosAppContext, type VideosAppState } from "./videosAppContext";
+import { VideosAppContext, type VideosAppHandlers, type VideosAppState } from "./videosAppContext";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
 interface VideosAppProps extends SubAppProps { }
-
-const getEmptyQuery = (): IVideoSearchQuery => {
-  return {
-    filled: false,
-    actor: '',
-    source: '',
-    tag: '',
-  }
-}
 
 const VideosApp = (props: VideosAppProps) => {
   const [allVideos, setAllVideos] = useState<IVideo[]>([])
@@ -36,6 +27,9 @@ const VideosApp = (props: VideosAppProps) => {
   const [showLoadingModal, setShowLoadingModal] = useState<boolean>(false)
   const [loadingModalText, setLoadingModalText] = useState<string>("")
   const [galleryPageSize, setGalleryPageSize] = useState<number>(16)
+
+  const [videoListingPage, setVideoListingPage] = useState<number>(0)
+  const [actorListingPage, setActorListingPage] = useState<number>(0)
 
   //#region Initialization
   useEffect(() => {
@@ -60,17 +54,19 @@ const VideosApp = (props: VideosAppProps) => {
     const data = await res.json()
     const actors = await actorsFromJson(data, videos)
     setAllActors(actors)
-    updateVideoActors(videos, actors)
+    updateAllVideoActors(videos, actors)
   }
-  
-  const updateVideoActors = (videos: IVideo[], actors: IActor[]): void => {
+
+  const updateAllVideoActors = (videos: IVideo[], actors: IActor[]): void => {
     const newVideosList = videos
-    newVideosList.forEach((v: IVideo) => {
-      if (v.actors.length > 0) {
-        v.actors = v.actors.map((a: IActor) => actors.find(x => x.id === a.id)).filter(a => a !== undefined)
-      }
-    })
+    newVideosList.forEach((v: IVideo) => { updateVideoActors(v, actors) })
     setAllVideos(newVideosList)
+  }
+
+  const updateVideoActors = (v: IVideo, actors: IActor[]) => {
+    if (v.actors.length > 0) {
+      v.actors = v.actors.map((a: IActor) => actors.find(x => x.id === a.id)).filter(a => a !== undefined)
+    }
   }
 
   const fillSources = async () => {
@@ -91,8 +87,13 @@ const VideosApp = (props: VideosAppProps) => {
     const data = await res.json()
     if (data.success) {
       console.log("Video " + video.id + " Updated")
-      const newVideos = allVideos.map(v => { return v.id === data.video.id ? data.video as IVideo : v })
+      const vData = videoFromJson(data.video)
+      updateVideoActors(vData, allActors)
+      const newVideos = allVideos.map(v => { return v.id === data.video.id ? vData : v })
       setAllVideos(newVideos)
+      if (currentVideo?.id === data.video.id) {
+        setCurrentVideo(vData)
+      }
     }
   }
 
@@ -241,17 +242,11 @@ const VideosApp = (props: VideosAppProps) => {
     }
   }
 
-  const viewListing = () => {
-    setViewMode(VideosViewMode.Listing)
-  }
+  const viewListing = () => { setViewMode(VideosViewMode.Listing) }
 
-  const viewActors = () => {
-    setViewMode(VideosViewMode.Actors)
-  }
+  const viewActors = () => { setViewMode(VideosViewMode.Actors) }
 
-  const viewSources = () => {
-    setViewMode(VideosViewMode.Sources)
-  }
+  const viewSources = () => { setViewMode(VideosViewMode.Sources) }
 
   const toggleLoadingModal = (text?: string) => {
     setLoadingModalText(text ?? "")
@@ -260,67 +255,66 @@ const VideosApp = (props: VideosAppProps) => {
   //#endregion
 
   //#region Nav Items
-  const getLeftNavItems = (): INavItem[] => {
-    return [
-      {
-        text: "Videos",
-        viewMode: VideosViewMode.Listing,
-        clickHandler: viewListing
-      },
-      {
-        text: "Actors",
-        viewMode: VideosViewMode.Actors,
-        clickHandler: viewActors
-      },
-      {
-        text: "Sources",
-        viewMode: VideosViewMode.Sources,
-        clickHandler: viewSources
-      },
-      {
-        text: "Current Video",
-        viewMode: VideosViewMode.Player,
-        clickHandler: viewCurrentVideo
-      },
-      {
-        text: "Search Results",
-        viewMode: VideosViewMode.SearchResults,
-        clickHandler: viewSearchResults
-      }
-    ]
-  }
+  const leftNavItems: INavItem[] = [
+    {
+      text: "Videos",
+      viewMode: VideosViewMode.Listing,
+      clickHandler: viewListing
+    },
+    {
+      text: "Actors",
+      viewMode: VideosViewMode.Actors,
+      clickHandler: viewActors
+    },
+    {
+      text: "Sources",
+      viewMode: VideosViewMode.Sources,
+      clickHandler: viewSources
+    },
+    {
+      text: "Current Video",
+      viewMode: VideosViewMode.Player,
+      clickHandler: viewCurrentVideo
+    },
+    {
+      text: "Search Results",
+      viewMode: VideosViewMode.SearchResults,
+      clickHandler: viewSearchResults
+    }
+  ]
 
-  const getRightNavItems = (): INavItem[] => {
-    return [
-      {
-        text: "Import Videos",
-        clickHandler: importVideos
-      },
-      {
-        text: "Books",
-        clickHandler: props.viewBooksApp
-      }]
-  }
+  const rightNavItems: INavItem[] = [
+    {
+      text: "Import Videos",
+      clickHandler: importVideos
+    },
+    {
+      text: "Books",
+      clickHandler: props.viewBooksApp
+    }
+  ]
   //#endregion
 
   const navProps = {
     viewMode: viewMode,
-    leftNavItems: getLeftNavItems(),
-    rightNavItems: getRightNavItems(),
+    leftNavItems: leftNavItems,
+    rightNavItems: rightNavItems,
     showSearch: true,
     logoClick: viewListing,
     viewSearchResults: viewSearchResults
   }
 
-  const handlers = {
+  const handlers: VideosAppHandlers = {
     watchVideo: watchVideo,
     viewListing: viewListing,
     viewActors: viewActors,
     viewCurrentVideo: viewCurrentVideo,
     viewSearchResults: viewSearchResults,
+    setVideoListingPage: (n: number) => { setVideoListingPage(n) },
+    setActorListingPage: (n: number) => { setActorListingPage(n) },
+
     updateVideo: updateVideo,
     deleteVideo: deleteVideo,
-    importVideos: importVideos,
     setThumbnailToTime: setThumbnailToTime,
     updateActor: updateActor,
     generateImageForActor: generateImageForActor,
@@ -337,10 +331,12 @@ const VideosApp = (props: VideosAppProps) => {
     currentSearchQuery: currentSearchQuery,
     showLoadingModal: showLoadingModal,
     loadingModalText: loadingModalText,
+    videoListingPage: videoListingPage,
+    actorListingPage: actorListingPage
   }
 
   return (
-    <VideosAppContext value={appState}>
+    <VideosAppContext value={{ ...appState, ...handlers }}>
       <div className="VideosApp">
         <Modal
           modalId="loading-modal"
@@ -350,7 +346,10 @@ const VideosApp = (props: VideosAppProps) => {
         </Modal>
         <Navigation {...navProps}>
         </Navigation>
-        <MultiView {...appState} {...handlers}></MultiView>
+        <MultiView
+          viewMode={viewMode}
+          galleryPageSize={galleryPageSize}
+          currentSearchQuery={currentSearchQuery} />
       </div>
     </VideosAppContext>
   )

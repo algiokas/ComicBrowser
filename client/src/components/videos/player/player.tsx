@@ -1,16 +1,10 @@
 import React, { useContext, useState } from "react";
 import type IActor from "../../../interfaces/actor";
-import type { IVideoSearchQuery } from "../../../interfaces/searchQuery";
 import type IVideo from "../../../interfaces/video";
 import PlayerSidebar, { type PlayerSidebarProps } from "./player-sidebar";
 import { VideosAppContext } from "../videosAppContext";
 
 export interface PlayerProps {
-    updateVideo(video: IVideo): void,
-    deleteVideo(videoId: number): void,
-    viewSearchResults(query?: IVideoSearchQuery): void,
-    setThumbnailToTime(videoId: number, timeMs: number): void,
-    generateImageForActor(videoId: number, actorId: number, timeMs: number): void,
     videoFavoriteClick?: (video: IVideo) => void,
     actorFavoriteClick?: (actor: IActor) => void
 }
@@ -39,7 +33,7 @@ const Player = (props: PlayerProps) => {
 
     return (
         <div className="player-container">
-            <div className="player-inner">
+            <div className={`player-inner ${(appContext.currentVideo?.isFavorite) ? 'favorite' : ''}`}>
                 <div className="player-video-container">
                     <div className="player-video">
                         <video muted preload="auto" ref={videoRef} controls={true} src={videoUrl()} width="100%" height="auto"></video>

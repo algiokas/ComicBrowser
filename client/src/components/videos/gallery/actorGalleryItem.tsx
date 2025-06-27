@@ -1,5 +1,4 @@
 import type IActor from "../../../interfaces/actor";
-import type { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
 import StarsImage from "../../../img/svg/stars.svg"
 
 

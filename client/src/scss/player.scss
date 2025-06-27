@@ -14,6 +14,10 @@
         background-color: $gray-2;
         display: flex;
         flex-direction: row-reverse;
+
+        &.favorite {
+            box-shadow: inset 12px 12px 28px -24px $yellow-favorite-glow;
+        }
     }
 
     &-video {
@@ -118,15 +122,20 @@
             }
         }
 
+        &-favorite {
+            position: absolute;
+            cursor: pointer;
+        }
+
     }
 
-    &-favorite-icon {
-        padding: 5px;
+    &-actor-favorite {
+        padding: 5px 10px;
         margin: auto 0;
     }
 
     &-actorimagegen-icon {
-        padding: 5px;
+        padding: 5px 10px;
         margin: auto 0;
     }
 }
