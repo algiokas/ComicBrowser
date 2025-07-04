@@ -33,7 +33,10 @@ function EditPanelRowMulti<T>(props: EditPanelRowProps<T>) {
     }, [props.tempValue])
 
     const handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setFieldValue(props.getValueFromDisplayString(e.target.value))
+        const selectedValue = props.getValueFromDisplayString(e.target.value)
+        if (selectedValue) {
+            setCollection([...collection, selectedValue])
+        }
     }
 
     const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,103 +79,97 @@ function EditPanelRowMulti<T>(props: EditPanelRowProps<T>) {
     }
 
     return (
-            <div className="edit-panel-row multi-row">
-                <span className="edit-panel-row-label">{props.editField.toString()}</span>
-                {
-                    editMode ?
-                        <div className="edit-panel-row-inner edit-mode">
-                            <div className="edit-panel-row-value">
-                                {
-                                    props.hideTextInput ? null :
-
-                                        props.valueRange ?
-                                            <div>
-                                                <select className="edit-panel-row-dropdown" onChange={handleDropdownChange}>
-                                                    {
-                                                        props.valueRange.map((v, i) => {
-                                                            return (<option key={i} value={props.getDisplayString(v)}>{props.getDisplayString(v)}</option>)
-                                                        })
-                                                    }
-                                                </select>
-                                                <button type="button" onClick={addToCollection}>
-                                                    <img className="svg-icon text-icon" src={PlusImg.toString()} alt="remove collection item"></img>
-                                                </button>
-                                            </div>
-                                            :
-                                            <div className="edit-panel-row-value-add">
-                                                <input type="text"
-                                                    value={props.getDisplayString(fieldValue)}
-                                                    onChange={handleTextInputChange}
-                                                    onKeyDown={handleTextInputKey}>
-                                                </input>
-                                                <button type="button" onClick={addToCollection}>
-                                                    <img className="svg-icon text-icon" src={PlusImg.toString()} alt="remove collection item"></img>
-                                                </button>
-                                            </div>
-
-                                }
-                                <div className="edit-panel-row-collection">
-                                    {
-                                        collection ?
-                                            collection.map((item, i) => {
-                                                return <div className="edit-panel-row-collection-item" key={i}>
-                                                    <span className="item-value">
-                                                        {props.getDisplayString(item)}
-                                                    </span>
-                                                    <span className="remove-button" onClick={() => removeFromCollection(i)} >
-                                                        <img className="svg-icon text-icon" src={XImg.toString()} alt="remove collection item"></img>
-                                                    </span>
-                                                </div>
-                                            }) : null
-                                    }
-                                </div>
-                            </div>
-                            <div className="edit-panel-row-buttons">
-                                <button type="button" onClick={confirmInput}>
-                                    <img className="svg-icon-pink text-icon" src={Check2Img.toString()} alt="confirm"></img>
-                                </button>
-                                <button type="button" onClick={cancelInput}>
-                                    <img className="svg-icon-pink text-icon" src={XImg.toString()} alt="cancel"></img>
-                                </button>
-                            </div>
-
-                        </div>
-                        :
-                        <div className="edit-panel-row-inner">
-                            <div className="edit-panel-row-value ">
-                                {
-                                    props.valueClick ?
-                                        <div className="click-items">
+        <div className="edit-panel-row multi-row">
+            <span className="edit-panel-row-label">{props.editField.toString()}</span>
+            {
+                editMode ?
+                    <div className="edit-panel-row-inner edit-mode">
+                        <div className="edit-panel-row-value">
+                            {
+                                props.hideTextInput ? null :
+                                    props.valueRange ?
+                                        <select className="edit-panel-row-dropdown" onChange={handleDropdownChange}>
                                             {
-                                                collection.map((item, i) => {
-                                                    return <span className="click-item clickable" onClick={() => props.valueClick!(props.getDisplayString(item))} key={i}>
-                                                        {props.getDisplayString(item)}
-                                                    </span>
+                                                props.valueRange.map((v, i) => {
+                                                    return (<option key={i} value={props.getDisplayString(v)}>{props.getDisplayString(v)}</option>)
                                                 })
                                             }
-                                        </div>
+                                        </select>
                                         :
+                                        <div className="edit-panel-row-value-add">
+                                            <input type="text"
+                                                value={props.getDisplayString(fieldValue)}
+                                                onChange={handleTextInputChange}
+                                                onKeyDown={handleTextInputKey}>
+                                            </input>
+                                            <button type="button" onClick={addToCollection}>
+                                                <img className="svg-icon text-icon" src={PlusImg.toString()} alt="remove collection item"></img>
+                                            </button>
+                                        </div>
+
+                            }
+                            <div className="edit-panel-row-collection">
+                                {
+                                    collection ?
                                         collection.map((item, i) => {
-                                            return <span key={i}>
-                                                {
-                                                    i + 1 < collection.length ?
-                                                        props.getDisplayString(item) + ", " :
-                                                        props.getDisplayString(item)
-                                                }
-                                            </span>
-                                        })
+                                            return <div className="edit-panel-row-collection-item" key={i}>
+                                                <span className="item-value">
+                                                    {props.getDisplayString(item)}
+                                                </span>
+                                                <span className="remove-button" onClick={() => removeFromCollection(i)} >
+                                                    <img className="svg-icon text-icon" src={XImg.toString()} alt="remove collection item"></img>
+                                                </span>
+                                            </div>
+                                        }) : null
                                 }
                             </div>
-                            <div className="edit-panel-row-buttons">
-                                <button type="button" onClick={toggleEditMode}>
-                                    <img className="svg-icon-pink text-icon" src={PencilSquareImg.toString()} alt="edit value"></img>
-                                </button>
-                            </div>
+                        </div>
+                        <div className="edit-panel-row-buttons">
+                            <button type="button" onClick={confirmInput}>
+                                <img className="svg-icon-pink text-icon" src={Check2Img.toString()} alt="confirm"></img>
+                            </button>
+                            <button type="button" onClick={cancelInput}>
+                                <img className="svg-icon-pink text-icon" src={XImg.toString()} alt="cancel"></img>
+                            </button>
                         </div>
 
-                }
-            </div>
-        )
+                    </div>
+                    :
+                    <div className="edit-panel-row-inner">
+                        <div className="edit-panel-row-value ">
+                            {
+                                props.valueClick ?
+                                    <div className="click-items">
+                                        {
+                                            collection.map((item, i) => {
+                                                return <span className="click-item clickable" onClick={() => props.valueClick!(props.getDisplayString(item))} key={i}>
+                                                    {props.getDisplayString(item)}
+                                                </span>
+                                            })
+                                        }
+                                    </div>
+                                    :
+                                    collection.map((item, i) => {
+                                        return <span key={i}>
+                                            {
+                                                i + 1 < collection.length ?
+                                                    props.getDisplayString(item) + ", " :
+                                                    props.getDisplayString(item)
+                                            }
+                                        </span>
+                                    })
+                            }
+                        </div>
+                        <div className="edit-panel-row-buttons">
+                            <button type="button" onClick={toggleEditMode}>
+                                <img className="svg-icon-pink text-icon" src={PencilSquareImg.toString()} alt="edit value"></img>
+                            </button>
+                        </div>
+                    </div>
+
+            }
+        </div>
+    )
 }
 
 export default EditPanelRowMulti

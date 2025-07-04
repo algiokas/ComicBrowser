@@ -1,5 +1,6 @@
 import type IActor from "../interfaces/actor";
 import type IBook from "../interfaces/book"
+import type ISlideshow from "../interfaces/slideshow";
 import type IVideo from "../interfaces/video";
 import type IVideoSource from "../interfaces/videoSource";
 
@@ -63,6 +64,26 @@ export function GetPagePath(book: IBook, pageNum: number): string {
         console.log("GetPagePath - page number out of range (book id: " + book.id + ")")
     }
     return GetPagePathByID(book.id, pageNum)
+}
+
+export function getSlideshowBookByPage(slideshow: ISlideshow, pageNum: number): IBook | null {
+    const books = slideshow.books
+    if (books.length < 1) {
+        return null
+    }
+    if (books.length < 2) {
+        return books[0]
+    }
+    let pageNumInternal = pageNum
+    for (let i = 0; i < books.length; i++) {
+        if (pageNumInternal < books[i].pageCount) {
+            return books[i]
+        }
+        else {
+            pageNumInternal = pageNumInternal - books[i].pageCount
+        }
+    }
+    return null
 }
 
 export function GetPagePathMulti(books: IBook[], pageNum: number): string {

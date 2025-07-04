@@ -45,7 +45,9 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
     <div className="videogallery" key={props.video.title}>
       <div className="videogallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
         <div className="videogallery-image">
-          <img src={thumbnailImageUrl} alt={`${props.video.title} thumbnail`}></img>
+          {
+            thumbnailImageUrl ? <img src={thumbnailImageUrl} alt={`${props.video.title} thumbnail`}></img> : null
+          }         
         </div>
         <div className={props.video.isFavorite ? "caption favorite" : "caption"}>
           <div className="caption-text">

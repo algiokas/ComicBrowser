@@ -234,7 +234,7 @@ export function updateActorImage(id, imageFile) {
 }
 
 export function setVideoTitle(id, newTitle) {
-    return updateVideoTitle.run(newTitle, id)
+    return _VIDEOS.updateTitle.run(newTitle, id)
 }
 
 export function addActors(id, actors) {

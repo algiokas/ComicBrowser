@@ -3,7 +3,7 @@ import type IBook from "../../../interfaces/book";
 import type { IBookSearchQuery } from "../../../interfaces/searchQuery";
 import type ISlideshow from "../../../interfaces/slideshow";
 import { BooksViewMode } from "../../../util/enums";
-import { GetPagePathMulti } from "../../../util/helpers";
+import { GetPagePathMulti, getSlideshowBookByPage } from "../../../util/helpers";
 import GridPage from "./gridPage";
 import Sidebar from "./slideshow-sidebar";
 
@@ -104,7 +104,6 @@ const Slideshow = (props: SlideshowProps) => {
         return gPages
     }
 
-    //override
     const setCurrentPage = (pageNum: number) => {
         setIntervalCounter(0)
         props.setCurrentPage(pageNum)
@@ -115,14 +114,28 @@ const Slideshow = (props: SlideshowProps) => {
     }
 
     const previousPage = () => {
-        if (props.currentPage > 0) {
-            setCurrentPage(props.currentPage - 1)
+        let prevPageNum = props.currentPage -1
+        let currentBook = getSlideshowBookByPage(props.slideshow, prevPageNum)
+        while (currentBook && currentBook.hiddenPages.includes(prevPageNum) && prevPageNum > 0) {
+            console.log(`Page ${prevPageNum+1} hidden - Skipping`)
+            prevPageNum = prevPageNum - 1
+            currentBook = getSlideshowBookByPage(props.slideshow, prevPageNum)
+        }
+        if (prevPageNum >= 0) {
+            setCurrentPage(prevPageNum)
         }
     }
 
     const nextPage = () => {
-        if (props.currentPage < props.slideshow.pageCount - 1) {
-            setCurrentPage(props.currentPage + 1)
+        let nextPageNum = props.currentPage + 1
+        let currentBook = getSlideshowBookByPage(props.slideshow, nextPageNum)
+        while (currentBook && currentBook.hiddenPages.includes(nextPageNum) && nextPageNum < props.slideshow.pageCount -1) {
+            console.log(`Page ${nextPageNum+1} hidden - Skipping`)
+            nextPageNum += 1
+            currentBook = getSlideshowBookByPage(props.slideshow, nextPageNum)
+        }
+        if (nextPageNum < props.slideshow.pageCount) {
+            setCurrentPage(nextPageNum)
         }
     }
 

@@ -15,8 +15,15 @@ export interface FileWithData {
 const SourceDetail = (props: SourceDetailProps) => {
     const [currentFile, setCurrentFile] = useState<FileWithData | null>(null)
     const [primaryImageUrl, setPrimaryImageUrl] = useState<string>('')
+    const [videoCount, setVideoCount] = useState<number>(0)
 
     const appContext = useContext(VideosAppContext)
+
+    useEffect(() => {
+        const sourceVideos = appContext.allVideos.filter(v => v.source.id === props.source.id)
+        setVideoCount(sourceVideos.length)
+    }, [props.source])
+
 
     useEffect(() => {
         const updatePrimaryImage = async () => {
@@ -59,10 +66,18 @@ const SourceDetail = (props: SourceDetailProps) => {
                         </div>
                         : null
                 }
+                <div className="sourcedetail-info">
+                    <div className="sourcedetail-info-row">
+                        <span className="sourcedetail-info-label">Number of Videos: </span>
+                        <span className="sourcedetail-info-value">{videoCount}</span>
+                    </div>
+                </div>
                 <div className="sourcedetail-upload">
-                    <input type="file" name="imageLarge" accept="image/*" onChange={handleFileChange} />
-                    <button type="button" onClick={() => upload('small')}>Upload Small</button>
-                    <button type="button" onClick={() => upload('large')}>Upload Large</button>
+                    <input type="file" id="source-image" name="source-image" accept="image/*" onChange={handleFileChange} />
+                    <div className="sourcedetail-upload-controls">
+                        <button type="button" onClick={() => upload('small')}>Upload Small</button>
+                        <button type="button" onClick={() => upload('large')}>Upload Large</button>
+                    </div>
                 </div>
             </div>
         </div>
