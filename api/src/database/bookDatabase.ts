@@ -1,4 +1,4 @@
-import { books_db as db } from '../src/database.js';
+import { books_db as db } from './database'
 
 const insertBook = db.prepare('INSERT INTO books (title, folderName, artGroup, prefix, language, pageCount, coverIndex, addedDate, pages, hiddenPages, isFavorite, originalTitle) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)');
 const insertArtist = db.prepare('INSERT INTO artists (name) VALUES (?)')

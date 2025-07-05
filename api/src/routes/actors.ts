@@ -1,6 +1,6 @@
 import { Router } from 'express';
 var router = Router();
-import { getActors, getActor, getActorImagePath, generateImageForActor, updateActor } from '../src/videoRepository.js';
+import { getActors, getActor, getActorImagePath, generateImageForActor, updateActor } from '../videoRepository';
 
 router.get('/', function (req, res) {
     res.json(getActors())

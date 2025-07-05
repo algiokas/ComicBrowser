@@ -1,9 +1,9 @@
-import Database from 'better-sqlite3';
-import { Actor, Source, Video, VideoActor } from '../types/video';
+import Database from "better-sqlite3"
+import { ActorRow, SourceRow, VideoRow, VideoActor } from '../types/video';
 import { _VIDEOS, _ACTORS, _VIDEOACTORS, _SOURCES } from './videoQueries';
 import { RunResultExisting } from '../types/shared';
 
-function insertVideoFromJson(videoJson: Partial<Video>): Database.RunResult | undefined {
+function insertVideoFromJson(videoJson: Partial<VideoRow>): Database.RunResult | undefined {
   try {
     return _VIDEOS.insert.run(
       videoJson.title,
@@ -11,7 +11,7 @@ function insertVideoFromJson(videoJson: Partial<Video>): Database.RunResult | un
       videoJson.filePath,
       videoJson.fileExt,
       videoJson.addedDate?.toString() ?? new Date().toISOString(),
-      0,
+      0,  
       videoJson.title,
       videoJson.sourceId
     );
@@ -26,7 +26,7 @@ function insertActorIfMissing(actorName: string): RunResultExisting | null {
     console.log('cannot input blank actor name');
     return null;
   }
-  const existing = _ACTORS.selectByName.get(actorName) as Actor;
+  const existing = _ACTORS.selectByName.get(actorName) as ActorRow;
   if (existing) {
     console.log('Actor: "' + actorName + '" found. Skipping...');
     return { existingRowId: existing.id };
@@ -71,7 +71,7 @@ function removeAllActorsForVideo(videoId: number): number[] {
 function removeActorsFromVideo(videoId: number, actorNames: string[]): number[] {
   const actorIds: number[] = [];
   actorNames.forEach((actorName) => {
-    const actorRow = _ACTORS.selectByName.get(actorName) as Actor;
+    const actorRow = _ACTORS.selectByName.get(actorName) as ActorRow;
     if (actorRow) {
       actorIds.push(actorRow.id);
       _VIDEOACTORS.delete.run(actorRow.id, videoId);
@@ -89,20 +89,20 @@ export function insertSourceIfMissing(sourceName: string): RunResultExisting | n
     console.log('cannot input blank source name');
     return null;
   }
-  const existing = _SOURCES.selectByName.get(sourceName) as Source;
+  const existing = _SOURCES.selectByName.get(sourceName) as SourceRow;
   if (existing) {
     return { existingRowId: existing.id };
   }
   return _SOURCES.insert.run(sourceName, null, null, null);
 }
 
-function addVideoToDb(videoJson: Partial<Video> & { actors?: string[]; source?: string }): RunResultExisting | null {
+function addVideoToDb(videoJson: Partial<VideoRow> & { actors?: string[]; source?: string }): RunResultExisting | null {
   const sourceId = insertSourceIfMissing(videoJson.source ?? '');
   videoJson.sourceId = Number(sourceId?.existingRowId ?? sourceId?.lastInsertRowid);
   const insertResult = insertVideoFromJson(videoJson);
   if (!insertResult) return null;
-  const actorIds = insertActorsForVideo(Number(insertResult.lastInsertRowid), videoJson.actors ?? []);
-  return { ...insertResult, actorIds };
+  insertActorsForVideo(Number(insertResult.lastInsertRowid), videoJson.actors ?? []);
+  return insertResult;
 }
 
 function removeVideoFromDb(videoId: number): Database.RunResult & { actorIds: number[] } {
@@ -112,14 +112,14 @@ function removeVideoFromDb(videoId: number): Database.RunResult & { actorIds: nu
 }
 
 export function deleteVideo(videoId: number): { success: boolean; error?: string } | (Database.RunResult & { actorIds: number[] }) {
-  const videoData = _VIDEOS.selectById.get(videoId) as Video;
+  const videoData = _VIDEOS.selectById.get(videoId) as VideoRow;
   if (!videoData) return { success: false, error: 'video not found' };
   return removeVideoFromDb(videoId);
 }
 
-export function addVideo(videoJson: Partial<Video> & { actors?: string[]; source?: string }, replace = false) {
+export function addVideo(videoJson: Partial<VideoRow> & { actors?: string[]; source?: string }, replace = false) {
   if (!replace) {
-    const existing: Video | undefined = _VIDEOS.selectByFilePath.get(videoJson.filePath);
+    const existing: VideoRow | undefined = _VIDEOS.selectByFilePath.get(videoJson.filePath) as VideoRow;
     if (existing) {
       return { existingRow: existing };
     }
@@ -129,12 +129,12 @@ export function addVideo(videoJson: Partial<Video> & { actors?: string[]; source
   }
 }
 
-export function getVideos(): Video[] {
-  return _VIDEOS.selectAll.all() as Video[];
+export function getVideos(): VideoRow[] {
+  return _VIDEOS.selectAll.all() as VideoRow[];
 }
 
-export function getVideoById(id: number): Video | undefined {
-  return _VIDEOS.selectById.get(id) as Video;
+export function getVideoById(id: number): VideoRow | undefined {
+  return _VIDEOS.selectById.get(id) as VideoRow;
 }
 
 export function getVideoThumbnailById(id: number): string | null {
@@ -146,16 +146,16 @@ export function updateThumbnail(id: number, thumbnail: string): Database.RunResu
   return _VIDEOS.updateThumbnailId.run(thumbnail, id);
 }
 
-export function getVideoActors(videoId: number): Actor[] {
-  return _ACTORS.selectByVideoId.all(videoId) as Actor[];
+export function getVideoActors(videoId: number): ActorRow[] {
+  return _ACTORS.selectByVideoId.all(videoId) as ActorRow[];
 }
 
-export function getActorById(id: number): Actor | undefined {
-  return _ACTORS.selectById.get(id) as Actor;
+export function getActorById(id: number): ActorRow | undefined {
+  return _ACTORS.selectById.get(id) as ActorRow;
 }
 
-export function getAllActors(): Actor[] {
-  return _ACTORS.selectAll.all() as Actor[];
+export function getAllActors(): ActorRow[] {
+  return _ACTORS.selectAll.all() as ActorRow[];
 }
 
 export function updateActorImage(id: number, imageFile: string): Database.RunResult {
@@ -178,12 +178,12 @@ export function setVideoFavoriteValue(id: number, value: boolean): Database.RunR
   return _VIDEOS.updateFavorite.run(value ? 1 : 0, id);
 }
 
-export function getAllSources(): Source[] {
-  return _SOURCES.selectAll.all() as Source[];
+export function getAllSources(): SourceRow[] {
+  return _SOURCES.selectAll.all() as SourceRow[];
 }
 
-export function getSourceById(id: number): Source | undefined {
-  return _SOURCES.selectById.get(id) as Source;
+export function getSourceById(id: number): SourceRow | undefined {
+  return _SOURCES.selectById.get(id) as SourceRow;
 }
 
 export function updateSourceImageSmall(id: number, imageSmall: string): Database.RunResult {

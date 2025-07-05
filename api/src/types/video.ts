@@ -1,3 +1,5 @@
+import { BaseResponse } from "./shared";
+
 export interface FileJsonOutput {
   filePath: string;
   fileExt?: string;
@@ -7,7 +9,7 @@ export interface FileJsonOutput {
   addedDate: Date | number;
 };
 
-export interface Video {
+export interface VideoRow {
   id: number;
   title: string | null;
   thumbnailId: string | null;
@@ -19,7 +21,20 @@ export interface Video {
   sourceId: number | null;
 };
 
-export interface Source {
+export interface ResponseVideo {
+  id: number;
+  title: string;
+  thumbnailId: string;
+  filePath: string;
+  fileExt: string;
+  addedDate: string;
+  isFavorite: boolean;
+  originalTitle: string;
+  source: SourceRow;
+  actors: ActorRow[];
+}
+
+export interface SourceRow {
   id: number;
   imageFileSmall: string | null;
   imageFileLarge: string | null;
@@ -27,7 +42,7 @@ export interface Source {
   name: string | null;
 };
 
-export interface Actor {
+export interface ActorRow {
   id: number;
   name: string | null;
   imageFile: string | null;
@@ -59,3 +74,13 @@ export interface VideoTagsRef {
   videoId: number;
   tagId: number;
 };
+
+export interface UpdateActorResult extends BaseResponse {
+  changes: string[],
+  actor?: ActorRow
+}
+
+export interface UpdateVideoResult extends BaseResponse {
+  changes: string[],
+  video?: VideoRow
+}

@@ -1,11 +1,12 @@
 import fs from 'fs';
-import path from 'path';
-import ffmpeg from 'fluent-ffmpeg';
 import mime from 'mime';
-import * as videoDatabase from '../src/database/videoDatabase'
+import path from 'path';
+import * as videoDatabase from '../src/database/videoDatabase';
 
 import 'dotenv/config';
-import { FileJsonOutput } from './types/video';
+import { generateImageFromVideo, GenerateThumbnailResult, VideoScreenshotOptions } from './ffmpeg';
+import { ActorRow, FileJsonOutput, ResponseVideo, SourceRow, UpdateActorResult, VideoRow } from './types/video';
+import { stripNonAlphanumeric } from './util';
 
 const dataDir = process.env.VIDEOS_DATA_DIR!
 const videosDir = path.join(dataDir, '/videos');
@@ -66,32 +67,38 @@ function wrapQuotes(str: string) {
     return '"' + str + '"'
 }
 
-function fillVideo(videoRow) {
-    let video = videoRow
-    video.isFavorite = videoRow.isFavorite > 0
-    video.source = videoDatabase.getSourceById(videoRow.sourceId)
-    if (!video.actors) {
-        let vActors = videoDatabase.getVideoActors(videoRow.id)
-        video.actors = vActors
+const placeholderSource: SourceRow = {
+        id: -1,
+        imageFileSmall: null,
+        imageFileLarge: null,
+        siteUrl: null,
+        name: 'MISSING_SOURCE',
+    }
+
+
+function fillVideo(videoRow: VideoRow): ResponseVideo {
+    const videoSource = videoDatabase.getSourceById(videoRow.sourceId ?? -1) ?? placeholderSource
+    const videoActors = videoDatabase.getVideoActors(videoRow.id)
+    let video: ResponseVideo = {
+        ...videoRow,
+        title: videoRow.title ?? '',
+        thumbnailId: videoRow.thumbnailId ?? '',
+        filePath: videoRow.filePath ?? '',
+        fileExt: videoRow.fileExt ?? '',
+        addedDate: videoRow.addedDate ?? '',
+        originalTitle: videoRow.originalTitle ?? '',
+        isFavorite: (videoRow.isFavorite !== null && videoRow.isFavorite > 0),
+        source: videoSource,
+        actors: videoActors
     }
     return video
 }
 
-function generateImageFromVideo(videoPath: string, timestamp, outputDir, outputFile, callback) {
-    new ffmpeg(videoPath).screenshots({
-        count: 1,
-        timestamps: [timestamp],
-        filename: outputFile,
-        folder: outputDir,
-        size: '100%'
-    }).on('end', callback);
-}
-
-function generateThumbnailFileName(videoId, index) {
+function generateThumbnailFileName(videoId: number, index: number) {
     return "vthumb_" + videoId + "-" + index
 }
 
-function getNewThumbnailFileName(videoId) {
+function getNewThumbnailFileName(videoId: number) {
     var thumbIndex = 0
     var thumbFileName = generateThumbnailFileName(videoId, thumbIndex)
     while (fs.existsSync(path.join(thumbnailDir, thumbFileName + ".png"))) {
@@ -101,18 +108,24 @@ function getNewThumbnailFileName(videoId) {
     return thumbFileName
 }
 
-export function getThumbnailFilePath (videoId) {
+export function getThumbnailFilePath(videoId: number) {
     var thumbFile = videoDatabase.getVideoThumbnailById(videoId)
     if (!thumbFile) return null
     return path.join(thumbnailDir, thumbFile + ".png")
 }
 
-function generateThumbnail(video, options, callback) {
+function generateThumbnail(video: VideoRow, options: VideoScreenshotOptions, callback: (result: GenerateThumbnailResult) => void) {
+    if (!video.filePath) {
+        console.error(`Video ${video.id} - missing filePath`)
+        callback({ success: false })
+        return null
+    }
     const videoPath = path.join(videosDir, video.filePath)
-    var timestamp = options?.timestamp ?? '00:30.000'
-    var thumbFileName = options?.thumbFileName ?? getNewThumbnailFileName(video.id)
+    options.timestamp = options.timestamp ?? '00:30.000'
+    const thumbFileName = options.outputFileName ?? getNewThumbnailFileName(video.id)
+    options.outputFileName = thumbFileName
     try {
-        generateImageFromVideo(videoPath, timestamp, thumbnailDir, thumbFileName, () => {
+        generateImageFromVideo(videoPath, options, () => {
             videoDatabase.updateThumbnail(video.id, thumbFileName)
             video.thumbnailId = thumbFileName
             if (callback) {
@@ -126,11 +139,11 @@ function generateThumbnail(video, options, callback) {
     }
 }
 
-function generateActorImageName(actor, index) {
-    return actor.id + "-" + actor.name.replace(' ', '_') + "-" + index
+function generateActorImageName(actor: ActorRow, index: number) {
+    return `${actor.id}-${actor.name?.replace(' ', '_') ?? 'NO_ACTOR_NAME'}-${index}`
 }
 
-function getActorImageName(actor) {
+function getActorImageName(actor: ActorRow) {
     var imgIndex = 0
     var imgFileName = generateActorImageName(actor, imgIndex)
     while (fs.existsSync(path.join(actorImageDir, imgFileName + ".png"))) {
@@ -140,13 +153,18 @@ function getActorImageName(actor) {
     return imgFileName
 }
 
-function generateActorImage(actor, video, timestamp, callback, imgFileName = null) {
-    const videoPath = path.join(videosDir, video.filePath)
-    if (!imgFileName) {
-        imgFileName = getActorImageName(actor)
+function generateActorImage(actor: ActorRow, video: VideoRow, options: VideoScreenshotOptions, callback: (result: GenerateThumbnailResult) => void) {
+    if (!video.filePath) {
+        console.error(`Video ${video.id} - missing filePath`)
+        callback({ success: false })
+        return null
     }
+    const videoPath = path.join(videosDir, video.filePath)
+    const imgFileName = options.outputFileName ?? getActorImageName(actor)
+    options.outputFileName = imgFileName
+    options.outputDir = options.outputDir ?? actorImageDir
     try {
-        generateImageFromVideo(videoPath, timestamp, actorImageDir, imgFileName, () => {
+        generateImageFromVideo(videoPath, options, () => {
             videoDatabase.updateActorImage(actor.id, imgFileName)
             actor.imageFile = imgFileName
             callback({ success: true, actor: actor })
@@ -157,7 +175,7 @@ function generateActorImage(actor, video, timestamp, callback, imgFileName = nul
     }
 }
 
-function getTimestampString(timeMs) {
+function getTimestampString(timeMs: string) {
     var baseTime = new Date(0)
     var msTime = new Date(parseInt(timeMs))
 
@@ -169,54 +187,58 @@ function getTimestampString(timeMs) {
     return hours.padStart(2, '0') + ":" + mins.padStart(2, '0') + ":" + seconds.padStart(2, '0') + "." + milliseconds
 }
 
-export function generateThumbnailExisting (videoId, timeMs, callback) {
+export function generateThumbnailExisting(videoId: number, timeMs: string, callback: (result: GenerateThumbnailResult) => void) {
     let video = videoDatabase.getVideoById(videoId)
     if (video) {
         let ts = getTimestampString(timeMs)
         generateThumbnail(video, { timestamp: ts }, callback)
     }
     else {
-        callback({ success: false, video: null })
+        callback({ success: false })
     }
 }
 
-export function generateImageForActor (actorId: number, videoId, timeMs: number, callback) {
+export function generateImageForActor(actorId: number, videoId: number, timeMs: string, callback: (result: GenerateThumbnailResult) => void) {
     const video = videoDatabase.getVideoById(videoId)
     const actor = videoDatabase.getActorById(actorId)
     if (actor && video) {
         let timestamp = getTimestampString(timeMs)
-        generateActorImage(actor, video, timestamp, callback)
+        generateActorImage(actor, video, { timestamp: timestamp }, callback)
     } else {
-        callback({ success: false, actor: null })
+        callback({ success: false })
     }
 }
 
-export function updateActor (actorId, newActorData, callback) {
+export function updateActor(actorId: number, newActorData: ActorRow, callback: (result: UpdateActorResult) => void): void {
     console.log("updating video with id " + actorId)
-    let updateResult = { success: false, errors: "", changes: [] }
+    let result: UpdateActorResult = { success: false, error: "", changes: [] }
     let currentActorData = videoDatabase.getActorById(actorId);
+    if (!currentActorData) {
+        result.error = `Could not find actor with ID: ${actorId}`
+        return callback(result)
+    }
     if (newActorData.name !== currentActorData.name) {
         let result = videoDatabase.setActorName(actorId, newActorData.name)
         if (result.changes > 0) {
-            updateResult.changes.push("name")
+            result.changes.push("name")
         } else {
-            updateResult.errors = updateResult.errors + "Updating name failed"
+            result.error = result.error + "Updating name failed"
         }
     }
     if (newActorData.isFavorite != currentActorData.isFavorite) {
         let result = videoDatabase.setFavorite(actorId, newActorData.isFavorite)
         if (result.changes > 0) {
-            updateResult.changes.push("favorite")
+            result.changes.push("favorite")
         } else {
-            updateResult.errors = updateResult.errors + "Updating favorite value failed"
+            result.error = result.error + "Updating favorite value failed"
         }
     }
-    updateResult.success = !updateResult.errors && updateResult.changes.length > 0
-    updateResult.actor = videoDatabase.getActorById(actorId)
-    callback(updateResult)
+    result.success = !result.error && result.changes.length > 0
+    result.actor = videoDatabase.getActorById(actorId)
+    callback(result)
 }
 
-export function importVideos (res, callback) {
+export function importVideos(res, callback) {
     let count = 0;
     fs.readdir(videosDir, function (err, subDirs) {
         if (err) {
@@ -281,7 +303,7 @@ export function importVideos (res, callback) {
     })
 }
 
-export function getVideos () {
+export function getVideos() {
     console.log("Get All Videos")
     let rows = videoDatabase.getVideos()
     if (!rows || rows.length < 1) {
@@ -295,7 +317,7 @@ export function getVideos () {
     return videos
 }
 
-export function getVideoFilePath (videoId) {
+export function getVideoFilePath(videoId: number) {
     let video = videoDatabase.getVideoById(videoId)
     const fullPath = path.join(videosDir, video.filePath)
     return {
@@ -304,15 +326,15 @@ export function getVideoFilePath (videoId) {
     }
 }
 
-export function getActor (actorId) {
+export function getActor(actorId: number) {
     return videoDatabase.getActorById(actorId)
 }
 
-export function getActors () {
+export function getActors() {
     return videoDatabase.getAllActors()
 }
 
-export function getActorImagePath (actorId) {
+export function getActorImagePath(actorId: number) {
     let actor = videoDatabase.getActorById(actorId)
     if (actor.imageFile) {
         return path.join(actorImageDir, actor.imageFile + ".png")
@@ -320,15 +342,12 @@ export function getActorImagePath (actorId) {
     return null
 }
 
-export function deleteVideo (videoId) {
+export function deleteVideo(videoId: number) {
     return videoDatabase.deleteVideo(videoId)
 }
 
-function stripNonAlphanumeric(str) {
-    return str.replace(/\W/g, '')
-}
 
-export function renameThumbnails () {
+export function renameThumbnails() {
     let rows = videoDatabase.getVideos()
     // rows.forEach(r => {
     //     let i = 0;
@@ -384,7 +403,7 @@ export function renameThumbnails () {
     }
 }
 
-export function removeDuplicates () {
+export function removeDuplicates() {
     let rows = videoDatabase.getVideos()
     let groups = []
 
@@ -429,7 +448,7 @@ export function removeDuplicates () {
     })
 }
 
-export function removeNoActorVideos () {
+export function removeNoActorVideos() {
     let rows = videoDatabase.getVideos()
     let videos = rows.map(fillVideo)
 
@@ -443,7 +462,7 @@ export function removeNoActorVideos () {
     return removed
 }
 
-export function updateVideo (id, newVideoData, callback) {
+export function updateVideo(id, newVideoData, callback) {
     console.log("updating video with id " + id)
     let updateResult = { success: false, errors: "", changes: [] }
     let currentVideoData = fillVideo(videoDatabase.getVideoById(id));
@@ -452,7 +471,7 @@ export function updateVideo (id, newVideoData, callback) {
         if (result.changes > 0) {
             updateResult.changes.push("title")
         } else {
-            updateResult.errors = updateResult.errors + "Updating title failed"
+            updateResult.error = updateResult.error + "Updating title failed"
         }
     }
     if (newVideoData.actors && currentVideoData.actors) {
@@ -464,7 +483,7 @@ export function updateVideo (id, newVideoData, callback) {
             if (addResult.length === actorsToAdd.length) {
                 updateResult.changes.push("added actors")
             } else {
-                updateResult.errors = updateResult.errors + "Adding actors failed"
+                updateResult.error = updateResult.error + "Adding actors failed"
             }
         }
         if (actorsToRemove.length) {
@@ -472,7 +491,7 @@ export function updateVideo (id, newVideoData, callback) {
             if (removeResult.length === actorsToRemove.length) {
                 updateResult.changes.push("removed actors")
             } else {
-                updateResult.errors = updateResult.errors + "removing actors failed"
+                updateResult.error = updateResult.error + "removing actors failed"
             }
         }
     }
@@ -485,7 +504,7 @@ export function updateVideo (id, newVideoData, callback) {
     //         if (addResult.length === tagsToAdd.length) {
     //             response.success = true;
     //         } else {
-    //             response.errors = response.errors + "Adding tags failed"
+    //             response.error = response.error + "Adding tags failed"
     //         }
     //     } 
     //     if (tagsToRemove.length) {
@@ -493,7 +512,7 @@ export function updateVideo (id, newVideoData, callback) {
     //         if (removeResult.length === tagsToRemove.length) {
     //             response.success = true;
     //         } else {
-    //             response.errors = response.errors + "Adding tags failed"
+    //             response.error = response.error + "Adding tags failed"
     //         }
     //     }
     // }
@@ -502,19 +521,19 @@ export function updateVideo (id, newVideoData, callback) {
             let favoriteResult = videoDatabase.setVideoFavoriteValue(id, newVideoData.isFavorite)
             if (favoriteResult) updateResult.changes.push("favorite")
         } catch (err) {
-            updateResult.errors = updateResult.errors + err.message
+            updateResult.error = updateResult.error + err.message
         }
     }
-    updateResult.success = !updateResult.errors && updateResult.changes.length > 0
+    updateResult.success = !updateResult.error && updateResult.changes.length > 0
     updateResult.video = fillVideo(videoDatabase.getVideoById(id))
     callback(updateResult)
 }
 
-export function getSources () {
+export function getSources() {
     return videoDatabase.getAllSources()
 }
 
-export function saveSourceImage (sourceId, imageSize, fileType, rawData, callback) {
+export function saveSourceImage(sourceId, imageSize, fileType, rawData, callback) {
     const sourceData = videoDatabase.getSourceById(sourceId)
     if (!sourceData) {
         return
@@ -536,7 +555,7 @@ export function saveSourceImage (sourceId, imageSize, fileType, rawData, callbac
     console.log(`Creating file: ${fileName}`)
     try {
         fs.writeFileSync(path.join(sourceImageDir, fileName), rawData)
-    
+
         if (imageSize === 'small') {
             sourceData.imageFileSmall = fileName
         } else {
@@ -548,7 +567,7 @@ export function saveSourceImage (sourceId, imageSize, fileType, rawData, callbac
     }
 }
 
-export function updateSource (id, newSourceData, callback) {
+export function updateSource(id, newSourceData, callback) {
     let updateResult = { success: false, errors: "", changes: [] }
     const currentSourceData = videoDatabase.getSourceById(id)
     if (newSourceData.imageFileSmall && currentSourceData.imageFileSmall !== newSourceData.imageFileSmall) {
@@ -575,7 +594,7 @@ export function updateSource (id, newSourceData, callback) {
             updateResult.err += `siteUrl Update Error: [${err.message}] `
         }
     }
-    updateResult.success = !updateResult.errors && updateResult.changes.length > 0
+    updateResult.success = !updateResult.error && updateResult.changes.length > 0
     updateResult.source = videoDatabase.getSourceById(id)
     callback(updateResult)
 }
