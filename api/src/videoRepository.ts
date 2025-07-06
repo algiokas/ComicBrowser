@@ -2,11 +2,12 @@ import fs from 'fs';
 import mime from 'mime';
 import path from 'path';
 import * as videoDatabase from '../src/database/videoDatabase';
+import { Response } from 'express';
 
 import 'dotenv/config';
 import { generateImageFromVideo, GenerateThumbnailResult, VideoScreenshotOptions } from './ffmpeg';
-import { ActorRow, FileJsonOutput, ResponseVideo, SourceRow, UpdateActorResult, VideoRow } from './types/video';
-import { stripNonAlphanumeric } from './util';
+import { ActorRow, ClientActor, VideoFileData, ImportVideosResult, ClientVideo, SourceRow, UpdateActorResult, VideoRow } from './types/video';
+import { getTimestampString, PLACEHOLDER_SOURCE, stripNonAlphanumeric } from './util';
 
 const dataDir = process.env.VIDEOS_DATA_DIR!
 const videosDir = path.join(dataDir, '/videos');
@@ -16,8 +17,8 @@ const sourceImageDir = path.join(dataDir, '/images/sources')
 
 //Import video file with the format:
 // ActorName1, ActorName2 - VideoTitle
-function fileToJson(parentDir: string, fileName: string, fileStats: fs.Stats) {
-    let output: FileJsonOutput = {
+function fileToJson(parentDir: string, fileName: string, fileStats: fs.Stats): VideoFileData | undefined {
+    let output: VideoFileData = {
         filePath: '',
         title: '',
         source: '',
@@ -55,7 +56,7 @@ function fileToJson(parentDir: string, fileName: string, fileStats: fs.Stats) {
     }
     output.source = parentDir
     if (fileStats) {
-        output.addedDate = fileStats.birthtime
+        output.addedDate = fileStats.birthtime.getTime()
     } else {
         output.addedDate = Date.now()
     }
@@ -63,23 +64,13 @@ function fileToJson(parentDir: string, fileName: string, fileStats: fs.Stats) {
     return output
 }
 
-function wrapQuotes(str: string) {
-    return '"' + str + '"'
-}
-
-const placeholderSource: SourceRow = {
-        id: -1,
-        imageFileSmall: null,
-        imageFileLarge: null,
-        siteUrl: null,
-        name: 'MISSING_SOURCE',
-    }
 
 
-function fillVideo(videoRow: VideoRow): ResponseVideo {
-    const videoSource = videoDatabase.getSourceById(videoRow.sourceId ?? -1) ?? placeholderSource
+
+function fillVideo(videoRow: VideoRow): ClientVideo {
+    const videoSource = videoDatabase.getSourceById(videoRow.sourceId ?? -1) ?? PLACEHOLDER_SOURCE
     const videoActors = videoDatabase.getVideoActors(videoRow.id)
-    let video: ResponseVideo = {
+    let video: ClientVideo = {
         ...videoRow,
         title: videoRow.title ?? '',
         thumbnailId: videoRow.thumbnailId ?? '',
@@ -175,18 +166,6 @@ function generateActorImage(actor: ActorRow, video: VideoRow, options: VideoScre
     }
 }
 
-function getTimestampString(timeMs: string) {
-    var baseTime = new Date(0)
-    var msTime = new Date(parseInt(timeMs))
-
-    var hours = String(msTime.getHours() - baseTime.getHours())
-    var mins = String(msTime.getMinutes() - baseTime.getMinutes())
-    var seconds = String(msTime.getSeconds() - baseTime.getSeconds())
-    var milliseconds = String(msTime.getMilliseconds() - baseTime.getMilliseconds())
-
-    return hours.padStart(2, '0') + ":" + mins.padStart(2, '0') + ":" + seconds.padStart(2, '0') + "." + milliseconds
-}
-
 export function generateThumbnailExisting(videoId: number, timeMs: string, callback: (result: GenerateThumbnailResult) => void) {
     let video = videoDatabase.getVideoById(videoId)
     if (video) {
@@ -209,43 +188,43 @@ export function generateImageForActor(actorId: number, videoId: number, timeMs: 
     }
 }
 
-export function updateActor(actorId: number, newActorData: ActorRow, callback: (result: UpdateActorResult) => void): void {
+export function updateActor(actorId: number, newActorData: Partial<ClientActor>, callback: (result: UpdateActorResult) => void): void {
     console.log("updating video with id " + actorId)
-    let result: UpdateActorResult = { success: false, error: "", changes: [] }
+    let updateResult: UpdateActorResult = { success: false, error: "", changes: [] }
     let currentActorData = videoDatabase.getActorById(actorId);
     if (!currentActorData) {
-        result.error = `Could not find actor with ID: ${actorId}`
-        return callback(result)
+        updateResult.error = `Could not find actor with ID: ${actorId}`
+        return callback(updateResult)
     }
-    if (newActorData.name !== currentActorData.name) {
-        let result = videoDatabase.setActorName(actorId, newActorData.name)
-        if (result.changes > 0) {
-            result.changes.push("name")
+    if (newActorData.name && newActorData.name !== currentActorData.name) {
+        let setActorResult = videoDatabase.setActorName(actorId, newActorData.name)
+        if (setActorResult.changes > 0) {
+            updateResult.changes.push("name")
         } else {
-            result.error = result.error + "Updating name failed"
+            updateResult.error = updateResult.error + "Updating name failed"
         }
     }
-    if (newActorData.isFavorite != currentActorData.isFavorite) {
-        let result = videoDatabase.setFavorite(actorId, newActorData.isFavorite)
-        if (result.changes > 0) {
-            result.changes.push("favorite")
+    if (newActorData.isFavorite !== undefined && (newActorData.isFavorite ? 1 : 0) != currentActorData.isFavorite) {
+        let setFavoriteResult = videoDatabase.setFavorite(actorId, newActorData.isFavorite ?? false)
+        if (setFavoriteResult.changes > 0) {
+            updateResult.changes.push("favorite")
         } else {
-            result.error = result.error + "Updating favorite value failed"
+            updateResult.error = updateResult.error + "Updating favorite value failed"
         }
     }
-    result.success = !result.error && result.changes.length > 0
-    result.actor = videoDatabase.getActorById(actorId)
-    callback(result)
+    updateResult.success = !updateResult.error && updateResult.changes.length > 0
+    updateResult.actor = videoDatabase.getActorById(actorId)
+    callback(updateResult)
 }
 
-export function importVideos(res, callback) {
+export function importVideos(res: Response<any, Record<string, any>>, callback: (res: Response<any, Record<string, any>>, importResult: ImportVideosResult) => void) {
     let count = 0;
     fs.readdir(videosDir, function (err, subDirs) {
         if (err) {
             return console.log('Unable to scan directory: ' + err);
         }
 
-        videoData = []
+        const videoData: VideoFileData[] = []
         subDirs.forEach((dir) => {
             let subDirPath = path.join(videosDir, dir);
             let dirStats = fs.statSync(subDirPath)
@@ -255,7 +234,8 @@ export function importVideos(res, callback) {
                     files.forEach((file) => {
                         let filePath = path.join(subDirPath, file)
                         let fileStats = fs.statSync(filePath)
-                        videoData.push(fileToJson(dir, file, fileStats));
+                        const fileJson = fileToJson(dir, file, fileStats)
+                        if (fileJson) videoData.push(fileJson)
                     });
                 } catch (err) {
                     return { error: err }
@@ -263,7 +243,7 @@ export function importVideos(res, callback) {
             }
         })
 
-        let dbRows = [];
+        let dbRows: ClientVideo[] = [];
         videoData.forEach(async (video) => {
             let addResult = videoDatabase.addVideo(video)
             if (addResult) {

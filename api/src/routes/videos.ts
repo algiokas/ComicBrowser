@@ -1,8 +1,9 @@
 import bodyParser from 'body-parser';
-import { Router } from 'express';
+import { Router, Response, Request } from 'express';
 import { createReadStream, statSync } from 'fs';
 import mime from 'mime';
 import * as videoRepository from "../videoRepository";
+import { ImportVideosResult } from '../types/video';
 const router = Router();
 
 router.get('/', function (req, res, next) {
@@ -10,8 +11,8 @@ router.get('/', function (req, res, next) {
     res.json(videos)
 });
 
-router.get('/import', (req, res, next) => {
-    videoRepository.importVideos(res, (res: any, importResult) => {
+router.get('/import', (req: any, res: Response<any, Record<string, any>>, next) => {
+    videoRepository.importVideos(res, (res: Response<any, Record<string, any>>, importResult: ImportVideosResult) => {
         console.log("imported " + importResult.importCount + " videos")
         res.json(importResult)
     })

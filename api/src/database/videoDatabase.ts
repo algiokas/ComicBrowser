@@ -1,5 +1,5 @@
 import Database from "better-sqlite3"
-import { ActorRow, SourceRow, VideoRow, VideoActor } from '../types/video';
+import { ActorRow, SourceRow, VideoRow, VideoActor, VideoFileData } from '../types/video';
 import { _VIDEOS, _ACTORS, _VIDEOACTORS, _SOURCES } from './videoQueries';
 import { RunResultExisting } from '../types/shared';
 
@@ -10,7 +10,7 @@ function insertVideoFromJson(videoJson: Partial<VideoRow>): Database.RunResult |
       videoJson.thumbnailId,
       videoJson.filePath,
       videoJson.fileExt,
-      videoJson.addedDate?.toString() ?? new Date().toISOString(),
+      videoJson.addedDate ?? new Date().toISOString(),
       0,  
       videoJson.title,
       videoJson.sourceId
@@ -96,10 +96,19 @@ export function insertSourceIfMissing(sourceName: string): RunResultExisting | n
   return _SOURCES.insert.run(sourceName, null, null, null);
 }
 
-function addVideoToDb(videoJson: Partial<VideoRow> & { actors?: string[]; source?: string }): RunResultExisting | null {
+function addVideoToDb(videoJson: VideoFileData): RunResultExisting | null {
+  const videoRow: Partial<VideoRow> = {
+    title: videoJson.title,
+    filePath: videoJson.filePath,
+    fileExt: videoJson.fileExt,
+    addedDate: (new Date(videoJson.addedDate)).toISOString(),
+    isFavorite: 0,
+    thumbnailId: ''
+  }
+
   const sourceId = insertSourceIfMissing(videoJson.source ?? '');
-  videoJson.sourceId = Number(sourceId?.existingRowId ?? sourceId?.lastInsertRowid);
-  const insertResult = insertVideoFromJson(videoJson);
+  videoRow.sourceId = Number(sourceId?.existingRowId ?? sourceId?.lastInsertRowid);
+  const insertResult = insertVideoFromJson(videoRow);
   if (!insertResult) return null;
   insertActorsForVideo(Number(insertResult.lastInsertRowid), videoJson.actors ?? []);
   return insertResult;
@@ -117,7 +126,7 @@ export function deleteVideo(videoId: number): { success: boolean; error?: string
   return removeVideoFromDb(videoId);
 }
 
-export function addVideo(videoJson: Partial<VideoRow> & { actors?: string[]; source?: string }, replace = false) {
+export function addVideo(videoJson: VideoFileData, replace = false) {
   if (!replace) {
     const existing: VideoRow | undefined = _VIDEOS.selectByFilePath.get(videoJson.filePath) as VideoRow;
     if (existing) {

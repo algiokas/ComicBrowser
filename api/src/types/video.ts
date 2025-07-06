@@ -1,12 +1,12 @@
 import { BaseResponse } from "./shared";
 
-export interface FileJsonOutput {
+export interface VideoFileData {
   filePath: string;
   fileExt?: string;
   title: string;
   actors: string[];
   source: string;
-  addedDate: Date | number;
+  addedDate: number;
 };
 
 export interface VideoRow {
@@ -21,7 +21,7 @@ export interface VideoRow {
   sourceId: number | null;
 };
 
-export interface ResponseVideo {
+export interface ClientVideo {
   id: number;
   title: string;
   thumbnailId: string;
@@ -42,13 +42,29 @@ export interface SourceRow {
   name: string | null;
 };
 
+export interface ClientSource {
+  id: number;
+  imageFileSmall: string;
+  imageFileLarge: string;
+  siteUrl: string;
+  name: string;
+}
+
 export interface ActorRow {
   id: number;
   name: string | null;
   imageFile: string | null;
   imageFallbackVideoId: number | null;
   isFavorite: number | null;      // 0 or 1
-};
+};  
+
+export interface ClientActor {
+  id: number;
+  name: string;
+  imageFile: string;
+  imageFallbackVideoId: number;
+  isFavorite: boolean;      // 0 or 1
+}
 
 export interface VideoActor {
   videoId: number;
@@ -77,10 +93,15 @@ export interface VideoTagsRef {
 
 export interface UpdateActorResult extends BaseResponse {
   changes: string[],
-  actor?: ActorRow
+  actor?: ClientActor | ActorRow
 }
 
 export interface UpdateVideoResult extends BaseResponse {
   changes: string[],
-  video?: VideoRow
+  video?: ClientVideo | VideoRow
+}
+
+export interface ImportVideosResult extends BaseResponse {
+  videos: ClientVideo[],
+  importCount: number
 }
