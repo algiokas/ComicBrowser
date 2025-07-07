@@ -126,11 +126,11 @@ export function deleteVideo(videoId: number): { success: boolean; error?: string
   return removeVideoFromDb(videoId);
 }
 
-export function addVideo(videoJson: VideoFileData, replace = false) {
+export function addVideo(videoJson: VideoFileData, replace = false): RunResultExisting | null {
   if (!replace) {
     const existing: VideoRow | undefined = _VIDEOS.selectByFilePath.get(videoJson.filePath) as VideoRow;
     if (existing) {
-      return { existingRow: existing };
+      return { existingRowId: existing.id };
     }
     return addVideoToDb(videoJson);
   } else {

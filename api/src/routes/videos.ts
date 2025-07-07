@@ -50,7 +50,11 @@ router.get('/sources/:sourceId/imagesmall', (req, res) => {
 })
 
 router.get('/thumbnail/:videoId', function (req, res) {
-    let fpath = videoRepository.getThumbnailFilePath(req.params.videoId)
+    const videoId = Number(req.params.videoId)
+    if (isNaN(videoId)) {
+        res.status(500).send(`Internal Server Error: parameter videoId must be a number - provided value: ${req.params.videoId}`)
+    }
+    let fpath = videoRepository.getThumbnailFilePath(videoId)
     if (fpath) res.sendFile(fpath, {});
     else {
         res.sendStatus(404).end();
@@ -58,7 +62,11 @@ router.get('/thumbnail/:videoId', function (req, res) {
 })
 
 router.post('/thumbnail/:videoId/generate/:timeMs', function (req, res) {
-    videoRepository.generateThumbnailExisting(req.params.videoId, req.params.timeMs, (thumbResult) => {
+    const videoId = Number(req.params.videoId)
+    if (isNaN(videoId)) {
+        res.status(500).send(`Internal Server Error: parameter videoId must be a number - provided value: ${req.params.videoId}`)
+    }
+    videoRepository.generateThumbnailExisting(videoId, req.params.timeMs, (thumbResult) => {
         console.log("Generated thumbnail for video " + req.params.videoId + " at " + req.params.timeMs + "ms")
         res.json(thumbResult)
     })
@@ -80,13 +88,20 @@ router.get('/audit/removenoactorvideos', (req, res) => {
 })
 
 router.delete('/:videoId', function (req, res) {
+    const videoId = Number(req.params.videoId)
+    if (isNaN(videoId)) {
+        res.status(500).send(`Internal Server Error: parameter videoId must be a number - provided value: ${req.params.videoId}`)
+    }
     console.log('delete video id: ' + req.params.videoId)
-    var deleteResponse = videoRepository.deleteVideo(req.params.videoId)
+    var deleteResponse = videoRepository.deleteVideo(videoId)
     res.json(deleteResponse)
 })
 
 router.post('/:videoId/update', function (req, res, next) {
-    let videoId = parseInt(req.params.videoId)
+    const videoId = Number(req.params.videoId)
+    if (isNaN(videoId)) {
+        res.status(500).send(`Internal Server Error: parameter videoId must be a number - provided value: ${req.params.videoId}`)
+    }
     console.log('update video id: ' + videoId)
     videoRepository.updateVideo(videoId, req.body, (updateResult) => {
         console.log("Updated video ID:" + videoId + " made " + updateResult.changes + " changes")
@@ -95,8 +110,11 @@ router.post('/:videoId/update', function (req, res, next) {
 })
 
 router.post('/:sourceId/updatesource', function (req, res, next) {
-    let sourceId = parseInt(req.params.sourceId)
-    console.log('update source id: ' + videoId)
+    const sourceId = Number(req.params.sourceId)
+    if (isNaN(sourceId)) {
+        res.status(500).send(`Internal Server Error: parameter sourceId must be a number - provided value: ${req.params.sourceId}`)
+    }
+    console.log('update source id: ' + sourceId)
     videoRepository.updateSource(sourceId, req.body, (updateResult) => {
         console.log("Updated source ID:" + sourceId + " made " + updateResult.changes + " changes")
         res.json(updateResult)
@@ -104,10 +122,14 @@ router.post('/:sourceId/updatesource', function (req, res, next) {
 })
 
 router.get('/:videoId', function (req, res) {
+    const videoId = Number(req.params.videoId)
+    if (isNaN(videoId)) {
+        res.status(500).send(`Internal Server Error: parameter videoId must be a number - provided value: ${req.params.videoId}`)
+    }
     console.log("get video ID: " + req.params.videoId)
-    let videoData = videoRepository.getVideoFilePath(req.params.videoId)
-    if (videoData) {
-        const stat = statSync(videoData.path)
+    let videoPath = videoRepository.getVideoFilePath(videoId)
+    if (videoPath) {
+        const stat = statSync(videoPath)
         const fileSize = stat.size
         const range = req.headers.range
         let start = 0
@@ -118,8 +140,8 @@ router.get('/:videoId', function (req, res) {
             end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
         }
         const chunkSize = end - start + 1;
-        const file = createReadStream(videoData.path, { start, end });
-        const mimeType = mime.getType(videoData.ext)
+        const file = createReadStream(videoPath, { start, end });
+        const mimeType = mime.getType(videoPath) ?? 'video/mp4'
         const head = {
             'Content-Range': `bytes ${start}-${end}/${fileSize}`,
             'Accept-Ranges': 'bytes',

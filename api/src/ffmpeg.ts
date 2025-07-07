@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 import path from 'path';
-import { ActorRow, VideoRow } from './types/video';
+import { ActorRow, ClientActor, ClientVideo, VideoRow } from './types/video';
 import { timeStamp } from 'console';
 
 const dataDir = process.env.VIDEOS_DATA_DIR!
@@ -16,8 +16,8 @@ export interface VideoScreenshotOptions {
 
 export interface GenerateThumbnailResult {
     success: boolean,
-    video?: VideoRow,
-    actor?: ActorRow
+    video?: VideoRow | ClientVideo,
+    actor?: ActorRow | ClientActor
 }
 
 export function generateImageFromVideo(videoPath: string, options: VideoScreenshotOptions, callback: () => void): void {

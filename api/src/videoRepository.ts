@@ -105,10 +105,10 @@ export function getThumbnailFilePath(videoId: number) {
     return path.join(thumbnailDir, thumbFile + ".png")
 }
 
-function generateThumbnail(video: VideoRow, options: VideoScreenshotOptions, callback: (result: GenerateThumbnailResult) => void) {
+function generateThumbnail(video: VideoRow | ClientVideo, options: VideoScreenshotOptions, callback?: (result: GenerateThumbnailResult) => void) {
     if (!video.filePath) {
         console.error(`Video ${video.id} - missing filePath`)
-        callback({ success: false })
+        if (callback) callback({ success: false })
         return null
     }
     const videoPath = path.join(videosDir, video.filePath)
@@ -243,20 +243,41 @@ export function importVideos(res: Response<any, Record<string, any>>, callback: 
             }
         })
 
-        let dbRows: ClientVideo[] = [];
+        let allVideos: ClientVideo[] = [];
         videoData.forEach(async (video) => {
             let addResult = videoDatabase.addVideo(video)
             if (addResult) {
+
                 if (addResult.lastInsertRowid) {
-                    video.id = addResult.lastInsertRowid
-                    let possibleThumbFile = generateThumbnailFileName(video.id, 0)
-                    let thumbFilePath = path.join(thumbnailDir, possibleThumbFile + ".png")
+                    const vId = Number(addResult.lastInsertRowid)
+                    const possibleThumbFile = generateThumbnailFileName(vId, 0)
+                    const thumbFileName = `${possibleThumbFile}.png`
+                    const thumbFilePath = path.join(thumbnailDir, thumbFileName)
+
+                    const v: VideoRow = {
+                        id: Number(addResult.lastInsertRowid),
+                        title: video.title,
+                        filePath: video.filePath,
+                        fileExt: video.fileExt ?? '',
+                        thumbnailId: thumbFileName,
+                        addedDate: (new Date(video.addedDate)).toISOString(),
+                        isFavorite: 0,
+                        originalTitle: video.title,
+
+
+                    
+                    }   
+
+
                     if (!fs.existsSync(thumbFilePath)) {
-                        generateThumbnail(video)
+                        generateThumbnail(v, { outputDir: thumbnailDir, outputFileName: thumbFileName})
                     } else {
-                        videoDatabase.updateThumbnail(video.id, possibleThumbFile)
+                        videoDatabase.updateThumbnail(vId, possibleThumbFile)
                     }
-                    dbRows.push(video)
+                    
+                    
+
+                    allVideos.push(video)
                     count++
                 }
                 else if (addResult.existingRow) {
@@ -275,11 +296,11 @@ export function importVideos(res: Response<any, Record<string, any>>, callback: 
                         addResult.existingRow.sourceId = sourceId
                         videoDatabase.setVideoSourceId(video.id, sourceId)
                     }
-                    dbRows.push(fillVideo(addResult.existingRow))
+                    allVideos.push(fillVideo(addResult.existingRow))
                 }
             }
         })
-        callback(res, { videos: dbRows, importCount: count })
+        callback(res, { videos: allVideos, importCount: count })
     })
 }
 
@@ -297,13 +318,10 @@ export function getVideos() {
     return videos
 }
 
-export function getVideoFilePath(videoId: number) {
+export function getVideoFilePath(videoId: number): string | null {
     let video = videoDatabase.getVideoById(videoId)
-    const fullPath = path.join(videosDir, video.filePath)
-    return {
-        path: fullPath,
-        ext: video.fileExt
-    }
+    if (!video?.filePath) return null
+    return path.join(videosDir, video.filePath)
 }
 
 export function getActor(actorId: number) {

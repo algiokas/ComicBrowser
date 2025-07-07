@@ -105,3 +105,7 @@ export interface ImportVideosResult extends BaseResponse {
   videos: ClientVideo[],
   importCount: number
 }
+
+export interface AddVideoResult {
+  
+}
