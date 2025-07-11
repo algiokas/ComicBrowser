@@ -7,7 +7,7 @@ import 'dotenv/config';
 const languages = ["Japanese", "English", "Chinese"]
 const imageDirectory = process.env.BOOKS_IMAGE_DIR
 
-export function getFileName (id, book) {
+export function getFileName (id: number, book) {
     return String(id).padStart(4, '0') + ' - ' + book.title
 }
 

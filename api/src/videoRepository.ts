@@ -6,7 +6,7 @@ import { Response } from 'express';
 
 import 'dotenv/config';
 import { generateImageFromVideo, GenerateThumbnailResult, VideoScreenshotOptions } from './ffmpeg';
-import { ActorRow, ClientActor, VideoFileData, ImportVideosResult, ClientVideo, SourceRow, UpdateActorResult, VideoRow } from './types/video';
+import { ActorRow, ClientActor, VideoFileData, ImportVideosResult, ClientVideo, SourceRow, UpdateActorResult, VideoRow, UpdateVideoResult, UpdateSourceResult, ClientSource } from './types/video';
 import { getTimestampString, PLACEHOLDER_SOURCE, stripNonAlphanumeric } from './util';
 
 const dataDir = process.env.VIDEOS_DATA_DIR!
@@ -79,10 +79,30 @@ function fillVideo(videoRow: VideoRow): ClientVideo {
         addedDate: videoRow.addedDate ?? '',
         originalTitle: videoRow.originalTitle ?? '',
         isFavorite: (videoRow.isFavorite !== null && videoRow.isFavorite > 0),
-        source: videoSource,
-        actors: videoActors
+        source: fillSource(videoSource),
+        actors: videoActors.map(a => fillActor(a))
     }
     return video
+}
+
+function fillActor(actorRow: ActorRow): ClientActor {
+    return {
+        id: actorRow.id,
+        name: actorRow.name ?? '',
+        imageFile: actorRow.imageFile ?? '',
+        imageFallbackVideoId: actorRow.imageFallbackVideoId ?? 0,
+        isFavorite: (actorRow.isFavorite ?? 0) > 0
+    }
+}
+
+function fillSource(sourceRow: SourceRow): ClientSource {
+    return {
+        id: sourceRow.id,
+        imageFileSmall: sourceRow.imageFileSmall ?? '',
+        imageFileLarge: sourceRow.imageFileLarge ?? '',
+        siteUrl: sourceRow.siteUrl ?? '',
+        name: sourceRow.name ?? '',
+    }
 }
 
 function generateThumbnailFileName(videoId: number, index: number) {
@@ -247,12 +267,13 @@ export function importVideos(res: Response<any, Record<string, any>>, callback: 
         videoData.forEach(async (video) => {
             let addResult = videoDatabase.addVideo(video)
             if (addResult) {
-
                 if (addResult.lastInsertRowid) {
                     const vId = Number(addResult.lastInsertRowid)
                     const possibleThumbFile = generateThumbnailFileName(vId, 0)
                     const thumbFileName = `${possibleThumbFile}.png`
                     const thumbFilePath = path.join(thumbnailDir, thumbFileName)
+
+                    const videoSource = videoDatabase.getSourceByName(video.source)
 
                     const v: VideoRow = {
                         id: Number(addResult.lastInsertRowid),
@@ -263,44 +284,28 @@ export function importVideos(res: Response<any, Record<string, any>>, callback: 
                         addedDate: (new Date(video.addedDate)).toISOString(),
                         isFavorite: 0,
                         originalTitle: video.title,
-
-
-                    
-                    }   
-
+                        sourceId: videoSource?.id ?? null
+                    }
 
                     if (!fs.existsSync(thumbFilePath)) {
-                        generateThumbnail(v, { outputDir: thumbnailDir, outputFileName: thumbFileName})
+                        generateThumbnail(v, { outputDir: thumbnailDir, outputFileName: thumbFileName })
                     } else {
                         videoDatabase.updateThumbnail(vId, possibleThumbFile)
                     }
-                    
-                    
 
-                    allVideos.push(video)
+                    allVideos.push(fillVideo(v))
                     count++
                 }
-                else if (addResult.existingRow) {
-                    video.id = addResult.existingRow.id
-                    if (!addResult.existingRow.thumbnailId) {
-                        generateThumbnail(video)
-                    } else {
-                        let thumbFilePath = getThumbnailFilePath(video.id)
-                        if (thumbFilePath && !fs.existsSync(thumbFilePath)) {
-                            generateThumbnail(video, { thumbFileName: addResult.existingRow.thumbnailId })
-                        }
+                else if (addResult.existingRowId) {
+                    const videoRow = videoDatabase.getVideoById(addResult.existingRowId)
+                    if (videoRow) {
+                        allVideos.push(fillVideo(videoRow))
                     }
-                    if (video.source && addResult.existingRow.sourceId === null) {
-                        let sourceResult = videoDatabase.insertSourceIfMissing(video.source)
-                        let sourceId = sourceResult.existingRowId ?? sourceResult.lastInsertRowid
-                        addResult.existingRow.sourceId = sourceId
-                        videoDatabase.setVideoSourceId(video.id, sourceId)
-                    }
-                    allVideos.push(fillVideo(addResult.existingRow))
+
                 }
             }
         })
-        callback(res, { videos: allVideos, importCount: count })
+        callback(res, { success: true, videos: allVideos, importCount: count })
     })
 }
 
@@ -311,7 +316,7 @@ export function getVideos() {
         console.log("no videos found")
         return rows
     }
-    let videos = []
+    let videos: ClientVideo[] = []
     rows.forEach(row => {
         videos.push(fillVideo(row))
     });
@@ -334,7 +339,7 @@ export function getActors() {
 
 export function getActorImagePath(actorId: number) {
     let actor = videoDatabase.getActorById(actorId)
-    if (actor.imageFile) {
+    if (actor && actor.imageFile) {
         return path.join(actorImageDir, actor.imageFile + ".png")
     }
     return null
@@ -344,126 +349,16 @@ export function deleteVideo(videoId: number) {
     return videoDatabase.deleteVideo(videoId)
 }
 
-
-export function renameThumbnails() {
-    let rows = videoDatabase.getVideos()
-    // rows.forEach(r => {
-    //     let i = 0;
-    //     let possibleThumbFile = generateThumbnailFileName(r.id, i)
-    //     let nextThumbFile = generateThumbnailFileName(r.id, i+1)
-    //     while (fs.fs.existsSync(path.path.join(thumbnailDir, nextThumbFile + ".png"))) {
-    //         i++
-    //         possibleThumbFile = generateThumbnailFileName(r.id, i)
-    //         nextThumbFile = generateThumbnailFileName(r.id, i+1)
-    //     } 
-    //     if (fs.fs.existsSync(path.path.join(thumbnailDir, possibleThumbFile + ".png"))) {
-    //         db.updateThumbnail(r.id, possibleThumbFile)
-    //         r.thumbnailId = possibleThumbFile
-    //     }
-    // })
-    rows.forEach(row => {
-        if (row.thumbnailId) {
-            let newThumbName = getNewThumbnailFileName(row.id)
-            // if (fs.fs.existsSync(path.path.join(thumbnailDir, row.thumbnailId + ".png"))) {
-            //     generateThumbnail(row, '00:30.000', newThumbName)
-            // }
-            if (row.thumbnailId !== newThumbName) {
-                let currentPath = path.join(thumbnailDir, row.thumbnailId + ".png")
-                let newPath = path.join(thumbnailDir, newThumbName + ".png")
-                fs.rename(currentPath, newPath, (err) => {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        videoDatabase.updateThumbnail(row.id, newThumbName)
-                        console.log("updated thumbnail for video " + row.id + " to " + newThumbName)
-                    }
-                })
-            }
-        }
-        else {
-            rowsWithoutThumb.push(row)
-        }
-    })
-
-    if (rowsWithoutThumb.length > 0) {
-        rowsWithoutThumb.forEach((r) => {
-            let possibleThumbFile = generateThumbnailFileName(r.id, 0)
-            if (fs.existsSync(path.join(thumbnailDir, possibleThumbFile + ".png"))) {
-                videoDatabase.updateThumbnail(r.id, possibleThumbFile)
-                r.thumbnailId = possibleThumbFile
-            }
-        })
-
-        let stillNoThumb = rowsWithoutThumb.filter(r => r.thumbnailId == null)
-        stillNoThumb.forEach((r) => {
-            generateThumbnail(r)
-        })
-    }
-}
-
-export function removeDuplicates() {
-    let rows = videoDatabase.getVideos()
-    let groups = []
-
-    rows.forEach(r => {
-        let existing = groups.find(g => g.filePath == r.filePath)
-        if (existing) {
-            existing.items.push(r)
-        }
-        else {
-            groups.push({
-                filePath: r.filePath,
-                items: [r]
-            })
-        }
-    })
-
-    let duplicateGroups = groups.filter(g => g.items.length > 1)
-    duplicateGroups.forEach(g => {
-        let thumbnails = g.items.map(i => i.thumbnailId).filter(x => x)
-        let definitiveThumbnail = thumbnails ? thumbnails[0] : null
-
-        let pathsegments = g.filePath.split('\\')
-        if (pathsegments.length == 2) {
-            let correctData = fileToJson(pathsegments[0], pathsegments[1])
-            let badData = g.items.filter(i => i.title != correctData.title)
-            badData.forEach(d => {
-                videoDatabase.deleteVideo(d.id)
-            })
-            let goodData = g.items.filter(i => i.title == correctData.title)
-            let definitiveVideo = goodData[0]
-            if (definitiveVideo.thumbnailId !== definitiveThumbnail) {
-                videoDatabase.updateThumbnail(definitiveVideo.id, definitiveThumbnail)
-            }
-            let toDelete = goodData.slice(1)
-            toDelete.forEach(d => {
-                videoDatabase.deleteVideo(d.id)
-            })
-        } else {
-            console.log(g.filePath)
-        }
-
-    })
-}
-
-export function removeNoActorVideos() {
-    let rows = videoDatabase.getVideos()
-    let videos = rows.map(fillVideo)
-
-    let videosWithNoActors = videos.filter(v => v.actors.length < 1)
-
-    let removed = []
-    videosWithNoActors.forEach(v => {
-        videoDatabase.deleteVideo(v.id)
-        removed.push(v)
-    })
-    return removed
-}
-
-export function updateVideo(id, newVideoData, callback) {
+export function updateVideo(id: number, newVideoData: ClientVideo, callback: (updateResult: UpdateVideoResult) => void) {
     console.log("updating video with id " + id)
-    let updateResult = { success: false, errors: "", changes: [] }
-    let currentVideoData = fillVideo(videoDatabase.getVideoById(id));
+    let updateResult: UpdateVideoResult = { success: false, error: "", changes: [] }
+    const existingVideo = videoDatabase.getVideoById(id);
+    if (!existingVideo) {
+        updateResult.error = `Unable to find video with ID: ${id}`
+        return callback(updateResult)
+    }
+
+    let currentVideoData = fillVideo(existingVideo);
     if (newVideoData.title !== currentVideoData.title) {
         let result = videoDatabase.setVideoTitle(id, newVideoData.title)
         if (result.changes > 0) {
@@ -518,12 +413,18 @@ export function updateVideo(id, newVideoData, callback) {
         try {
             let favoriteResult = videoDatabase.setVideoFavoriteValue(id, newVideoData.isFavorite)
             if (favoriteResult) updateResult.changes.push("favorite")
-        } catch (err) {
+        } catch (err: any) {
             updateResult.error = updateResult.error + err.message
         }
     }
     updateResult.success = !updateResult.error && updateResult.changes.length > 0
-    updateResult.video = fillVideo(videoDatabase.getVideoById(id))
+
+    const updatedVideoRow = videoDatabase.getVideoById(id)
+    if (!updatedVideoRow) {
+        updateResult.success = false
+        return callback(updateResult)
+    }
+    updateResult.video = fillVideo(updatedVideoRow)
     callback(updateResult)
 }
 
@@ -531,10 +432,10 @@ export function getSources() {
     return videoDatabase.getAllSources()
 }
 
-export function saveSourceImage(sourceId, imageSize, fileType, rawData, callback) {
+export function saveSourceImage(sourceId: number, imageSize: "small" | "large", fileType: string, rawData: any, callback: (updateResult: UpdateSourceResult) => void) {
     const sourceData = videoDatabase.getSourceById(sourceId)
-    if (!sourceData) {
-        return
+    if (!sourceData || !sourceData.name) {
+        return callback({ success: false, changes: [], error: `No source found with ID: ${sourceId}` })
     }
 
     const sourceNameSlug = stripNonAlphanumeric(sourceData.name).toLowerCase()
@@ -559,46 +460,59 @@ export function saveSourceImage(sourceId, imageSize, fileType, rawData, callback
         } else {
             sourceData.imageFileLarge = fileName
         }
-        updateSource(sourceId, sourceData, callback)
-    } catch (err) {
-        logger.error(`saveSourceImage Error: ${err.message}`)
+        updateSource(sourceId, fillSource(sourceData), callback)
+    } catch (err: any) {
+        return callback({ success: false, changes: [], error: err.message })
     }
 }
 
-export function updateSource(id, newSourceData, callback) {
-    let updateResult = { success: false, errors: "", changes: [] }
+export function updateSource(id: number, newSourceData: ClientSource, callback: (updateResult: UpdateSourceResult) => void) {
+    let updateResult: UpdateSourceResult = { success: false, error: "", changes: [] }
     const currentSourceData = videoDatabase.getSourceById(id)
+    if (!currentSourceData) {
+        updateResult.error = `No source found with ID: ${id}`
+        return callback(updateResult)
+    }
+
     if (newSourceData.imageFileSmall && currentSourceData.imageFileSmall !== newSourceData.imageFileSmall) {
         try {
             videoDatabase.updateSourceImageSmall(id, newSourceData.imageFileSmall)
             updateResult.changes.push('imageFileSmall')
-        } catch (err) {
-            updateResult.err += `imageFileSmall Update Error: [${err.message}] `
+        } catch (err: any) {
+            updateResult.error += `imageFileSmall Update Error: [${err.message}] `
         }
     }
     if (newSourceData.imageFileLarge && currentSourceData.imageFileLarge !== newSourceData.imageFileLarge) {
         try {
             videoDatabase.updateSourceImageLarge(id, newSourceData.imageFileLarge)
             updateResult.changes.push('imageFileLarge')
-        } catch (err) {
-            updateResult.err += `imageFileLarge Update Error: [${err.message}] `
+        } catch (err: any) {
+            updateResult.error += `imageFileLarge Update Error: [${err.message}] `
         }
     }
     if (newSourceData.siteUrl && currentSourceData.siteUrl !== newSourceData.siteUrl) {
         try {
             videoDatabase.updateSourceSiteUrl(id, newSourceData.siteUrl)
             updateResult.changes.push('siteUrl')
-        } catch (err) {
-            updateResult.err += `siteUrl Update Error: [${err.message}] `
+        } catch (err: any) {
+            updateResult.error += `siteUrl Update Error: [${err.message}] `
         }
     }
     updateResult.success = !updateResult.error && updateResult.changes.length > 0
-    updateResult.source = videoDatabase.getSourceById(id)
+    const updatedSource = videoDatabase.getSourceById(id)
+    if (!updatedSource) {
+        updateResult.error = `No source found with ID: ${id}`
+        return callback(updateResult)
+    }
+
+    updateResult.source = fillSource(updatedSource)
     callback(updateResult)
 }
 
-export function getSourceImagePath(id, small) {
-    let sourceData = videoDatabase.getSourceById(id)
+export function getSourceImagePath(id: number, small: boolean) {
+    const sourceData = videoDatabase.getSourceById(id)
+    if (!sourceData) return null
+
     if (small && sourceData.imageFileSmall) {
         return path.join(sourceImageDir, sourceData.imageFileSmall)
     } else if (sourceData.imageFileLarge) {

@@ -30,8 +30,8 @@ export interface ClientVideo {
   addedDate: string;
   isFavorite: boolean;
   originalTitle: string;
-  source: SourceRow;
-  actors: ActorRow[];
+  source: ClientSource;
+  actors: ClientActor[];
 }
 
 export interface SourceRow {
@@ -108,4 +108,9 @@ export interface ImportVideosResult extends BaseResponse {
 
 export interface AddVideoResult {
   
+}
+
+export interface UpdateSourceResult extends BaseResponse {
+  changes: string[],
+  source?: ClientSource;
 }

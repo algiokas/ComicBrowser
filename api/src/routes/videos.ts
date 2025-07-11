@@ -23,18 +23,40 @@ router.get('/sources', (req, res) => {
 })
 
 router.post('/upload/sourceimage/:sourceId/:imageSize', bodyParser.raw({ type: "*/*", limit: "10mb" }), (req, res) => {
-    if (!req.body) {
-        console.log(`File Upload: Empty Body`)
+    const sourceId = Number(req.params.sourceId)
+    if (isNaN(sourceId)) {
+        res.status(500).send(`Internal Server Error: parameter sourceId must be a number - provided value: ${req.params.sourceId}`)
+        return
     }
-    console.log(`Uploaded source image - Source: ${req.params.sourceId} - Size: ${req.params.imageSize}`)
-    videoRepository.saveSourceImage(req.params.sourceId, req.params.imageSize, req.headers['content-type'], req.body, (updateResult) => {
-        console.log("Updated source ID: " + updateResult.source.id + " made " + updateResult.changes + " changes")
+    if (!req.body) {
+        res.status(500).send(`File Upload: Empty Body`)
+        return
+    }
+    if (!(req.params.imageSize === 'small' || req.params.imageSize === 'large')) {
+        res.status(500).send(`Internal Server Error: parameter imageSize must be one of "small" or "large - provided value: ${req.params.sourceId}`)
+        return
+    }
+    if (!req.headers['content-type']) {
+        res.status(500).send(`Internal Server Error: header "content-type" required`)
+        return
+    }
+    console.log(`Uploaded source image - Source: ${sourceId} - Size: ${req.params.imageSize}`)
+    videoRepository.saveSourceImage(sourceId, req.params.imageSize, req.headers['content-type'], req.body, (updateResult) => {
+        if (updateResult.success && updateResult.source) {
+            console.log("Updated source ID: " + updateResult.source.id + " made " + updateResult.changes + " changes")
+        }    
         res.json(updateResult)
     })
 })
 
 router.get('/sources/:sourceId/imagelarge', (req, res) => {
-    let fpath = videoRepository.getSourceImagePath(req.params.sourceId, false)
+    const sourceId = Number(req.params.sourceId)
+    if (isNaN(sourceId)) {
+        res.status(500).send(`Internal Server Error: parameter sourceId must be a number - provided value: ${req.params.sourceId}`)
+        return
+    }
+
+    let fpath = videoRepository.getSourceImagePath(sourceId, false)
     if (fpath) res.sendFile(fpath, {});
     else {
         res.sendStatus(404).end();
@@ -42,7 +64,13 @@ router.get('/sources/:sourceId/imagelarge', (req, res) => {
 })
 
 router.get('/sources/:sourceId/imagesmall', (req, res) => {
-    let fpath = videoRepository.getSourceImagePath(req.params.sourceId, true)
+    const sourceId = Number(req.params.sourceId)
+    if (isNaN(sourceId)) {
+        res.status(500).send(`Internal Server Error: parameter sourceId must be a number - provided value: ${req.params.sourceId}`)
+        return
+    }
+
+    let fpath = videoRepository.getSourceImagePath(sourceId, true)
     if (fpath) res.sendFile(fpath, {});
     else {
         res.sendStatus(404).end();
@@ -53,7 +81,9 @@ router.get('/thumbnail/:videoId', function (req, res) {
     const videoId = Number(req.params.videoId)
     if (isNaN(videoId)) {
         res.status(500).send(`Internal Server Error: parameter videoId must be a number - provided value: ${req.params.videoId}`)
+        return
     }
+
     let fpath = videoRepository.getThumbnailFilePath(videoId)
     if (fpath) res.sendFile(fpath, {});
     else {
@@ -70,21 +100,6 @@ router.post('/thumbnail/:videoId/generate/:timeMs', function (req, res) {
         console.log("Generated thumbnail for video " + req.params.videoId + " at " + req.params.timeMs + "ms")
         res.json(thumbResult)
     })
-})
-
-router.get('/audit/renamethumbnails', function (req, res) {
-    videoRepository.renameThumbnails()
-    res.sendStatus(200).end()
-})
-
-router.get('/audit/removeduplicates', (req, res) => {
-    videoRepository.removeDuplicates()
-    res.sendStatus(200).end()
-})
-
-router.get('/audit/removenoactorvideos', (req, res) => {
-    let removedVideos = videoRepository.removeNoActorVideos()
-    res.json(removedVideos)
 })
 
 router.delete('/:videoId', function (req, res) {

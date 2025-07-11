@@ -195,6 +195,10 @@ export function getSourceById(id: number): SourceRow | undefined {
   return _SOURCES.selectById.get(id) as SourceRow;
 }
 
+export function getSourceByName(name: string): SourceRow | undefined {
+  return _SOURCES.selectByName.get(name) as SourceRow;
+}
+
 export function updateSourceImageSmall(id: number, imageSmall: string): Database.RunResult {
   return _SOURCES.updateImageSmall.run(imageSmall, id);
 }
