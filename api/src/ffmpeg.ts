@@ -23,14 +23,12 @@ export interface GenerateThumbnailResult {
 export function generateImageFromVideo(videoPath: string, options: VideoScreenshotOptions, callback: () => void): void {
     if (!options.timestamp) {
         console.log(`generateImageFromVideo - no timestamp provided`)
-        return callback()
-        
+        return callback() 
     }
 
     if (!options.outputDir) {
         console.error(`generateImageFromVideo - no output directory provided`)
-        return callback()
-        
+        return callback()    
     }
 
     if (!options.outputFileName) {
@@ -46,7 +44,7 @@ export function generateImageFromVideo(videoPath: string, options: VideoScreensh
         '-frames:v', '1',          // Capture 1 frame
         '-q:v', '3',               // Quality level
         '-vf', 'scale=iw:ih',      // Scale to 100% (identity)
-        outputFullPath             // Output path
+        `${outputFullPath}.png`             // Output path
     ];
 
     const ffmpeg = spawn('ffmpeg', args);

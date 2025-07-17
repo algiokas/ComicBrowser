@@ -8,7 +8,7 @@ router.get('/', function (req, res, next) {
   res.send("API Root");
 });
 
-//router.use("/books", booksRouter)
+router.use("/books", booksRouter)
 router.use("/actors", actorsRouter)
 router.use("/videos", videosRouter)
 

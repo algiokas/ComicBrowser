@@ -1,4 +1,4 @@
-import { videos_db as db } from './database';
+import { books_db as db } from './database';
 
 export const _BOOKS = Object.freeze({
     insert: db.prepare('INSERT INTO books (title, folderName, artGroup, prefix, language, pageCount, coverIndex, addedDate, pages, hiddenPages, isFavorite, originalTitle) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)'),

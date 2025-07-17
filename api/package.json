@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "npx tsx ./bin/www"
   },
   "dependencies": {
     "better-sqlite3": "^10.0.0",
@@ -24,7 +24,7 @@
     "@types/express": "^5.0.3",
     "@types/fluent-ffmpeg": "^2.1.27",
     "@types/node": "^24.0.4",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   }
 }

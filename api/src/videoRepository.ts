@@ -135,6 +135,7 @@ function generateThumbnail(video: VideoRow | ClientVideo, options: VideoScreensh
     options.timestamp = options.timestamp ?? '00:30.000'
     const thumbFileName = options.outputFileName ?? getNewThumbnailFileName(video.id)
     options.outputFileName = thumbFileName
+    options.outputDir = options.outputDir ?? thumbnailDir
     try {
         generateImageFromVideo(videoPath, options, () => {
             videoDatabase.updateThumbnail(video.id, thumbFileName)
