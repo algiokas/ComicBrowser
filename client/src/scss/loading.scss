@@ -14,3 +14,18 @@
     animation-duration: 1.2s;
     animation-iteration-count: infinite;
 }
+
+.loading-modal {
+    &-inner {
+        display: flex;
+        flex-direction: column;
+
+        span {
+            margin: 0 auto;
+        }
+
+        .loader {
+            margin-bottom: 10px;
+        }
+    }
+}

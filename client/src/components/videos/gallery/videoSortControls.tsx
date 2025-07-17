@@ -8,7 +8,8 @@ interface VideoSortControlsProps {
     videoList: IVideo[],
     pageSize: number,
     sortVideos(order: VideosSortOrder): void,
-    setPage(pageNum: number): void
+    setPage(pageNum: number): void,
+    disabledSorts?: VideosSortOrder[]
 }
 
 const VideoSortControls = (props: VideoSortControlsProps) => {
@@ -71,11 +72,26 @@ const VideoSortControls = (props: VideoSortControlsProps) => {
         setSelectedIndex(indexKey)
     }
 
+    const getValidSortOrders = (): string[] => {
+        const allSorts = Object.keys(VideosSortOrder)
+        if (props.disabledSorts && props.disabledSorts.length > 0) {
+            const validSorts: string[] = []
+            for (const s of allSorts) {
+                const sortVal = VideosSortOrder[s as keyof typeof VideosSortOrder]
+                if (!props.disabledSorts.some(ds => ds == sortVal)) {
+                    validSorts.push(s)
+                }
+            }
+            return validSorts
+        }
+        return allSorts   
+    }
+
     return (
         <div className="sort-controls">
             <div className="sort-select">
                 {
-                    Object.keys(VideosSortOrder).map((key, index) => {
+                    getValidSortOrders().map((key, index) => {
                         return <div key={key} className={`sort-order ${props.sortOrder === Object.values(VideosSortOrder)[index] ? "selected" : ""}`}
                             onClick={() => { props.sortVideos(Object.values(VideosSortOrder)[index]) }}>{key}</div>
                     })

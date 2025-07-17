@@ -150,7 +150,7 @@ const VideosApp = (props: VideosAppProps) => {
 
   const setThumbnailToTime = async (videoId: number, timeMs: number) => {
     console.log('set thumbnail for video:' + videoId + ' to ' + timeMs + 'ms')
-    toggleLoadingModal("Generating thumbnail for video " + videoId)
+    setLoadingModal(true, "Generating thumbnail for video " + videoId)
     const res = await fetch(`${apiBaseUrl}/videos/thumbnail/${videoId}/generate/${timeMs}`, {
       method: 'post'
     })
@@ -170,7 +170,7 @@ const VideosApp = (props: VideosAppProps) => {
 
   const generateImageForActor = async (videoId: number, actorId: number, timeMs: number) => {
     console.log('Generating image for actor: ' + actorId + " from video " + videoId + " @" + timeMs + 'ms')
-    toggleLoadingModal("Generating image for actor " + actorId)
+    setLoadingModal(true, "Generating image for actor " + actorId)
     const res = await fetch(`${apiBaseUrl}/actors/${actorId}/imagefromvideo`, {
       method: 'post',
       headers: {
@@ -198,7 +198,7 @@ const VideosApp = (props: VideosAppProps) => {
   }
 
   const uploadSourceImage = async (sourceId: number, imageSize: 'small' | 'large', fileData: FileWithData) => {
-    toggleLoadingModal(`Uploading image for source: ${sourceId}`)
+    setLoadingModal(true, `Uploading image for source: ${sourceId}`)
     const res = await fetch(`${apiBaseUrl}/videos/upload/sourceimage/${sourceId}/${imageSize}`, {
       method: 'post',
       headers: {
@@ -248,9 +248,9 @@ const VideosApp = (props: VideosAppProps) => {
 
   const viewSources = () => { setViewMode(VideosViewMode.Sources) }
 
-  const toggleLoadingModal = (text?: string) => {
+  const setLoadingModal = (show: boolean, text?: string) => {
     setLoadingModalText(text ?? "")
-    setShowLoadingModal(!showLoadingModal)
+    setShowLoadingModal(show)
   }
   //#endregion
 
@@ -312,6 +312,7 @@ const VideosApp = (props: VideosAppProps) => {
     viewSearchResults: viewSearchResults,
     setVideoListingPage: (n: number) => { setVideoListingPage(n) },
     setActorListingPage: (n: number) => { setActorListingPage(n) },
+    setLoadingModal: setLoadingModal,
 
     updateVideo: updateVideo,
     deleteVideo: deleteVideo,
@@ -341,8 +342,11 @@ const VideosApp = (props: VideosAppProps) => {
         <Modal
           modalId="loading-modal"
           displayModal={showLoadingModal}
-          toggleModal={toggleLoadingModal}>
-          <span className="loading-modal-text">{loadingModalText}</span>
+          toggleModal={() => setLoadingModal(!showLoadingModal)}>
+            <div className="loading-modal-inner">
+              <span className="loader"></span>
+              <span className="loading-modal-text">{loadingModalText}</span>
+            </div>
         </Modal>
         <Navigation {...navProps}>
         </Navigation>

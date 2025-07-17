@@ -10,10 +10,11 @@ interface VideoGalleryItemProps {
   bodyClickHandler?: (data: IVideo, index: number) => void,
   favoriteClickHandler?: (data: IVideo) => void,
   subTitleItemClickHandler?: (actor: IActor) => void,
+  onImageLoad?: (idx: number) => void
 }
 
 const VideoGalleryItem = (props: VideoGalleryItemProps) => {
-  const [ thumbnailImageUrl, setThumbnailImageUrl ] = useState<string>('')
+  const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string>('')
 
   useEffect(() => {
     const updateThumbnail = async () => {
@@ -21,7 +22,7 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
       setThumbnailImageUrl(thumbnailUrl)
     }
     updateThumbnail()
-  }, [ props.video ])
+  }, [props.video])
 
   const bodyClick = (e: React.MouseEvent) => {
     if (props.bodyClickHandler)
@@ -46,8 +47,14 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
       <div className="videogallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
         <div className="videogallery-image">
           {
-            thumbnailImageUrl ? <img src={thumbnailImageUrl} alt={`${props.video.title} thumbnail`}></img> : null
-          }         
+            thumbnailImageUrl ?
+              <img
+                src={thumbnailImageUrl}
+                alt={`${props.video.title} thumbnail`}
+                onLoad={() => { if (props.onImageLoad) props.onImageLoad(props.index)}}>
+              </img>
+              : null
+          }
         </div>
         <div className={props.video.isFavorite ? "caption favorite" : "caption"}>
           <div className="caption-text">

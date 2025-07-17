@@ -35,7 +35,6 @@ const MultiView = (props: MultiViewProps) => {
         case VideosViewMode.SearchResults:
             return (
                 <VideoGallery
-                    sortOrder={VideosSortOrder.Favorite}
                     query={props.currentSearchQuery}
                     pageSize={props.galleryPageSize} />
             )

@@ -29,6 +29,7 @@ export type VideosAppHandlers = {
     viewSearchResults: (query?: IVideoSearchQuery) => void,
     setVideoListingPage: (n: number) => void,
     setActorListingPage: (n: number) => void,
+    setLoadingModal: (show: boolean, text?: string) => void
 
     updateVideo: (video: IVideo) => Promise<void>,
     deleteVideo: (videoId: number) => Promise<void>,
@@ -59,6 +60,7 @@ export const VideosAppContext = createContext<VideosAppState & VideosAppHandlers
     viewSearchResults: () => { },
     setVideoListingPage: () => { },
     setActorListingPage: () => { },
+    setLoadingModal: () => { },
 
     //async
     updateVideo: async () => { },

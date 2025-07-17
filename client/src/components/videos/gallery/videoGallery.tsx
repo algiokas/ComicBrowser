@@ -11,6 +11,7 @@ import type IVideoSource from "../../../interfaces/videoSource"
 import SourceDetail from "./sourceDetail"
 import { VideosAppContext } from "../videosAppContext"
 import { scalarArrayCompare } from "../../../util/helpers"
+import { BitArray } from "../../../util/bitArray"
 
 interface VideoGalleryProps {
     pageSize: number,
@@ -30,12 +31,28 @@ const VideoGallery = (props: VideoGalleryProps) => {
     const [sortOrder, setSortOrder] = useState<VideosSortOrder>(initialSortOrder)
     const [actorListingActor, setActorListingActor] = useState<IActor | null>(null)
     const [sourceListingSource, setSourceListingSource] = useState<IVideoSource | null>(null)
+    const [imageLoadState, setImageLoadState] = useState<BitArray>(new BitArray(props.pageSize))
+    const [disabledSortOrders, setDisabledSortOrder] = useState<VideosSortOrder[]>([])
 
     const previousVideos = useRef([] as IVideo[])
     const previousQuery = useRef({} as IVideoSearchQuery | undefined)
+
+
     useEffect(() => {
         updateItems(appContext.allVideos, props.query)
+        console.log(`VideoGallery update triggered`)
     }, [appContext.allVideos, props.query])
+
+    useEffect(() => {
+        appContext.setLoadingModal(true, "Loading Images")
+    }, [items, galleryPage, appContext.videoListingPage])
+
+    useEffect(() => {
+        console.log(`update image load state: [${imageLoadState.getBits().map(b => b ? 1 : 0).join(',')}]`)
+        if (imageLoadState.allTrue()) {
+            appContext.setLoadingModal(false)
+        }
+    }, [imageLoadState])
 
     const updateItems = (videos: IVideo[], query?: IVideoSearchQuery) => {
         if (query) {
@@ -49,6 +66,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
                 setGalleryPage(0)
                 updateActorListingActor()
                 updateSourceListingSource()
+                setImageLoadState(new BitArray(Math.min(props.pageSize, filteredVideos.length)))
             }
         } else {
             const newIds = videos.map(v => v.id)
@@ -148,7 +166,8 @@ const VideoGallery = (props: VideoGalleryProps) => {
 
     const sortVideos = (order: VideosSortOrder) => {
         if (sortOrder !== order || order === VideosSortOrder.Random || order === VideosSortOrder.Favorite) {
-            setItems(getSortedVideos(appContext.allVideos, order))
+            const videos = props.query ? getFilteredVideos(appContext.allVideos, props.query) : appContext.allVideos
+            setItems(getSortedVideos(videos, order))
             setSortOrder(order)
             setGalleryPage(0)
         }
@@ -176,7 +195,9 @@ const VideoGallery = (props: VideoGalleryProps) => {
     const getCurrentGalleryPageItems = (videos: IVideo[]): IVideo[] => {
         let pageStart = getGalleryPage() * props.pageSize;
         let pageEnd = (getGalleryPage() + 1) * props.pageSize;
-        return videos.slice(pageStart, pageEnd)
+
+        const galleryItems = videos.slice(pageStart, pageEnd)
+        return galleryItems
     }
 
     const bodyClick = (Video: IVideo) => {
@@ -194,6 +215,10 @@ const VideoGallery = (props: VideoGalleryProps) => {
         appContext.updateVideo(video)
     }
 
+    const onImageLoad = (idx: number) => {
+        setImageLoadState(prev => prev.toggle(idx))
+    }
+
     const updateActorListingActor = () => {
         const isActorListing = props.query &&
             props.query.filled &&
@@ -202,10 +227,12 @@ const VideoGallery = (props: VideoGalleryProps) => {
             !props.query.tag
         if (!isActorListing) {
             setActorListingActor(null)
+            setDisabledSortOrder(prev => prev.filter(s => s !== "AlphaActor"))
             return
         }
         const matchingActor = appContext.allActors.find(a => a.name == props.query!.actor) ?? null
         setActorListingActor(matchingActor)
+        setDisabledSortOrder(prev => [...prev, "AlphaActor"])
     }
 
     const updateSourceListingSource = () => {
@@ -216,10 +243,12 @@ const VideoGallery = (props: VideoGalleryProps) => {
             !props.query.tag
         if (!isSourceListing) {
             setSourceListingSource(null)
+            setDisabledSortOrder(prev => prev.filter(s => s !== "AlphaSource"))
             return
         }
         const matchingSource = appContext.allSources.find(s => s.name === props.query!.source) ?? null
         setSourceListingSource(matchingSource)
+        setDisabledSortOrder(prev => [...prev, "AlphaSource"])
     }
 
     return (
@@ -247,10 +276,11 @@ const VideoGallery = (props: VideoGalleryProps) => {
                             videoList={items}
                             pageSize={props.pageSize}
                             sortVideos={sortVideos}
-                            setPage={setPage} />
+                            setPage={setPage}
+                            disabledSorts={disabledSortOrders} />
                 }
             </div>
-            <div className="videogallery-container-inner">
+            <div className="videogallery-container-inner" style={{ 'visibility': (appContext.showLoadingModal ? 'hidden' : 'visible') }}>
                 {
                     getCurrentGalleryPageItems(items).map((video, i) => {
                         return <VideoGalleryItem
@@ -260,6 +290,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
                             bodyClickHandler={bodyClick}
                             subTitleItemClickHandler={subtitleClick}
                             favoriteClickHandler={favoriteClick}
+                            onImageLoad={onImageLoad}
                         ></VideoGalleryItem>
                     })
                 }
