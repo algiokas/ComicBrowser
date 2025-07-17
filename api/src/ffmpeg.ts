@@ -1,12 +1,6 @@
 import { spawn } from 'child_process';
 import path from 'path';
 import { ActorRow, ClientActor, ClientVideo, VideoRow } from './types/video';
-import { timeStamp } from 'console';
-
-const dataDir = process.env.VIDEOS_DATA_DIR!
-const actorImageDir = path.join(dataDir, '/images/actors')
-const sourceImageDir = path.join(dataDir, '/images/sources')
-const thumbnailDir = path.join(dataDir, '/images/thumbnails')
 
 export interface VideoScreenshotOptions {
     timestamp?: string;
@@ -38,16 +32,17 @@ export function generateImageFromVideo(videoPath: string, options: VideoScreensh
 
     const outputFullPath = path.join(options.outputDir, options.outputFileName);
 
-    const args = [
-        '-ss', options.timestamp,          // Seek to timestamp
-        '-i', videoPath,           // Input file
-        '-frames:v', '1',          // Capture 1 frame
-        '-q:v', '3',               // Quality level
-        '-vf', 'scale=iw:ih',      // Scale to 100% (identity)
-        `${outputFullPath}.png`             // Output path
-    ];
+    const newArgs = [
+        '-ss', options.timestamp,
+        '-i', videoPath,
+        '-y',
+        '-filter_complex', 'scale=w=trunc(iw*1/2)*2:h=trunc(ih*1/2)*2[size0];[size0]split=1[screen0]',
+        '-vframes', '1',
+        '-map', '[screen0]',
+        `${outputFullPath}.png`
+    ]
 
-    const ffmpeg = spawn('ffmpeg', args);
+    const ffmpeg = spawn('ffmpeg', newArgs);
 
     ffmpeg.stderr.on('data', (data) => {
         // ffmpeg writes progress/errors to stderr
