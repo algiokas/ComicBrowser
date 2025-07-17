@@ -6,7 +6,8 @@
         "type": "node",
         "request": "launch",
         "skipFiles": ["<node_internals>/**"],
-        "program": "${workspaceFolder}\\api\\bin\\www",
+        "runtimeExecutable": "npm",
+        "runtimeArgs": ["run", "start"],
         "cwd": "${workspaceFolder}\\api"
       },
       {

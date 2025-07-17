@@ -8,5 +8,6 @@ db.sqlite
 api/data/backup
 api/data/*.sqlite
 api/data/**/*.sqlite
+api/dist
 stylesheet.css
 stylesheet.css.map
