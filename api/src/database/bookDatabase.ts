@@ -1,48 +1,17 @@
-import { books_db as db } from './database'
+import { RunResult } from 'better-sqlite3'
+import { Artist, BookArtist, BookRow, BookTag, ClientBook, ClientCollection, CollectionBook, CollectionRow, FolderJSON, Tag } from '../types/book'
+import { RunResultExisting } from '../types/shared'
+import { _BOOKS, _ARTISTS, _BOOKARTISTS, _TAGS, _BOOKTAGS, _COLLECTIONS, _COLLECTIONBOOKS } from './bookQueries'
 
-const insertBook = db.prepare('INSERT INTO books (title, folderName, artGroup, prefix, language, pageCount, coverIndex, addedDate, pages, hiddenPages, isFavorite, originalTitle) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)');
-const insertArtist = db.prepare('INSERT INTO artists (name) VALUES (?)')
-const insertBookArtist = db.prepare('INSERT INTO bookArtists (bookId, artistId) VALUES (?, ?)')
-const insertTag = db.prepare('INSERT INTO tags (name) VALUES (?)')
-const insertBookTag = db.prepare('INSERT INTO bookTags (bookId, tagId) VALUES (?, ?)')
-const insertCollection = db.prepare('INSERT INTO collections (name, coverImage, coverBook, coverPage) VALUES (?, ?, ?, ?)')
-const insertCollectionBook = db.prepare('INSERT INTO collectionBooks (collectionId, bookId, sortOrder) VALUES (?, ?, ?)')
-const selectBooks = db.prepare('SELECT * FROM books')
-const selectCollections = db.prepare('SELECT * FROM collections')
-const selectCollectionById = db.prepare('SELECT * FROM collections WHERE id = ?')
-const selectCollectionByRow = db.prepare('SELECT * FROM collections WHERE rowid = ?')
-const selectCollectionBooks = db.prepare('SELECT bookId FROM collectionBooks WHERE collectionID = ? ORDER BY sortOrder')
-const getBookByID = db.prepare('SELECT * FROM books WHERE id = ?')
-const getBookByTitle = db.prepare('SELECT * FROM books WHERE title = ?')
-const getArtistById = db.prepare('SELECT name FROM artists WHERE id = ?')
-const getArtistByName = db.prepare('SELECT * FROM artists WHERE name = ?')
-const getArtistsByBookId = db.prepare('SELECT artists.name FROM bookArtists JOIN artists ON bookArtists.artistId = artists.id WHERE bookArtists.bookId = ?');
-const getTagById = db.prepare('SELECT name FROM tags WHERE id = ?')
-const getTagByName = db.prepare('SELECT * FROM tags WHERE name = ?')
-const getTagsByBookId = db.prepare('SELECT tags.name FROM bookTags JOIN tags ON bookTags.tagId = tags.id WHERE bookTags.bookId = ?');
-const selectBookArtistIds = db.prepare('SELECT * FROM bookArtists WHERE bookId = ?')
-const selectBookArtistsByArtist = db.prepare('SELECT * FROM bookArtists WHERE artistId = ?')
-const selectBookTagIds = db.prepare('SELECT * FROM bookTags WHERE bookId = ?')
-const selectBookTagsByTag = db.prepare('SELECT * FROM bookTags WHERE tagId = ?')
-const deleteBook = db.prepare('DELETE FROM books WHERE id = ?')
-const deleteTag = db.prepare('DELETE FROM tags WHERE id = ?')
-const deleteBookTag = db.prepare('DELETE FROM bookTags WHERE bookId = ? AND tagId = ?')
-const deleteArtist = db.prepare('DELETE FROM artists WHERE id = ?')
-const deleteBookArtist = db.prepare('DELETE FROM bookArtists WHERE bookId = ? AND artistId = ?')
-const updateHiddenPages = db.prepare('UPDATE books SET hiddenPages = ? WHERE id = ?')
-const updateFavoriteValue = db.prepare('UPDATE books SET isFavorite = ? WHERE id = ?')
-const updateTitle = db.prepare('UPDATE books SET title = ? WHERE id = ?')
-const updateArtGroup = db.prepare('UPDATE books SET artGroup = ? WHERE id = ?')
-
-function insertBookFromJson(bookJson) {
+function insertBookFromJson(bookJson: FolderJSON): RunResult | null {
     try {
-        return insertBook.run(
-            bookJson.title, 
-            bookJson.folderName, 
-            bookJson.artGroup, 
-            bookJson.prefix, 
-            bookJson.language, 
-            bookJson.pageCount, 
+        return _BOOKS.insert.run(
+            bookJson.title,
+            bookJson.folderName,
+            bookJson.artGroup,
+            bookJson.prefix,
+            bookJson.language,
+            bookJson.pageCount,
             bookJson.coverIndex,
             bookJson.addedDate.toString(),
             JSON.stringify(bookJson.pages),
@@ -52,77 +21,78 @@ function insertBookFromJson(bookJson) {
         console.error("Failed to insert book " + bookJson.title)
         console.log(err)
     }
-
+    return null
 }
 
-function insertArtistIfMissing(artistName) {
+function insertArtistIfMissing(artistName: string): RunResultExisting | null {
     if (!artistName) {
         console.log('cannot input blank artist name')
         return null
     }
-    let existing = getArtistByName.get(artistName)
+    let existing = _ARTISTS.selectByName.get(artistName) as Artist
     if (existing) {
         console.log('Artist: "' + artistName + '" found. Skipping...')
         return { existingRowId: existing.id }
     }
 
-    return insertArtist.run(artistName)
+    return _ARTISTS.insert.run(artistName)
 }
 
-function insertArtistsForBook(bookId, artists) {
+function insertArtistsForBook(bookId: number, artists: string[]): number[] {
     if (!artists) {
         console.log('Book ID ' + bookId + 'artist list empty')
         return []
     }
 
-    let artistIds = []
+    let artistIds: number[] = []
     artists.forEach((artist) => {
         let insertResult = insertArtistIfMissing(artist)
         if (insertResult) {
-            let artistId = insertResult.lastInsertRowid 
-                        ?? insertResult.existingRowId
-            insertBookArtist.run(bookId, artistId)
-            artistIds.push(artistId)
-        }
-    })
-    return artistIds
-}
-
-function removeArtistsFromBook(bookId, artists) {
-    if (!artists) {
-        console.log('Book ID ' + bookId + 'artist list empty')
-        return []
-    }
-
-    let artistIds = []
-    artists.forEach((artist) => {
-        let artistRow = getArtistByName.get(artist)
-        if (artistRow) {
-            artistIds.push(artistRow.id)
-            deleteBookArtist.run(bookId, artistRow.id)
-            let otherBookArtists = selectBookArtistsByArtist.all(artistRow.id)
-            if (otherBookArtists.length < 1) {
-                deleteArtist.run(artistRow.id)
+            let artistId = Number(insertResult.lastInsertRowid ?? insertResult.existingRowId)
+            if (!isNaN(artistId)) {
+                _BOOKARTISTS.insert.run(bookId, artistId)
+                artistIds.push(artistId)
             }
         }
     })
     return artistIds
 }
 
-function removeAllArtistsForBook(bookId) {
-    if (!bookId) console.err('invalid book ID')
-    let artistRows = selectBookArtistIds.all(bookId)
-    let removedArtists = []
+function removeArtistsFromBook(bookId: number, artists: string[]): number[] {
+    if (!artists) {
+        console.log('Book ID ' + bookId + 'artist list empty')
+        return []
+    }
+
+    let artistIds: number[] = []
+    artists.forEach((artist) => {
+        let artistRow = _ARTISTS.selectByName.get(artist) as Artist
+        if (artistRow) {
+            artistIds.push(artistRow.id)
+            _BOOKARTISTS.delete.run(bookId, artistRow.id)
+            let otherBookArtists = _BOOKARTISTS.selectByArtistId.all(artistRow.id)
+            if (otherBookArtists.length < 1) {
+                _ARTISTS.delete.run(artistRow.id)
+            }
+        }
+    })
+    return artistIds
+}
+
+function removeAllArtistsForBook(bookId: number): number[] {
+    if (!bookId) console.error('invalid book ID')
+    let artistRows = _BOOKARTISTS.selectByBookId.all(bookId) as BookArtist[]
+    let removedArtists: number[] = []
     if (artistRows && artistRows.length > 0) {
-        artistRows.forEach((idRow) => {
+        artistRows.forEach(idRow => {
             console.log("removing artist ID: " + idRow.artistId + " from book ID: " + bookId)
-            let deleteResult = deleteBookArtist.run(bookId, idRow.artistId)
+            let deleteResult = _BOOKARTISTS.delete.run(bookId, idRow.artistId)
             console.log(deleteResult)
-            let otherBooksWithArtist = selectBookArtistsByArtist.all(idRow.artistId)
+            let otherBooksWithArtist = _BOOKARTISTS.selectByArtistId.all(idRow.artistId)
             console.log('other books with artist ID: ' + idRow.artistId)
             console.log(otherBooksWithArtist)
             if (otherBooksWithArtist.length < 1) {
-                let artistDeleteResult = deleteArtist.run(idRow.artistId)
+                let artistDeleteResult = _ARTISTS.delete.run(idRow.artistId)
                 if (artistDeleteResult.changes > 0) {
                     removedArtists.push(idRow.artistId)
                 }
@@ -132,71 +102,72 @@ function removeAllArtistsForBook(bookId) {
     return removedArtists
 }
 
-function insertTagIfMissing(tagName) {
+function insertTagIfMissing(tagName: string): RunResultExisting | null {
     if (!tagName) {
         console.log('cannot input blank tag name')
         return null
     }
-    let existing = getTagByName.get(tagName)
+    let existing = _TAGS.selectByName.get(tagName) as Tag
     if (existing) {
         console.log('Tag: "' + tagName + '" found. Skipping...')
         return { existingRowId: existing.id }
     }
 
-    return insertTag.run(tagName)
+    return _TAGS.insert.run(tagName)
 }
 
-function insertTagsForBook(bookId, tags) {
+function insertTagsForBook(bookId: number, tags: string[]): number[] {
     if (!tags) {
         console.log('Book ID ' + bookId + 'tag list empty')
         return []
     }
 
-    let tagIds = []
+    let tagIds: number[] = []
     tags.forEach((tag) => {
         let insertResult = insertTagIfMissing(tag)
         if (insertResult) {
-            let tagId = insertResult.lastInsertRowid 
-                     ?? insertResult.existingRowId;
-            insertBookTag.run(bookId, tagId)
-            tagIds.push(tagId)
+            let tagId = Number(insertResult.lastInsertRowid ?? insertResult.existingRowId)
+            if (!isNaN(tagId)) {
+                _BOOKTAGS.insert.run(bookId, tagId)
+                tagIds.push(tagId)
+            }
         }
 
     })
     return tagIds
 }
 
-function removeTagsFromBook(bookId, tags) {
+function removeTagsFromBook(bookId: number, tags: string[]): number[] {
     if (!tags) {
         console.log('Book ID ' + bookId + 'tag list empty')
         return []
     }
 
-    let tagIds = []
+    let tagIds: number[] = []
     tags.forEach((tag) => {
-        let tagRow = getTagByName.get(tag)
+        let tagRow = _TAGS.selectByName.get(tag) as Tag
         if (tagRow) {
             tagIds.push(tagRow.id)
-            deleteBookTag.run(bookId, tagRow.id)
-            let otherBookTags = selectBookTagsByTag.all(tagRow.id)
+            _BOOKTAGS.delete.run(bookId, tagRow.id)
+            let otherBookTags = _BOOKTAGS.selectByTagId.all(tagRow.id)
             if (otherBookTags.length < 1) {
-                deleteTag.run(tagRow.id)
+                _TAGS.delete.run(tagRow.id)
             }
         }
     })
     return tagIds
 }
 
-function removeAllTagsForBook(bookId) {
-    if (!bookId) console.err('invalid book ID')
-    let tagRows = selectBookTagIds.all(bookId)
-    let removedTags = []
+function removeAllTagsForBook(bookId: number): number[] {
+    if (!bookId) console.error('invalid book ID')
+    let tagRows = _BOOKTAGS.selectByBookId.all(bookId) as BookTag[]
+    let removedTags: number[] = []
     if (tagRows && tagRows.length > 0) {
         tagRows.forEach((idRow) => {
-            let deleteResult = deleteBookTag.run(bookId, idRow.tagId)
-            let otherBooksWithTag = selectBookTagsByTag.all(idRow.tagId)
+            _BOOKTAGS.delete.run(bookId, idRow.tagId)
+            let otherBooksWithTag = _BOOKTAGS.selectByTagId.all(idRow.tagId)
             if (otherBooksWithTag.length < 1) {
-                let tagDeleteResult = deleteTag.run(idRow.tagId)
+                _TAGS.delete.run(idRow.tagId)
                 removedTags.push(idRow.tagId)
             }
         })
@@ -205,30 +176,29 @@ function removeAllTagsForBook(bookId) {
 }
 
 //Adds book, artists and (soon) tags to all relevant DBs
-function addBookToDb(bookJson) {
+function addBookToDb(bookJson: FolderJSON): RunResult | null {
     let insertResult = insertBookFromJson(bookJson)
-    let artistIds = insertArtistsForBook(insertResult.lastInsertRowid, bookJson.artists)
-    let tagIds = insertTagsForBook(insertResult.lastInsertRowid, bookJson.tags)
-    insertResult.artistIds = artistIds
-    insertResult.tagIds = tagIds
+    if (insertResult) {
+        const bookId = Number(insertResult.lastInsertRowid)
+        insertArtistsForBook(bookId, bookJson.artists)
+        insertTagsForBook(bookId, bookJson.tags)
+    }
     return insertResult
 }
 
-function removeBookFromDb(bookId, bookData) {
+function removeBookFromDb(bookId: number) {
     let artistIds = removeAllArtistsForBook(bookId)
     let tagIds = removeAllTagsForBook(bookId)
-    let insertResult = deleteBook.run(bookId)
-    insertResult.artistIds = artistIds
-    insertResult.tagIds = tagIds
-    return insertResult
+    let deleteResult = _BOOKS.delete.run(bookId)
+    return deleteResult
 }
 
-export function addBook(bookJson, replace = false) {
+export function addBook(bookJson: FolderJSON, replace = false): RunResultExisting | null {
     if (!replace) {
-        let existing = getBookByTitle.get(bookJson.title)
+        let existing = _BOOKS.selectByTitle.get(bookJson.title) as BookRow
         if (existing && existing.folderName === bookJson.folderName) {
             console.log('Book: "' + bookJson.title + '" found. Skipping...')
-            return { existingRow: existing}
+            return { existingRowId: existing.id }
         } else {
             console.log('Added book: "' + bookJson.title + '"')
             return addBookToDb(bookJson)
@@ -240,88 +210,92 @@ export function addBook(bookJson, replace = false) {
     }
 }
 
-const _deleteBook = function (bookId) {
-    let bookData = getBookByID.get(bookId);
+export function deleteBook(bookId: number) {
+    let bookData = _BOOKS.selectById.get(bookId) as BookRow;
     if (!bookData) return { success: false, error: 'book not found' };
-    return removeBookFromDb(bookId, bookData);
+    return removeBookFromDb(bookId);
 };
-export { _deleteBook as deleteBook };
 
-export function getBookArtists(bookId) {
-    return getArtistsByBookId.all(bookId).map(a => a.name)
+export function getBookArtists(bookId: number): string[] {
+    const artists = _ARTISTS.selectArtistsByBookId.all(bookId) as { name: string }[]
+    return artists.map(a => a.name)
 }
 
-export function getBookTags(bookId) {
-    return getTagsByBookId.all(bookId).map(t => t.name)
+export function getBookTags(bookId: number): string[] {
+    const tags = _TAGS.selectTagsByBookId.all(bookId) as Tag[]
+    return tags.map(t => t.name)
 }
 
-export function getBooks() {
-    return selectBooks.all()
+export function getBooks(): BookRow[] {
+    return _BOOKS.selectAll.all() as BookRow[]
 }
 
-const _getBookByID = function (id) {
-    return getBookByID.get(id);
+export function getBookByID(id: number): BookRow {
+    return _BOOKS.selectById.get(id) as BookRow;
 };
-export { _getBookByID as getBookByID };
 
-export function addTags(bookId, tags) {
+export function addTags(bookId: number, tags: string[]): number[] {
     return insertTagsForBook(bookId, tags)
 }
 
-export function removeTags(bookId, tags) {
+export function removeTags(bookId: number, tags: string[]): number[] {
     return removeTagsFromBook(bookId, tags)
 }
 
-export function addArtists(bookId, artists) {
+export function addArtists(bookId: number, artists: string[]): number[] {
     return insertArtistsForBook(bookId, artists)
 }
 
-export function removeArtists(bookId, artists) {
+export function removeArtists(bookId: number, artists: string[]): number[] {
     return removeArtistsFromBook(bookId, artists)
 }
 
-export function setHiddenPages(bookId, hiddenPages) {
-    return updateHiddenPages.run(JSON.stringify(hiddenPages), bookId)
+export function setHiddenPages(bookId: number, hiddenPages: number[]): RunResult {
+    return _BOOKS.updateHiddenPages.run(JSON.stringify(hiddenPages), bookId)
 }
 
-export function setTitle(bookId, title) {
-    return updateTitle.run(title, bookId)
+export function setTitle(bookId: number, title: string): RunResult {
+    return _BOOKS.updateTitle.run(title, bookId)
 }
 
-export function setArtGroup(bookId, groupName) {
-    return updateArtGroup.run(groupName, bookId)
+export function setArtGroup(bookId: number, groupName: string): RunResult {
+    return _BOOKS.updateArtGroup.run(groupName, bookId)
 }
 
-export function setFavoriteValue(bookId, value) {
-    if (typeof value !== "boolean") {
-        throw new Error("TypeError - Favorite value must be boolean")    
-    }
-    return updateFavoriteValue.run(value ? 1 : 0, bookId)
+export function setFavoriteValue(bookId: number, value: boolean): RunResult {
+    return _BOOKS.updateFavoriteValue.run(value ? 1 : 0, bookId)
 }
 
-export function getAllCollections() {
-    const collectionRows = selectCollections.all()
+export function getAllCollections(): ClientCollection[] {
+    const collectionRows = _COLLECTIONS.selectAll.all() as CollectionRow[]
     return collectionRows.map(row => fillCollection(row))
 }
 
-export function getCollectionById(id) {
-    const collectionRow = selectCollectionById.get(id)
+export function getCollectionById(id: number): ClientCollection {
+    const collectionRow = _COLLECTIONS.selectById.get(id) as CollectionRow
     return fillCollection(collectionRow)
 }
 
-const fillCollection = function(collectionRow) {
+const fillCollection = function (collectionRow: CollectionRow): ClientCollection {
     const collectionId = collectionRow.id
-    const books = selectCollectionBooks.all(collectionId)
-    collectionRow.books = books
-    return collectionRow
+    const books = _COLLECTIONBOOKS.selectByCollectionId.all(collectionId) as CollectionBook[]
+    const filledCollection: ClientCollection = {
+        id: collectionRow.id,
+        name: collectionRow.name,
+        coverImage: collectionRow.coverImage ?? '',
+        coverBook: collectionRow.coverBook ?? 0,
+        coverPage: collectionRow.coverPage ?? 0,
+        books: books
+    }
+    return filledCollection
 }
 
-export function createCollection(cName, books, coverBookId) {
-    const collectionInsertResult = insertCollection.run(cName, '', coverBookId, 0)
-    const collectionRowId = collectionInsertResult.lastInsertRowid ?? collectionInsertResult.existingRowId
-    const collectionRow = selectCollectionByRow.get(collectionRowId)
+export function createCollection(cName: string, books: ClientBook[], coverBookId: number): ClientCollection {
+    const collectionInsertResult = _COLLECTIONS.insert.run(cName, '', coverBookId, 0)
+    const collectionRowId = Number(collectionInsertResult.lastInsertRowid)
+    const collectionRow = _COLLECTIONS.selectByRowId.get(collectionRowId) as CollectionRow
     for (let i = 0; i < books.length; i++) {
-        insertCollectionBook.run(collectionRow.id, books[i].id, i)
+        _COLLECTIONBOOKS.insert.run(collectionRow.id, books[i].id, i)
     }
     return fillCollection(collectionRow)
 }

@@ -3,7 +3,7 @@ import { ActorRow, SourceRow, VideoRow, VideoActor, VideoFileData } from '../typ
 import { _VIDEOS, _ACTORS, _VIDEOACTORS, _SOURCES } from './videoQueries';
 import { RunResultExisting } from '../types/shared';
 
-function insertVideoFromJson(videoJson: Partial<VideoRow>): Database.RunResult | undefined {
+function insertVideoFromJson(videoJson: Omit<VideoRow, 'id'>): Database.RunResult | undefined {
   try {
     return _VIDEOS.insert.run(
       videoJson.title,
@@ -97,17 +97,17 @@ export function insertSourceIfMissing(sourceName: string): RunResultExisting | n
 }
 
 function addVideoToDb(videoJson: VideoFileData): RunResultExisting | null {
-  const videoRow: Partial<VideoRow> = {
+  const sourceId = insertSourceIfMissing(videoJson.source ?? '');
+  const videoRow: Omit<VideoRow, 'id'> = {
     title: videoJson.title,
     filePath: videoJson.filePath,
-    fileExt: videoJson.fileExt,
+    fileExt: videoJson.fileExt ?? null,
     addedDate: (new Date(videoJson.addedDate)).toISOString(),
     isFavorite: 0,
-    thumbnailId: ''
+    thumbnailId: '',
+    sourceId: Number(sourceId?.existingRowId ?? sourceId?.lastInsertRowid),
+    originalTitle: videoJson.title
   }
-
-  const sourceId = insertSourceIfMissing(videoJson.source ?? '');
-  videoRow.sourceId = Number(sourceId?.existingRowId ?? sourceId?.lastInsertRowid);
   const insertResult = insertVideoFromJson(videoRow);
   if (!insertResult) return null;
   insertActorsForVideo(Number(insertResult.lastInsertRowid), videoJson.actors ?? []);

@@ -106,10 +106,6 @@ export interface ImportVideosResult extends BaseResponse {
   importCount: number
 }
 
-export interface AddVideoResult {
-  
-}
-
 export interface UpdateSourceResult extends BaseResponse {
   changes: string[],
   source?: ClientSource;

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createCollection, deleteBook, getBookPage, getBooks, getCollections, importBooks, updateBook } from '../src/bookRepository.js';
+import { getBooks, importBooks, getBookPage, updateBook, deleteBook, getCollections, createCollection } from '../bookRepository';
 var router = Router();
 
 router.get('/', function (req, res, next) {
@@ -14,9 +14,20 @@ router.get('/import', function (req, res, next) {
     })
 });
 
-
 router.get('/:bookId/page/:pageNum', function (req, res, next) {
-    let fpath = getBookPage(req.params.bookId, req.params.pageNum);
+    const bookId = Number(req.params.bookId)
+    if (isNaN(bookId)) {
+        res.status(500).send(`Internal Server Error: parameter bookId must be a number - provided value: ${bookId}`)
+        return
+    }
+
+    const pageNum = Number(req.params.pageNum)
+    if (isNaN(pageNum)) {
+        res.status(500).send(`Internal Server Error: parameter pageNum must be a number - provided value: ${pageNum}`)
+        return
+    }
+
+    let fpath = getBookPage(bookId, pageNum);
     if (fpath) res.sendFile(fpath, { root: process.env.BOOKS_IMAGE_DIR });
     else {
         res.sendStatus(404).end();
@@ -25,17 +36,31 @@ router.get('/:bookId/page/:pageNum', function (req, res, next) {
 
 
 router.post('/:bookId/update', function (req, res, next) {
+    const bookId = Number(req.params.bookId)
+    if (isNaN(bookId)) {
+        res.status(500).send(`Internal Server Error: parameter bookId must be a number - provided value: ${bookId}`)
+        return
+    }
+
     if (!req.body) {
         console.log("invalid book data")
     } 
-    if (req.body.id.toString() === req.params.bookId) {
-        res.json(updateBook(req.params.bookId, req.body))
+    if (req.body.id.toString() === bookId) {
+        res.json(updateBook(bookId, req.body))
+    } else {
+        res.status(500).send(`Internal Server Error: mismatch between bookId param and request body book ID - ${bookId} vs ${req.body.id}`)
     }
 })
 
 router.delete('/:bookId', function (req, res) {
-    console.log('delete book id: ' + req.params.bookId)
-    res.json(deleteBook(req.params.bookId))
+    const bookId = Number(req.params.bookId)
+    if (isNaN(bookId)) {
+        res.status(500).send(`Internal Server Error: parameter bookId must be a number - provided value: ${bookId}`)
+        return
+    }
+
+    console.log('delete book id: ' + bookId)
+    res.json(deleteBook(bookId))
 })
 
 router.get('/collections/all', function (req, res) {
@@ -49,12 +74,13 @@ router.post('/collections/create', function (req, res) {
 })
 
 router.post('/collections/update/:collectionId', function (req, res) {
-    console.log('update collection: ' + req.params.collectionId)
-
+    //TODO
+    console.log('NOT IMPLEMENTED - update collection: ' + req.params.collectionId)
 })
 
 router.delete('/collections/delete/:collectionId', function (req, res) {
-    console.log('delete collection: ' + req.params.collectionId)
+    //TODO
+    console.log('NOT IMPLEMENTED - delete collection: ' + req.params.collectionId)
 })
 
 export default router
