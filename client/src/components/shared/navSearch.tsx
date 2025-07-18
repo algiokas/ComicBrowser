@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import searchIcon from "../../img/svg/search.svg";
-import type { IBookSearchQuery } from "../../interfaces/searchQuery";
+import type { ISearchQuery } from "../../interfaces/searchQuery";
 
 interface NavSearchProps {
     displayToggle: boolean,
-    viewSearchResults(query?: IBookSearchQuery): void,
+    viewSearchResults(query?: ISearchQuery): void,
 }
 
 const NavSearch = (props: NavSearchProps) => {
@@ -13,7 +13,7 @@ const NavSearch = (props: NavSearchProps) => {
 
     const textSearch = () => {
         if (queryValue) {
-            const query: IBookSearchQuery = {
+            const query: ISearchQuery = {
                 text: queryValue
             }
             setQueryValue('')

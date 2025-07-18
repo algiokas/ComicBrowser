@@ -11,5 +11,6 @@ export default interface IVideo {
     tags: string[],
     isFavorite: boolean,
     addedDate: Date,
-    thumbnailId: string
+    thumbnailId: string,
+    searchTerms: string[]
 }

@@ -1,5 +1,5 @@
 import type INavItem from "../../interfaces/navItem";
-import type { IBookSearchQuery } from "../../interfaces/searchQuery";
+import type { ISearchQuery } from "../../interfaces/searchQuery";
 import { NavLogo } from "./navLogo";
 import NavSearch from "./navSearch";
 
@@ -9,7 +9,7 @@ interface NavProps {
   leftNavItems: INavItem[],
   rightNavItems: INavItem[],
   logoClick(): void,
-  viewSearchResults(query?: IBookSearchQuery): void
+  viewSearchResults(query?: ISearchQuery): void
 }
 
 const Navigation = (props: NavProps) => {

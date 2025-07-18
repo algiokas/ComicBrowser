@@ -161,6 +161,14 @@ const VideoGallery = (props: VideoGalleryProps) => {
                 return false
             })
         }
+        if (searchQuery.text) {
+            results = results.filter(video => {
+                if (video.searchTerms) {
+                    return video.searchTerms.some((a) => a.toLowerCase() === searchQuery.text?.toLowerCase())
+                }
+                return false
+            })
+        }
         return results
     }
 

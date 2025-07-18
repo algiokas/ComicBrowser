@@ -1,14 +1,16 @@
-export interface IBookSearchQuery {
+export interface ISearchQuery {
     filled?: boolean,
+    text?: string
+}
+
+export interface IBookSearchQuery extends ISearchQuery{
     artists?: string,
     groups?: string,
     prefix?: string,
     tags?: string,
-    text?: string
 }
 
-export interface IVideoSearchQuery {
-    filled?: boolean,
+export interface IVideoSearchQuery extends ISearchQuery {
     actor?: string,
     source?: string,
     tag?: string,
