@@ -82,81 +82,85 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
     }
 
     return (
-        <div className="player-video-info">
-            <h3 className="player-video-info-title">{appContext.currentVideo?.title}</h3>
-            <div className="player-video-favorite" onClick={(e) => videoFavoriteClick(e)}>
-                {
-                    appContext.currentVideo?.isFavorite ?
-                        <img className="svg-icon-favorite" src={StarsIcon.toString()} alt="remove from favorites"></img>
-                        :
-                        <img className="svg-icon-disabled test" src={StarsIcon.toString()} alt="add to favorites"></img>
-                }
-            </div>
-            <span className="player-video-info-id">{appContext.currentVideo?.id}</span>
-            <div className="player-video-info-source">
-                <span className="info-item clickable" onClick={() => searchSource(appContext.currentVideo!.source.name)}>{appContext.currentVideo?.source.name}</span>
-            </div>
+        <div className="player-video-sidebar">
             {
-                appContext.currentVideo && appContext.currentVideo.actors.length > 0 ?
-                    <div className="player-video-info-actors">
-                        {
-                            appContext.currentVideo.actors.map((actor, i) => {
-                                return (
-                                    <div key={i} className="player-actor" onClick={() => searchActor(actor.name)}>
-                                        <div className="player-actor-image">
-                                            <img className="actorgallery-image" src={actor.imageUrl} alt={`${actor.name}`}></img>
-                                        </div>
-                                        <div className={`caption ${(actor.isFavorite ? 'favorite' : '')}`}>
-                                            <div className="player-actorimagegen-icon" onClick={(e) => generateActorImage(e, actor)}>
-                                                <img className="svg-icon-favorite" src={CameraIcon.toString()} alt={"Generate image for " + actor.name}></img>
-                                            </div>
-                                            <span>{actor.name}</span>
-                                            <div className="player-actor-favorite" onClick={(e) => actorFavoriteClick(e, actor)}>
-                                                {
-                                                    actor.isFavorite ?
-                                                        <img className="svg-icon-favorite" src={StarsIcon.toString()} alt="remove from favorites"></img>
-                                                        :
-                                                        <img className="svg-icon-disabled test" src={StarsIcon.toString()} alt="add to favorites"></img>
-                                                }
-                                            </div>
-                                        </div>
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                    : null
-            }
-            <div className="player-video-controls">
-                <div className="player-video-controls-row">
-                    <button type="button" onClick={() => { advanceVideoTime(-50) }}>
-                        Previous Frame
-                    </button>
-                    <button type="button" onClick={() => { advanceVideoTime(50) }}>
-                        Next Frame
-                    </button>
-                </div>
-                <div className="player-video-controls-row">
-                    <button type="button" onClick={() => { setThumbToCurrentTime() }}>
-                        Set Thumbnail To Current Time
-                    </button>
-                </div>
-                {
-                    appContext.currentVideo !== null ?
-                        <div className="player-video-controls-row">
-                            <button type="button" onClick={() => { props.toggleEditModal() }}>
-                                Edit Video
-                            </button>
-                            <Modal modalId={"bookinfo-edit-modal"} displayModal={props.showEditModal} toggleModal={props.toggleEditModal}>
-                                <EditPanel
-                                    video={appContext.currentVideo}
-                                    toggleDisplay={props.toggleEditModal}
-                                    {...searchHandlers} />
-                            </Modal>
+                appContext.currentVideo ?
+                    <div className="player-video-info">
+                        <h3 className="player-video-info-title">{appContext.currentVideo?.title}</h3>
+                        <div className="player-video-favorite" onClick={(e) => videoFavoriteClick(e)}>
+                            {
+                                appContext.currentVideo.isFavorite ?
+                                    <img className="svg-icon-favorite" src={StarsIcon.toString()} alt="remove from favorites"></img>
+                                    :
+                                    <img className="svg-icon-disabled test" src={StarsIcon.toString()} alt="add to favorites"></img>
+                            }
                         </div>
-                        : null
-                }
-            </div>
+                        <span className="player-video-info-id">{appContext.currentVideo?.id}</span>
+                        <div className="player-video-info-source">
+                            <span className="info-item clickable" onClick={() => searchSource(appContext.currentVideo!.source.name)}>{appContext.currentVideo?.source.name}</span>
+                        </div>
+                        {
+                            appContext.currentVideo.actors.length > 0 ?
+                                <div className="player-video-info-actors">
+                                    {
+                                        appContext.currentVideo.actors.map((actor, i) => {
+                                            return (
+                                                <div key={i} className="player-actor" onClick={() => searchActor(actor.name)}>
+                                                    <div className="player-actor-image">
+                                                        <img className="actorgallery-image" src={actor.imageUrl} alt={`${actor.name}`}></img>
+                                                    </div>
+                                                    <div className={`caption ${(actor.isFavorite ? 'favorite' : '')}`}>
+                                                        <div className="player-actorimagegen-icon" onClick={(e) => generateActorImage(e, actor)}>
+                                                            <img className="svg-icon-favorite" src={CameraIcon.toString()} alt={"Generate image for " + actor.name}></img>
+                                                        </div>
+                                                        <span>{actor.name}</span>
+                                                        <div className="player-actor-favorite" onClick={(e) => actorFavoriteClick(e, actor)}>
+                                                            {
+                                                                actor.isFavorite ?
+                                                                    <img className="svg-icon-favorite" src={StarsIcon.toString()} alt="remove from favorites"></img>
+                                                                    :
+                                                                    <img className="svg-icon-disabled test" src={StarsIcon.toString()} alt="add to favorites"></img>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                                : null
+                        }
+                        <div className="player-video-controls">
+                            <div className="player-video-controls-row">
+                                <button type="button" onClick={() => { advanceVideoTime(-50) }}>
+                                    Previous Frame
+                                </button>
+                                <button type="button" onClick={() => { advanceVideoTime(50) }}>
+                                    Next Frame
+                                </button>
+                            </div>
+                            <div className="player-video-controls-row">
+                                <button type="button" onClick={() => { setThumbToCurrentTime() }}>
+                                    Set Thumbnail To Current Time
+                                </button>
+                            </div>
+                            <div className="player-video-controls-row">
+                                <button type="button" onClick={() => { props.toggleEditModal() }}>
+                                    Edit Video
+                                </button>
+                            </div>
+                        </div>
+                    </div> : null
+            }
+            {
+                appContext.currentVideo ?
+                    <Modal modalId={"bookinfo-edit-modal"} displayModal={props.showEditModal} toggleModal={props.toggleEditModal}>
+                        <EditPanel
+                            video={appContext.currentVideo}
+                            toggleDisplay={props.toggleEditModal}
+                            {...searchHandlers} />
+                    </Modal> : null
+            }
         </div>
     )
 }

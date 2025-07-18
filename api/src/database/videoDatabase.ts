@@ -1,6 +1,6 @@
 import Database from "better-sqlite3"
-import { ActorRow, SourceRow, VideoRow, VideoActor, VideoFileData } from '../types/video';
-import { _VIDEOS, _ACTORS, _VIDEOACTORS, _SOURCES } from './videoQueries';
+import { ActorRow, SourceRow, VideoRow, VideoActor, VideoFileData, VideoTag, VideoTagsRef } from '../types/video';
+import { _VIDEOS, _ACTORS, _VIDEOACTORS, _SOURCES, _VIDEOTAGS, _VIDEOTAGSREF } from './videoQueries';
 import { RunResultExisting } from '../types/shared';
 
 function insertVideoFromJson(videoJson: Omit<VideoRow, 'id'>): Database.RunResult | undefined {
@@ -138,6 +138,78 @@ export function addVideo(videoJson: VideoFileData, replace = false): RunResultEx
   }
 }
 
+function insertTagIfMissing(tagName: string): RunResultExisting | null {
+    if (!tagName) {
+        console.log('cannot input blank tag name')
+        return null
+    }
+    let existing = _VIDEOTAGS.selectByName.get(tagName) as VideoTag
+    if (existing) {
+        console.log('Tag: "' + tagName + '" found. Skipping...')
+        return { existingRowId: existing.id }
+    }
+
+    return _VIDEOTAGS.insert.run(tagName)
+}
+
+export function insertTagsForVideo(videoId: number, tags: string[]): number[] {
+    if (!tags) {
+        console.log('Video ID ' + videoId + 'tag list empty')
+        return []
+    }
+
+    let tagIds: number[] = []
+    tags.forEach((tag) => {
+        let insertResult = insertTagIfMissing(tag)
+        if (insertResult) {
+            let tagId = Number(insertResult.lastInsertRowid ?? insertResult.existingRowId)
+            if (!isNaN(tagId)) {
+                _VIDEOTAGSREF.insert.run(videoId, tagId)
+                tagIds.push(tagId)
+            }
+        }
+    })
+    return tagIds
+}
+
+export function removeTagsFromVideo(videoId: number, tags: string[]): number[] {
+    if (!tags) {
+        console.log('Video ID ' + videoId + 'tag list empty')
+        return []
+    }
+
+    let tagIds: number[] = []
+    tags.forEach((tag) => {
+        let tagRow = _VIDEOTAGS.selectByName.get(tag) as VideoTag
+        if (tagRow) {
+            tagIds.push(tagRow.id)
+            _VIDEOTAGSREF.delete.run(videoId, tagRow.id)
+            let otherVideoTags = _VIDEOTAGSREF.selectByTagId.all(tagRow.id)
+            if (otherVideoTags.length < 1) {
+                _VIDEOTAGS.delete.run(tagRow.id)
+            }
+        }
+    })
+    return tagIds
+}
+
+function removeAllTagsForVideo(videoId: number): number[] {
+    if (!videoId) console.error('invalid video ID')
+    let tagRows = _VIDEOTAGSREF.selectByVideoId.all(videoId) as VideoTagsRef[]
+    let removedTags: number[] = []
+    if (tagRows && tagRows.length > 0) {
+        tagRows.forEach((idRow) => {
+            _VIDEOTAGSREF.delete.run(videoId, idRow.tagId)
+            let otherVideosWithTag = _VIDEOTAGSREF.selectByTagId.all(idRow.tagId)
+            if (otherVideosWithTag.length < 1) {
+                _VIDEOTAGS.delete.run(idRow.tagId)
+                removedTags.push(idRow.tagId)
+            }
+        })
+    }
+    return removedTags
+}
+
 export function getVideos(): VideoRow[] {
   return _VIDEOS.selectAll.all() as VideoRow[];
 }
@@ -221,4 +293,13 @@ export function setActorName(id: number, name: string): Database.RunResult {
 
 export function setFavorite(id: number, value: boolean): Database.RunResult {
   return _ACTORS.updateFavorite.run(value ? 1 : 0, id);
+}
+
+export function getAllVideoTags(): VideoTag[] {
+  return _VIDEOTAGS.selectAll.all() as VideoTag[]
+}
+
+export function getVideoTags(videoId: number): VideoTag[] {
+  const tags = _VIDEOTAGS.selectTagsByVideoId.all(videoId) as VideoTag[]
+  return tags
 }

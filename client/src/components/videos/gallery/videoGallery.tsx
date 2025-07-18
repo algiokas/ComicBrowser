@@ -156,7 +156,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
         if (searchQuery.tag) {
             results = results.filter(video => {
                 if (video.tags) {
-                    return video.tags.some((a) => a.toLowerCase() === searchQuery.tag!.toLowerCase())
+                    return video.tags.some((a) => a.name.toLowerCase() === searchQuery.tag!.toLowerCase())
                 }
                 return false
             })

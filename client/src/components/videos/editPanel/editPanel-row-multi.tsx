@@ -12,6 +12,7 @@ interface EditPanelRowProps<T> {
     hideTextInput?: boolean,
     getDisplayString: (x: T | null) => string,
     getValueFromDisplayString: (str: string) => T | null,
+    getValueFromTextInput?: (str: string) => T | null,
     updateTempValue(field: VideosEditField, value: any): void,
     valueClick?: (v: string) => void
 }
@@ -40,7 +41,9 @@ function EditPanelRowMulti<T>(props: EditPanelRowProps<T>) {
     }
 
     const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFieldValue(props.getValueFromDisplayString(e.target.value))
+        if (props.getValueFromTextInput) {
+            setFieldValue(props.getValueFromTextInput(e.target.value))
+        }
     }
 
     const handleTextInputKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -86,27 +89,32 @@ function EditPanelRowMulti<T>(props: EditPanelRowProps<T>) {
                     <div className="edit-panel-row-inner edit-mode">
                         <div className="edit-panel-row-value">
                             {
-                                props.hideTextInput ? null :
-                                    props.valueRange ?
-                                        <select className="edit-panel-row-dropdown" onChange={handleDropdownChange}>
-                                            {
-                                                props.valueRange.map((v, i) => {
+                                props.valueRange ?
+                                    <select className="edit-panel-row-dropdown" onChange={handleDropdownChange} id={`${props.editField.toString().toLowerCase()}-dropdown`} >
+                                        <option value=''>{`-- Select ${props.editField} --`}</option>
+                                        {
+                                            props.valueRange.map((v, i) => {
+                                                if (!collection.some(item => props.getDisplayString(item) === props.getDisplayString(v))) {
                                                     return (<option key={i} value={props.getDisplayString(v)}>{props.getDisplayString(v)}</option>)
-                                                })
-                                            }
-                                        </select>
-                                        :
-                                        <div className="edit-panel-row-value-add">
-                                            <input type="text"
-                                                value={props.getDisplayString(fieldValue)}
-                                                onChange={handleTextInputChange}
-                                                onKeyDown={handleTextInputKey}>
-                                            </input>
-                                            <button type="button" onClick={addToCollection}>
-                                                <img className="svg-icon text-icon" src={PlusImg.toString()} alt="remove collection item"></img>
-                                            </button>
-                                        </div>
-
+                                                }
+                                            })
+                                        }
+                                    </select>
+                                    : null
+                            }
+                            {
+                                props.getValueFromTextInput ?
+                                    <div className="edit-panel-row-value-add">
+                                        <input type="text" id={`${props.editField.toString().toLowerCase()}-text-input`} 
+                                            value={props.getDisplayString(fieldValue)}
+                                            onChange={handleTextInputChange}
+                                            onKeyDown={handleTextInputKey}>
+                                        </input>
+                                        <button type="button" onClick={addToCollection}>
+                                            <img className="svg-icon text-icon" src={PlusImg.toString()} alt="remove collection item"></img>
+                                        </button>
+                                    </div>
+                                    : null
                             }
                             <div className="edit-panel-row-collection">
                                 {

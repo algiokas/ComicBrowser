@@ -8,9 +8,14 @@ export default interface IVideo {
     filePath: string,
     source: IVideoSource,
     actors: IActor[],
-    tags: string[],
+    tags: IVideoTag[],
     isFavorite: boolean,
     addedDate: Date,
     thumbnailId: string,
     searchTerms: string[]
+}
+
+export interface IVideoTag {
+    id: number,
+    name: string
 }

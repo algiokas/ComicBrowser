@@ -1,46 +1,72 @@
 import { videos_db as db } from './database';
 
+const tables = Object.freeze({
+  videos: 'videos',
+  sources: 'sources',
+  actors: 'actors',
+  videoActors: 'videoActors',
+  actorTags: 'actorTags',
+  actorTagsRef: 'actorTagsRef',
+  videoTags: 'videoTags',
+  videoTagsRef: 'videoTagsRef'
+})
+
 export const _VIDEOS = Object.freeze({
-  insert: db.prepare('INSERT INTO videos (title, thumbnailId, filePath, fileExt, addedDate, isFavorite, originalTitle, sourceId) VALUES (?,?,?,?,?,?,?,?)'),
-  delete: db.prepare('DELETE FROM videos WHERE id = ?'),
-  selectAll: db.prepare('SELECT * FROM videos'),
-  selectById: db.prepare('SELECT * FROM videos WHERE id = ?'),
-  selectByTitle: db.prepare('SELECT * FROM videos WHERE title = ?'),
-  selectByFilePath: db.prepare('SELECT * FROM videos WHERE filePath = ?'),
-  selectFilePathById: db.prepare('SELECT filePath FROM videos WHERE id = ?'),
-  selectThumbnailById: db.prepare('SELECT thumbnailId FROM videos WHERE id = ?'),
-  updateThumbnailId: db.prepare('UPDATE videos SET thumbnailId = ? WHERE id = ?'),
-  updateTitle: db.prepare('UPDATE videos SET title = ? WHERE id = ?'),
-  updateFavorite: db.prepare('UPDATE videos SET isFavorite = ? WHERE id = ?'),
-  updateSource: db.prepare('UPDATE videos SET sourceId = ? WHERE id = ?'),
+  insert: db.prepare(`INSERT INTO ${tables.videos} (title, thumbnailId, filePath, fileExt, addedDate, isFavorite, originalTitle, sourceId) VALUES (?,?,?,?,?,?,?,?)`),
+  delete: db.prepare(`DELETE FROM ${tables.videos} WHERE id = ?`),
+  selectAll: db.prepare(`SELECT * FROM ${tables.videos}`),
+  selectById: db.prepare(`SELECT * FROM ${tables.videos} WHERE id = ?`),
+  selectByTitle: db.prepare(`SELECT * FROM ${tables.videos} WHERE title = ?`),
+  selectByFilePath: db.prepare(`SELECT * FROM ${tables.videos} WHERE filePath = ?`),
+  selectFilePathById: db.prepare(`SELECT filePath FROM ${tables.videos} WHERE id = ?`),
+  selectThumbnailById: db.prepare(`SELECT thumbnailId FROM ${tables.videos} WHERE id = ?`),
+  updateThumbnailId: db.prepare(`UPDATE ${tables.videos} SET thumbnailId = ? WHERE id = ?`),
+  updateTitle: db.prepare(`UPDATE ${tables.videos} SET title = ? WHERE id = ?`),
+  updateFavorite: db.prepare(`UPDATE ${tables.videos} SET isFavorite = ? WHERE id = ?`),
+  updateSource: db.prepare(`UPDATE ${tables.videos} SET sourceId = ? WHERE id = ?`),
 });
 
 export const _ACTORS = Object.freeze({
-  insert: db.prepare('INSERT INTO actors (name) VALUES (?)'),
-  delete: db.prepare('DELETE FROM actors WHERE id = ?'),
-  selectAll: db.prepare('SELECT * FROM actors'),
-  selectById: db.prepare('SELECT * FROM actors WHERE id = ?'),
-  selectByName: db.prepare('SELECT * FROM actors WHERE name = ?'),
-  selectByVideoId: db.prepare('SELECT * FROM videoActors JOIN actors ON videoActors.actorId = actors.id WHERE videoActors.videoId = ?'),
-  updateImage: db.prepare('UPDATE actors SET imageFile = ? WHERE id = ?'),
-  updateName: db.prepare('UPDATE actors SET name = ? WHERE id = ?'),
-  updateFavorite: db.prepare('UPDATE actors SET isFavorite = ? WHERE id = ?'),
+  insert: db.prepare(`INSERT INTO ${tables.actors} (name) VALUES (?)`),
+  delete: db.prepare(`DELETE FROM ${tables.actors} WHERE id = ?`),
+  selectAll: db.prepare(`SELECT * FROM ${tables.actors}`),
+  selectById: db.prepare(`SELECT * FROM ${tables.actors} WHERE id = ?`),
+  selectByName: db.prepare(`SELECT * FROM ${tables.actors} WHERE name = ?`),
+  selectByVideoId: db.prepare(`SELECT * FROM ${tables.videoActors} JOIN ${tables.actors} ON ${tables.videoActors}.actorId = ${tables.actors}.id WHERE ${tables.videoActors}.videoId = ?`),
+  updateImage: db.prepare(`UPDATE ${tables.actors} SET imageFile = ? WHERE id = ?`),
+  updateName: db.prepare(`UPDATE ${tables.actors} SET name = ? WHERE id = ?`),
+  updateFavorite: db.prepare(`UPDATE ${tables.actors} SET isFavorite = ? WHERE id = ?`),
 });
 
 export const _VIDEOACTORS = Object.freeze({
-  insert: db.prepare('INSERT INTO videoActors (videoId, actorId) VALUES (?,?)'),
-  delete: db.prepare('DELETE FROM videoActors WHERE actorId = ? AND videoId = ?'),
-  selectAll: db.prepare('SELECT * FROM videoActors WHERE videoId = ?'),
-  selectByVideoId: db.prepare('SELECT * FROM videoActors WHERE videoId = ?'),
-  selectByActorId: db.prepare('SELECT * FROM videoActors WHERE actorId = ?'),
+  insert: db.prepare(`INSERT INTO ${tables.videoActors} (videoId, actorId) VALUES (?,?)`),
+  delete: db.prepare(`DELETE FROM ${tables.videoActors} WHERE actorId = ? AND videoId = ?`),
+  selectAll: db.prepare(`SELECT * FROM ${tables.videoActors} WHERE videoId = ?`),
+  selectByVideoId: db.prepare(`SELECT * FROM ${tables.videoActors} WHERE videoId = ?`),
+  selectByActorId: db.prepare(`SELECT * FROM ${tables.videoActors} WHERE actorId = ?`),
 });
 
 export const _SOURCES = Object.freeze({
-  insert: db.prepare('INSERT INTO sources (name, imageFileSmall, imageFileLarge, siteUrl) VALUES (?,?,?,?)'),
-  selectAll: db.prepare('SELECT * FROM sources'),
-  selectById: db.prepare('SELECT * FROM sources WHERE id = ?'),
-  selectByName: db.prepare('SELECT * FROM sources WHERE name = ?'),
-  updateImageSmall: db.prepare('UPDATE sources SET imageFileSmall = ? WHERE id = ?'),
-  updateImageLarge: db.prepare('UPDATE sources SET imageFileLarge = ? WHERE id = ?'),
-  updateSiteUrl: db.prepare('UPDATE sources SET siteUrl = ? WHERE id = ?'),
+  insert: db.prepare(`INSERT INTO ${tables.sources} (name, imageFileSmall, imageFileLarge, siteUrl) VALUES (?,?,?,?)`),
+  selectAll: db.prepare(`SELECT * FROM ${tables.sources}`),
+  selectById: db.prepare(`SELECT * FROM ${tables.sources} WHERE id = ?`),
+  selectByName: db.prepare(`SELECT * FROM ${tables.sources} WHERE name = ?`),
+  updateImageSmall: db.prepare(`UPDATE ${tables.sources} SET imageFileSmall = ? WHERE id = ?`),
+  updateImageLarge: db.prepare(`UPDATE ${tables.sources} SET imageFileLarge = ? WHERE id = ?`),
+  updateSiteUrl: db.prepare(`UPDATE ${tables.sources} SET siteUrl = ? WHERE id = ?`),
 });
+
+export const _VIDEOTAGS = Object.freeze({
+  insert: db.prepare(`INSERT INTO ${tables.videoTags} (name) VALUES (?)`),
+  selectAll: db.prepare(`SELECT * FROM ${tables.videoTags}`),
+  selectByName: db.prepare(`SELECT * FROM ${tables.videoTags} WHERE name = ?`),
+  selectTagsByVideoId: db.prepare(`SELECT ${tables.videoTags}.id, ${tables.videoTags}.name FROM ${tables.videoTagsRef} JOIN ${tables.videoTags} ON ${tables.videoTagsRef}.tagId = ${tables.videoTags}.id WHERE ${tables.videoTagsRef}.videoId = ?`),
+  delete: db.prepare(`DELETE FROM ${tables.videoTags} WHERE id = ?`)
+})
+
+export const _VIDEOTAGSREF = Object.freeze({
+  insert: db.prepare(`INSERT INTO ${tables.videoTagsRef} (videoId, tagId) VALUES (?, ?)`),
+  selectByVideoId: db.prepare(`SELECT * FROM ${tables.videoTagsRef} WHERE videoId = ?`),
+  selectByTagId: db.prepare(`SELECT * FROM ${tables.videoTagsRef} WHERE tagId = ?`),
+  delete: db.prepare(`DELETE FROM ${tables.videoTagsRef} WHERE videoId = ? AND tagId = ?`)
+})

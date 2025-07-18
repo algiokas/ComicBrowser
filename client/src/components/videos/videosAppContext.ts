@@ -5,12 +5,14 @@ import type IVideo from "../../interfaces/video";
 import type IVideoSource from "../../interfaces/videoSource";
 import { VideosViewMode } from "../../util/enums";
 import type { FileWithData } from "./gallery/sourceDetail";
+import type { IVideoTag } from "../../interfaces/video";
 
 export type VideosAppState = {
     galleryPageSize: number,
     allVideos: IVideo[],
     allActors: IActor[],
     allSources: IVideoSource[],
+    allVideoTags: IVideoTag[],
     viewMode: VideosViewMode,
     currentVideo: IVideo | null,
     currentSearchQuery: IVideoSearchQuery,
@@ -44,6 +46,7 @@ export const VideosAppContext = createContext<VideosAppState & VideosAppHandlers
     allVideos: [],
     allActors: [],
     allSources: [],
+    allVideoTags: [],
     viewMode: VideosViewMode.Loading,
     currentVideo: null,
     currentSearchQuery: {},

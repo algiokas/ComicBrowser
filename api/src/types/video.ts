@@ -32,6 +32,7 @@ export interface ClientVideo {
   originalTitle: string;
   source: ClientSource;
   actors: ClientActor[];
+  tags: VideoTag[]
 }
 
 export interface SourceRow {

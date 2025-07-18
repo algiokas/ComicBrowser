@@ -82,7 +82,7 @@ const generateVideoSearchTerms = (video: IVideo): string[] => {
     }
     if (video.tags) {
         video.tags.forEach(tag => {
-            getComponentTerms(tag).forEach(t => { terms.add(t) })
+            getComponentTerms(tag.name).forEach(t => { terms.add(t) })
         })
     }
     if (video.source) {

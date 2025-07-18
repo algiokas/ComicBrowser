@@ -7,6 +7,7 @@ import EditPanelRow from "./editPanel-row";
 import EditPanelRowMulti from "./editPanel-row-multi";
 import EditPanelRowStatic from "./editPanel-row-static";
 import { VideosAppContext } from "../videosAppContext";
+import type { IVideoTag } from "../../../interfaces/video";
 
 interface EditPanelProps {
     video: IVideo,
@@ -20,7 +21,7 @@ interface EditPanelProps {
 interface EditFields {
     title: string,
     actors: IActor[],
-    tags: string[],
+    tags: IVideoTag[],
     source: IVideoSource
 }
 
@@ -126,12 +127,15 @@ const EditPanel = (props: EditPanelProps) => {
                     valueClick={props.searchActor}
                     getDisplayString={(a) => a?.name ?? ''}
                     getValueFromDisplayString={(str) => { return appContext.allActors.find((a) => a.name == str) ?? null }} />
-                <EditPanelRowMulti<string> editField={VideosEditField.Tags}
+                <EditPanelRowMulti<IVideoTag> editField={VideosEditField.Tags}
                     tempValue={tempFields.tags}
                     updateTempValue={updateTempValue}
+                    valueRange={appContext.allVideoTags.sort((a, b) => a.name.localeCompare(b.name))}
                     valueClick={props.searchTag}
-                    getDisplayString={(t) => t ?? ''}
-                    getValueFromDisplayString={(t) => t} />
+                    getDisplayString={(t) => t?.name ?? ''}
+                    getValueFromDisplayString={(str) => { return appContext.allVideoTags.find((t) => t.name == str) ?? null }}
+                    getValueFromTextInput={(str) => { return { id: -1, name: str }}}
+                    />
                 <EditPanelRow<IVideoSource> editField={VideosEditField.Source}
                     tempValue={tempFields.source}
                     updateTempValue={updateTempValue}

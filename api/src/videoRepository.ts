@@ -70,6 +70,7 @@ function fileToJson(parentDir: string, fileName: string, fileStats: fs.Stats): V
 function fillVideo(videoRow: VideoRow): ClientVideo {
     const videoSource = videoDatabase.getSourceById(videoRow.sourceId ?? -1) ?? PLACEHOLDER_SOURCE
     const videoActors = videoDatabase.getVideoActors(videoRow.id)
+    const videoTags = videoDatabase.getVideoTags(videoRow.id)
     let video: ClientVideo = {
         ...videoRow,
         title: videoRow.title ?? '',
@@ -80,7 +81,8 @@ function fillVideo(videoRow: VideoRow): ClientVideo {
         originalTitle: videoRow.originalTitle ?? '',
         isFavorite: (videoRow.isFavorite !== null && videoRow.isFavorite > 0),
         source: fillSource(videoSource),
-        actors: videoActors.map(a => fillActor(a))
+        actors: videoActors.map(a => fillActor(a)),
+        tags: videoTags
     }
     return video
 }
@@ -389,27 +391,35 @@ export function updateVideo(id: number, newVideoData: ClientVideo, callback: (up
             }
         }
     }
-    // if (newVideoData.tags && currentVideoData.tags) {
-    //     let tagsToAdd = newVideoData.tags.filter(t => !currentVideoData.tags.includes(t))
-    //     let tagsToRemove = currentVideoData.tags.filter(t => !newVideoData.tags.includes(t))
+    if (newVideoData.tags && currentVideoData.tags) {
+        let tagsToAdd = newVideoData.tags.filter(t => !currentVideoData.tags.some(a => a.name === t.name))
+        let tagsToRemove = currentVideoData.tags.filter(t => !newVideoData.tags.some(a => a.name === t.name))
 
-    //     if (tagsToAdd.length) {
-    //         let addResult = db.addTags(id, tagsToAdd)
-    //         if (addResult.length === tagsToAdd.length) {
-    //             response.success = true;
-    //         } else {
-    //             response.error = response.error + "Adding tags failed"
-    //         }
-    //     } 
-    //     if (tagsToRemove.length) {
-    //         let removeResult = db.removeTags(id, tagsToRemove)
-    //         if (removeResult.length === tagsToRemove.length) {
-    //             response.success = true;
-    //         } else {
-    //             response.error = response.error + "Adding tags failed"
-    //         }
-    //     }
-    // }
+        if (tagsToAdd.length) {
+            let addResult = videoDatabase.insertTagsForVideo(id, tagsToAdd.map(t => t.name!))
+            if (addResult.length === tagsToAdd.length) {
+                updateResult.changes.push(`Added ${addResult.length} tags`)
+            } else {
+                if (addResult.length > 0) {
+                    updateResult.error += `Add tags partial success - added (${addResult.length}/${tagsToAdd.length}) tags`
+                } else {
+                    updateResult.error += "Adding tags failed"
+                }
+            }
+        } 
+        if (tagsToRemove.length) {
+            let removeResult = videoDatabase.removeTagsFromVideo(id, tagsToRemove.map(t => t.name!))
+            if (removeResult.length === tagsToRemove.length) {
+                updateResult.changes.push(`Removed ${removeResult.length} tags`)
+            } else {
+                if (removeResult.length > 0) {
+                    updateResult.error += `Remove tags partial success - removed (${removeResult.length}/${tagsToRemove.length}) tags`
+                } else {
+                    updateResult.error += "Removing tags failed"
+                }
+            }
+        }
+    }
     if (newVideoData.isFavorite !== currentVideoData.isFavorite) {
         try {
             let favoriteResult = videoDatabase.setVideoFavoriteValue(id, newVideoData.isFavorite)
@@ -520,6 +530,10 @@ export function getSourceImagePath(id: number, small: boolean) {
         return path.join(sourceImageDir, sourceData.imageFileLarge)
     }
     return null
+}
+
+export function getAllVideoTags() {
+    return videoDatabase.getAllVideoTags()
 }
 
 

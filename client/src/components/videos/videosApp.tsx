@@ -12,6 +12,7 @@ import Navigation from "../shared/navigation";
 import type { FileWithData } from "./gallery/sourceDetail";
 import MultiView from "./multiView";
 import { VideosAppContext, type VideosAppHandlers, type VideosAppState } from "./videosAppContext";
+import type { IVideoTag } from "../../interfaces/video";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
@@ -21,6 +22,7 @@ const VideosApp = (props: VideosAppProps) => {
   const [allVideos, setAllVideos] = useState<IVideo[]>([])
   const [allActors, setAllActors] = useState<IActor[]>([])
   const [allSources, setAllSources] = useState<IVideoSource[]>([])
+  const [allVideoTags, setAllVideoTags] = useState<IVideoTag[]>([])
   const [viewMode, setViewMode] = useState<VideosViewMode>(VideosViewMode.Loading)
   const [currentVideo, setCurrentVideo] = useState<IVideo | null>(null)
   const [currentSearchQuery, setCurrentSearchQuery] = useState<IVideoSearchQuery>(getEmptyQuery())
@@ -45,6 +47,10 @@ const VideosApp = (props: VideosAppProps) => {
     const data = await res.json()
     const videos = videosFromJson(data)
     setAllVideos(videos)
+
+    const videoTagsRes = await fetch(`${apiBaseUrl}/videos/tags`)
+    const videoTagsData = await videoTagsRes.json()
+    setAllVideoTags(videoTagsData as IVideoTag[])
     await fillActors(videos)
     await fillSources()
   }
@@ -327,6 +333,7 @@ const VideosApp = (props: VideosAppProps) => {
     allVideos: allVideos,
     allActors: allActors,
     allSources: allSources,
+    allVideoTags: allVideoTags,
     viewMode: viewMode,
     currentVideo: currentVideo,
     currentSearchQuery: currentSearchQuery,

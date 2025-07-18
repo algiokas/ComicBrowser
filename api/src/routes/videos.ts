@@ -22,6 +22,11 @@ router.get('/sources', (req, res) => {
     res.json(videoRepository.getSources())
 })
 
+
+router.get(`/tags`, function (req, res) {
+    res.json(videoRepository.getAllVideoTags())
+})
+
 router.post('/upload/sourceimage/:sourceId/:imageSize', bodyParser.raw({ type: "*/*", limit: "10mb" }), (req, res) => {
     const sourceId = Number(req.params.sourceId)
     if (isNaN(sourceId)) {
