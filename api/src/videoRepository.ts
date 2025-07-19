@@ -64,9 +64,6 @@ function fileToJson(parentDir: string, fileName: string, fileStats: fs.Stats): V
     return output
 }
 
-
-
-
 function fillVideo(videoRow: VideoRow): ClientVideo {
     const videoSource = videoDatabase.getSourceById(videoRow.sourceId ?? -1) ?? PLACEHOLDER_SOURCE
     const videoActors = videoDatabase.getVideoActors(videoRow.id)
@@ -88,12 +85,15 @@ function fillVideo(videoRow: VideoRow): ClientVideo {
 }
 
 function fillActor(actorRow: ActorRow): ClientActor {
+    const actorTags = videoDatabase.getActorTags(actorRow.id)
     return {
         id: actorRow.id,
         name: actorRow.name ?? '',
         imageFile: actorRow.imageFile ?? '',
         imageFallbackVideoId: actorRow.imageFallbackVideoId ?? 0,
-        isFavorite: (actorRow.isFavorite ?? 0) > 0
+        isFavorite: (actorRow.isFavorite ?? 0) > 0,
+        birthYear: actorRow.birthYear ?? 1700,
+        tags: actorTags
     }
 }
 
@@ -235,6 +235,15 @@ export function updateActor(actorId: number, newActorData: Partial<ClientActor>,
             updateResult.error = updateResult.error + "Updating favorite value failed"
         }
     }
+    if (newActorData.birthYear !== undefined && newActorData.birthYear !== currentActorData.birthYear) {
+        let setBirthYearResult = videoDatabase.setBirthYear(actorId, newActorData.birthYear)
+        if (setBirthYearResult.changes > 0) {
+            updateResult.changes.push("birthYear")
+        } else {
+            updateResult.error = updateResult.error + "Updating birth year failed"
+        }
+    }
+    if (newActorData)
     updateResult.success = !updateResult.error && updateResult.changes.length > 0
     updateResult.actor = videoDatabase.getActorById(actorId)
     callback(updateResult)

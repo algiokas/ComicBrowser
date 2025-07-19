@@ -3,7 +3,14 @@ export default interface IActor {
     name: string,
     imageFile: string,
     imageFallbackVideoId: number,
-    isFavorite: boolean,
+    isFavorite: boolean,  
+    imageUrl: string,
+    birthYear: number
     videos: number[],
-    imageUrl: string
+    tags: IActorTag[]
+}
+
+export interface IActorTag {
+    id: number,
+    name: string
 }

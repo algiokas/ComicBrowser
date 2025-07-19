@@ -57,6 +57,7 @@ export interface ActorRow {
   imageFile: string | null;
   imageFallbackVideoId: number | null;
   isFavorite: number | null;      // 0 or 1
+  birthYear: number | null;
 };  
 
 export interface ClientActor {
@@ -65,6 +66,8 @@ export interface ClientActor {
   imageFile: string;
   imageFallbackVideoId: number;
   isFavorite: boolean;      // 0 or 1
+  birthYear: number;
+  tags: ActorTag[]
 }
 
 export interface VideoActor {

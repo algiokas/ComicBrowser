@@ -1,6 +1,6 @@
 import Database from "better-sqlite3"
-import { ActorRow, SourceRow, VideoRow, VideoActor, VideoFileData, VideoTag, VideoTagsRef } from '../types/video';
-import { _VIDEOS, _ACTORS, _VIDEOACTORS, _SOURCES, _VIDEOTAGS, _VIDEOTAGSREF } from './videoQueries';
+import { ActorRow, SourceRow, VideoRow, VideoActor, VideoFileData, VideoTag, VideoTagsRef, ActorTag, ActorTagsRef } from '../types/video';
+import { _VIDEOS, _ACTORS, _VIDEOACTORS, _SOURCES, _VIDEOTAGS, _VIDEOTAGSREF, _ACTORTAGS, _ACTORTAGSREF } from './videoQueries';
 import { RunResultExisting } from '../types/shared';
 
 function insertVideoFromJson(videoJson: Omit<VideoRow, 'id'>): Database.RunResult | undefined {
@@ -138,7 +138,7 @@ export function addVideo(videoJson: VideoFileData, replace = false): RunResultEx
   }
 }
 
-function insertTagIfMissing(tagName: string): RunResultExisting | null {
+function insertVideoTagIfMissing(tagName: string): RunResultExisting | null {
     if (!tagName) {
         console.log('cannot input blank tag name')
         return null
@@ -160,7 +160,7 @@ export function insertTagsForVideo(videoId: number, tags: string[]): number[] {
 
     let tagIds: number[] = []
     tags.forEach((tag) => {
-        let insertResult = insertTagIfMissing(tag)
+        let insertResult = insertVideoTagIfMissing(tag)
         if (insertResult) {
             let tagId = Number(insertResult.lastInsertRowid ?? insertResult.existingRowId)
             if (!isNaN(tagId)) {
@@ -203,6 +203,78 @@ function removeAllTagsForVideo(videoId: number): number[] {
             let otherVideosWithTag = _VIDEOTAGSREF.selectByTagId.all(idRow.tagId)
             if (otherVideosWithTag.length < 1) {
                 _VIDEOTAGS.delete.run(idRow.tagId)
+                removedTags.push(idRow.tagId)
+            }
+        })
+    }
+    return removedTags
+}
+
+function insertActorTagIfMissing(tagName: string): RunResultExisting | null {
+    if (!tagName) {
+        console.log('cannot input blank tag name')
+        return null
+    }
+    let existing = _ACTORTAGS.selectByName.get(tagName) as ActorTag
+    if (existing) {
+        console.log('Tag: "' + tagName + '" found. Skipping...')
+        return { existingRowId: existing.id }
+    }
+
+    return _ACTORTAGS.insert.run(tagName)
+}
+
+export function insertTagsForActor(actorId: number, tags: string[]): number[] {
+    if (!tags) {
+        console.log('Actor ID ' + actorId + 'tag list empty')
+        return []
+    }
+
+    let tagIds: number[] = []
+    tags.forEach((tag) => {
+        let insertResult = insertActorTagIfMissing(tag)
+        if (insertResult) {
+            let tagId = Number(insertResult.lastInsertRowid ?? insertResult.existingRowId)
+            if (!isNaN(tagId)) {
+                _ACTORTAGSREF.insert.run(actorId, tagId)
+                tagIds.push(tagId)
+            }
+        }
+    })
+    return tagIds
+}
+
+export function removeTagsFromActor(actorId: number, tags: string[]): number[] {
+    if (!tags) {
+        console.log('Actor ID ' + actorId + 'tag list empty')
+        return []
+    }
+
+    let tagIds: number[] = []
+    tags.forEach((tag) => {
+        let tagRow = _ACTORTAGS.selectByName.get(tag) as ActorTag
+        if (tagRow) {
+            tagIds.push(tagRow.id)
+            _ACTORTAGSREF.delete.run(actorId, tagRow.id)
+            let otherActorTags = _ACTORTAGSREF.selectByTagId.all(tagRow.id)
+            if (otherActorTags.length < 1) {
+                _ACTORTAGS.delete.run(tagRow.id)
+            }
+        }
+    })
+    return tagIds
+}
+
+function removeAllTagsForActor(actorId: number): number[] {
+    if (!actorId) console.error('invalid actor ID')
+    let tagRows = _ACTORTAGSREF.selectByActorId.all(actorId) as ActorTagsRef[]
+    let removedTags: number[] = []
+    if (tagRows && tagRows.length > 0) {
+        tagRows.forEach((idRow) => {
+            _ACTORTAGSREF.delete.run(actorId, idRow.tagId)
+            let otherActorsWithTag = _ACTORTAGSREF.selectByTagId.all(idRow.tagId)
+            if (otherActorsWithTag.length < 1) {
+                _ACTORTAGS.delete.run(idRow.tagId)
                 removedTags.push(idRow.tagId)
             }
         })
@@ -295,11 +367,24 @@ export function setFavorite(id: number, value: boolean): Database.RunResult {
   return _ACTORS.updateFavorite.run(value ? 1 : 0, id);
 }
 
+export function setBirthYear(actorId: number, year: number): Database.RunResult {
+  return _ACTORS.updateBirthYear.run(year, actorId)
+}
+
 export function getAllVideoTags(): VideoTag[] {
   return _VIDEOTAGS.selectAll.all() as VideoTag[]
 }
 
 export function getVideoTags(videoId: number): VideoTag[] {
   const tags = _VIDEOTAGS.selectTagsByVideoId.all(videoId) as VideoTag[]
+  return tags
+}
+
+export function getAllActorTags(): ActorTag[] {
+  return _ACTORTAGS.selectAll.all() as ActorTag[]
+}
+
+export function getActorTags(actorId: number): ActorTag[] {
+  const tags = _ACTORTAGS.selectTagsByActorId.all(actorId) as ActorTag[]
   return tags
 }

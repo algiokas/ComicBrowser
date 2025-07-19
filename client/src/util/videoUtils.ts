@@ -44,6 +44,7 @@ export const actorFromJson = async (actorJson: any, videos: IVideo[]): Promise<I
     newActor.isFavorite = actorJson.isFavorite != null && actorJson.isFavorite > 0
     newActor.videos = videos.filter((v: any) => v.actors.some((a: any) => a.id === newActor.id)).map((v: any) => v.id)
     newActor.imageUrl = await getActorImageUrlWithFallback(newActor, videos)
+    newActor.birthYear = actorJson.birthYear ?? 1990
     return newActor
 }
 

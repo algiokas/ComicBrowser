@@ -36,6 +36,7 @@ export const _ACTORS = Object.freeze({
   updateImage: db.prepare(`UPDATE ${tables.actors} SET imageFile = ? WHERE id = ?`),
   updateName: db.prepare(`UPDATE ${tables.actors} SET name = ? WHERE id = ?`),
   updateFavorite: db.prepare(`UPDATE ${tables.actors} SET isFavorite = ? WHERE id = ?`),
+  updateBirthYear: db.prepare(`UPDATE ${tables.actors} SET birthYear = ? WHERE id = ?`)
 });
 
 export const _VIDEOACTORS = Object.freeze({
@@ -69,4 +70,19 @@ export const _VIDEOTAGSREF = Object.freeze({
   selectByVideoId: db.prepare(`SELECT * FROM ${tables.videoTagsRef} WHERE videoId = ?`),
   selectByTagId: db.prepare(`SELECT * FROM ${tables.videoTagsRef} WHERE tagId = ?`),
   delete: db.prepare(`DELETE FROM ${tables.videoTagsRef} WHERE videoId = ? AND tagId = ?`)
+})
+
+export const _ACTORTAGS = Object.freeze({
+  insert: db.prepare(`INSERT INTO ${tables.actorTags} (name) VALUES (?)`),
+  selectAll: db.prepare(`SELECT * FROM ${tables.actorTags}`),
+  selectByName: db.prepare(`SELECT * FROM ${tables.actorTags} WHERE name = ?`),
+  selectTagsByActorId: db.prepare(`SELECT ${tables.actorTags}.id, ${tables.actorTags}.name FROM ${tables.actorTagsRef} JOIN ${tables.actorTags} ON ${tables.actorTagsRef}.tagId = ${tables.actorTags}.id WHERE ${tables.actorTagsRef}.actorId = ?`),
+  delete: db.prepare(`DELETE FROM ${tables.actorTags} WHERE id = ?`)
+})
+
+export const _ACTORTAGSREF = Object.freeze({
+  insert: db.prepare(`INSERT INTO ${tables.actorTagsRef} (actorId, tagId) VALUES (?, ?)`),
+  selectByActorId: db.prepare(`SELECT * FROM ${tables.actorTagsRef} WHERE actorId = ?`),
+  selectByTagId: db.prepare(`SELECT * FROM ${tables.actorTagsRef} WHERE tagId = ?`),
+  delete: db.prepare(`DELETE FROM ${tables.actorTagsRef} WHERE actorId = ? AND tagId = ?`)
 })
