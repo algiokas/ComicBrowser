@@ -214,11 +214,13 @@ export function generateImageForActor(actorId: number, videoId: number, timeMs: 
 export function updateActor(actorId: number, newActorData: Partial<ClientActor>, callback: (result: UpdateActorResult) => void): void {
     console.log("updating video with id " + actorId)
     let updateResult: UpdateActorResult = { success: false, error: "", changes: [] }
-    let currentActorData = videoDatabase.getActorById(actorId);
-    if (!currentActorData) {
+    let actorRow = videoDatabase.getActorById(actorId);
+    if (!actorRow) {
         updateResult.error = `Could not find actor with ID: ${actorId}`
         return callback(updateResult)
     }
+
+    const currentActorData = fillActor(actorRow)
     if (newActorData.name && newActorData.name !== currentActorData.name) {
         let setActorResult = videoDatabase.setActorName(actorId, newActorData.name)
         if (setActorResult.changes > 0) {
@@ -227,7 +229,7 @@ export function updateActor(actorId: number, newActorData: Partial<ClientActor>,
             updateResult.error = updateResult.error + "Updating name failed"
         }
     }
-    if (newActorData.isFavorite !== undefined && (newActorData.isFavorite ? 1 : 0) != currentActorData.isFavorite) {
+    if (newActorData.isFavorite !== undefined && newActorData.isFavorite != currentActorData.isFavorite) {
         let setFavoriteResult = videoDatabase.setFavorite(actorId, newActorData.isFavorite ?? false)
         if (setFavoriteResult.changes > 0) {
             updateResult.changes.push("favorite")
@@ -243,7 +245,35 @@ export function updateActor(actorId: number, newActorData: Partial<ClientActor>,
             updateResult.error = updateResult.error + "Updating birth year failed"
         }
     }
-    if (newActorData)
+    if (newActorData.tags && currentActorData.tags) {
+        let tagsToAdd = newActorData.tags.filter(t => !currentActorData.tags.some(a => a.name === t.name))
+        let tagsToRemove = currentActorData.tags.filter(t => !(newActorData.tags!).some(a => a.name === t.name))
+
+        if (tagsToAdd.length) {
+            let addResult = videoDatabase.insertTagsForActor(actorId, tagsToAdd.map(t => t.name!))
+            if (addResult.length === tagsToAdd.length) {
+                updateResult.changes.push(`Added ${addResult.length} tags`)
+            } else {
+                if (addResult.length > 0) {
+                    updateResult.error += `Add tags partial success - added (${addResult.length}/${tagsToAdd.length}) tags`
+                } else {
+                    updateResult.error += "Adding tags failed"
+                }
+            }
+        } 
+        if (tagsToRemove.length) {
+            let removeResult = videoDatabase.removeTagsFromActor(actorId, tagsToRemove.map(t => t.name!))
+            if (removeResult.length === tagsToRemove.length) {
+                updateResult.changes.push(`Removed ${removeResult.length} tags`)
+            } else {
+                if (removeResult.length > 0) {
+                    updateResult.error += `Remove tags partial success - removed (${removeResult.length}/${tagsToRemove.length}) tags`
+                } else {
+                    updateResult.error += "Removing tags failed"
+                }
+            }
+        }
+    }
     updateResult.success = !updateResult.error && updateResult.changes.length > 0
     updateResult.actor = videoDatabase.getActorById(actorId)
     callback(updateResult)
@@ -346,7 +376,17 @@ export function getActor(actorId: number) {
 }
 
 export function getActors() {
-    return videoDatabase.getAllActors()
+    console.log("Get All Actors")
+    let rows = videoDatabase.getAllActors()
+    if (!rows || rows.length < 1) {
+        console.log("no videos found")
+        return rows
+    }
+    let actors: ClientActor[] = []
+    rows.forEach(row => {
+        actors.push(fillActor(row))
+    });
+    return actors
 }
 
 export function getActorImagePath(actorId: number) {
@@ -545,4 +585,7 @@ export function getAllVideoTags() {
     return videoDatabase.getAllVideoTags()
 }
 
+export function getAllActorTags() {
+    return videoDatabase.getAllActorTags()
+}
 

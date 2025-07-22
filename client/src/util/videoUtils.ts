@@ -42,9 +42,9 @@ export const getActorImageUrlWithFallback = async (actor: IActor, videos: IVideo
 export const actorFromJson = async (actorJson: any, videos: IVideo[]): Promise<IActor> => {
     let newActor = actorJson as IActor
     newActor.isFavorite = actorJson.isFavorite != null && actorJson.isFavorite > 0
-    newActor.videos = videos.filter((v: any) => v.actors.some((a: any) => a.id === newActor.id)).map((v: any) => v.id)
     newActor.imageUrl = await getActorImageUrlWithFallback(newActor, videos)
     newActor.birthYear = actorJson.birthYear ?? 1990
+    newActor.tags = actorJson.tags ?? []
     return newActor
 }
 
@@ -56,6 +56,16 @@ export const actorsFromJson = async (actorJson: any, videoJson: IVideo[]): Promi
         actorList.push(newActor)
     }
     return actorList
+}
+
+export const getActorVideoCount = (actor: IActor, allVideos: IVideo[]): number => {
+    const actorVideos = allVideos.filter(v => v.actors.some(a => a.id === actor.id))
+    return actorVideos.length
+}
+
+export const getActorAge = (actor: IActor): number => {
+    const currentYear = new Date().getFullYear()
+    return currentYear - actor.birthYear
 }
 
 const getComponentTerms = (str: string): string[] => {
@@ -79,6 +89,9 @@ const generateVideoSearchTerms = (video: IVideo): string[] => {
     if (video.actors) {
         video.actors.forEach(a => {
             getComponentTerms(a.name).forEach(t => { terms.add(t) })
+            if (a.tags.length > 0) {
+                a.tags.forEach(t => getComponentTerms(t.name).forEach(term => { terms.add(term) }))
+            }
         })
     }
     if (video.tags) {

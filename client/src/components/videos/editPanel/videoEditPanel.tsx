@@ -9,7 +9,7 @@ import EditPanelRowStatic from "./editPanel-row-static";
 import { VideosAppContext } from "../videosAppContext";
 import type { IVideoTag } from "../../../interfaces/video";
 
-interface EditPanelProps {
+interface VideoEditPanelProps {
     video: IVideo,
     toggleDisplay(): void
 
@@ -18,16 +18,16 @@ interface EditPanelProps {
     searchTag(t: string): void
 }
 
-interface EditFields {
+interface VideoEditFields {
     title: string,
     actors: IActor[],
     tags: IVideoTag[],
     source: IVideoSource
 }
 
-const EditPanel = (props: EditPanelProps) => {
+const VideoEditPanel = (props: VideoEditPanelProps) => {
     const appContext = useContext(VideosAppContext)
-    const [tempFields, setTempFields] = useState<EditFields>({
+    const [tempFields, setTempFields] = useState<VideoEditFields>({
         title: props.video.title,
         actors: props.video.actors,
         tags: props.video.tags,
@@ -46,7 +46,7 @@ const EditPanel = (props: EditPanelProps) => {
         return false;
     }
 
-    const checkPendingChanges = (tempFields: EditFields) => {
+    const checkPendingChanges = (tempFields: VideoEditFields) => {
         if (tempFields.title !== props.video.title) return true;
         if (tempFields.source.id !== props.video.source.id) return true;
 
@@ -153,4 +153,4 @@ const EditPanel = (props: EditPanelProps) => {
     )
 }
 
-export default EditPanel
+export default VideoEditPanel

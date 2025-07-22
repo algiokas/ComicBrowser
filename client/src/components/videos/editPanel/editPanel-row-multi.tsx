@@ -3,7 +3,7 @@ import Check2Img from "../../../img/svg/check2.svg";
 import PencilSquareImg from "../../../img/svg/pencil-square.svg";
 import PlusImg from "../../../img/svg/plus-symbol.svg";
 import XImg from "../../../img/svg/x.svg";
-import { VideosEditField } from "../../../util/enums";
+import { ActorsEditField, VideosEditField } from "../../../util/enums";
 
 interface EditPanelRowProps<T> {
     editField: VideosEditField,
@@ -13,7 +13,7 @@ interface EditPanelRowProps<T> {
     getDisplayString: (x: T | null) => string,
     getValueFromDisplayString: (str: string) => T | null,
     getValueFromTextInput?: (str: string) => T | null,
-    updateTempValue(field: VideosEditField, value: any): void,
+    updateTempValue(field: VideosEditField | ActorsEditField, value: any): void,
     valueClick?: (v: string) => void
 }
 

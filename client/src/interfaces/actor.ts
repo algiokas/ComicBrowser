@@ -5,8 +5,7 @@ export default interface IActor {
     imageFallbackVideoId: number,
     isFavorite: boolean,  
     imageUrl: string,
-    birthYear: number
-    videos: number[],
+    birthYear: number,
     tags: IActorTag[]
 }
 

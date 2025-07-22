@@ -1,18 +1,27 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import StarsImage from "../../../img/svg/stars.svg";
 import type IActor from "../../../interfaces/actor";
 import { VideosAppContext } from "../videosAppContext";
+import { getActorAge, getActorVideoCount } from "../../../util/videoUtils";
+import ActorEditPanel from "../editPanel/actorEditPanel";
+import Modal from "../../shared/modal";
 
 interface ActorDetailProps {
     actor: IActor,
 }
 
 const ActorDetail = (props: ActorDetailProps) => {
+    const [showActorEditModal, setShowActorEditModal] = useState<boolean>(false)
+
     const appContext = useContext(VideosAppContext)
 
     const favoriteClick = () => {
         props.actor.isFavorite = !props.actor.isFavorite; //toggle value
         appContext.updateActor(props.actor)
+    }
+
+    const toggleEditModal = () => {
+        setShowActorEditModal(prev => !prev)
     }
 
     return (
@@ -35,8 +44,22 @@ const ActorDetail = (props: ActorDetailProps) => {
                 <div className="actordetail-info">
                     <div className="actordetail-info-row">
                         <span className="actordetail-info-label">Videos: </span>
-                        <span className="actordetail-info-value">{props.actor.videos.length}</span>
+                        <span className="actordetail-info-value">{getActorVideoCount(props.actor, appContext.allVideos)}</span>
                     </div>
+                    <div className="actordetail-info-row">
+                        <span className="actordetail-info-label">Age: </span>
+                        <span className="actordetail-info-value">{getActorAge(props.actor)}</span>
+                    </div>
+                </div>
+                <div className="actordetail-edit">
+                    <button type="button" onClick={() => { toggleEditModal() }}>
+                        Edit Actor
+                    </button>
+                    <Modal modalId={"bookinfo-edit-modal"} displayModal={showActorEditModal} toggleModal={toggleEditModal}>
+                        <ActorEditPanel
+                            actor={props.actor}
+                            toggleDisplay={toggleEditModal} />
+                    </Modal>
                 </div>
             </div>
         </div>

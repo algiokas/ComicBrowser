@@ -6,6 +6,7 @@ import ActorSortControls from "./actorSortControls"
 import { useContext, useEffect, useRef, useState } from "react"
 import { VideosAppContext } from "../videosAppContext"
 import { scalarArrayCompare } from "../../../util/helpers"
+import { getActorVideoCount } from "../../../util/videoUtils"
 
 
 interface ActorGalleryProps {
@@ -52,7 +53,7 @@ const ActorGallery = (props: ActorGalleryProps) => {
                 break
             case ActorsSortOrder.NumVideos:
                 sortedCopy.sort((a, b) => {
-                    return b.videos.length - a.videos.length
+                    return getActorVideoCount(b, appContext.allVideos) - getActorVideoCount(a, appContext.allVideos)
                 })
                 break
             case ActorsSortOrder.Random:

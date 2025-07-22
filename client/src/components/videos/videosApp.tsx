@@ -13,6 +13,7 @@ import type { FileWithData } from "./gallery/sourceDetail";
 import MultiView from "./multiView";
 import { VideosAppContext, type VideosAppHandlers, type VideosAppState } from "./videosAppContext";
 import type { IVideoTag } from "../../interfaces/video";
+import type { IActorTag } from "../../interfaces/actor";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
@@ -23,6 +24,8 @@ const VideosApp = (props: VideosAppProps) => {
   const [allActors, setAllActors] = useState<IActor[]>([])
   const [allSources, setAllSources] = useState<IVideoSource[]>([])
   const [allVideoTags, setAllVideoTags] = useState<IVideoTag[]>([])
+  const [allActorTags, setAllActorTags] = useState<IActorTag[]>([])
+
   const [viewMode, setViewMode] = useState<VideosViewMode>(VideosViewMode.Loading)
   const [currentVideo, setCurrentVideo] = useState<IVideo | null>(null)
   const [currentSearchQuery, setCurrentSearchQuery] = useState<IVideoSearchQuery>(getEmptyQuery())
@@ -51,6 +54,11 @@ const VideosApp = (props: VideosAppProps) => {
     const videoTagsRes = await fetch(`${apiBaseUrl}/videos/tags`)
     const videoTagsData = await videoTagsRes.json()
     setAllVideoTags(videoTagsData as IVideoTag[])
+
+    const actorTagsRes = await fetch(`${apiBaseUrl}/actors/tags`)
+    const actorTagsData = await actorTagsRes.json()
+    setAllActorTags(actorTagsData as IActorTag[])
+    
     await fillActors(videos)
     await fillSources()
   }
@@ -334,6 +342,7 @@ const VideosApp = (props: VideosAppProps) => {
     allActors: allActors,
     allSources: allSources,
     allVideoTags: allVideoTags,
+    allActorTags: allActorTags,
     viewMode: viewMode,
     currentVideo: currentVideo,
     currentSearchQuery: currentSearchQuery,

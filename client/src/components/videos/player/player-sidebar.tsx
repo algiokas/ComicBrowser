@@ -1,6 +1,6 @@
 import type IActor from "../../../interfaces/actor"
 import Modal from "../../shared/modal"
-import EditPanel from "../editPanel/editPanel"
+import VideoEditPanel from "../editPanel/videoEditPanel"
 import CameraIcon from "../../../img/svg/camera.svg";
 import StarsIcon from "../../../img/svg/stars.svg";
 import type { PlayerProps } from "./player"
@@ -155,7 +155,7 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
             {
                 appContext.currentVideo ?
                     <Modal modalId={"bookinfo-edit-modal"} displayModal={props.showEditModal} toggleModal={props.toggleEditModal}>
-                        <EditPanel
+                        <VideoEditPanel
                             video={appContext.currentVideo}
                             toggleDisplay={props.toggleEditModal}
                             {...searchHandlers} />

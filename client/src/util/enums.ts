@@ -72,3 +72,10 @@ export const VideosEditField = {
   Tags: "Tags",
 } as const;
 export type VideosEditField = (typeof VideosEditField)[keyof typeof VideosEditField];
+
+export const ActorsEditField = {
+  Name: "Name",
+  BirthYear: "BirthYear",
+  Tags: "Tags",
+} as const;
+export type ActorsEditField = (typeof ActorsEditField)[keyof typeof ActorsEditField];

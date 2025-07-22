@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import Check2Img from "../../../img/svg/check2.svg";
 import PencilSquareImg from "../../../img/svg/pencil-square.svg";
 import XImg from "../../../img/svg/x.svg";
-import { VideosEditField } from "../../../util/enums";
+import { ActorsEditField, VideosEditField } from "../../../util/enums";
 
 interface EditPanelRowProps<T> {
-    editField: VideosEditField,
+    editField: VideosEditField | ActorsEditField,
     tempValue: T,
     valueRange?: T[],
     getDisplayString: (x: T) => string,
     getValueFromDisplayString: (str: string) => T,
-    updateTempValue(field: VideosEditField, value: any): void,
+    updateTempValue(field: VideosEditField | ActorsEditField, value: any): void,
     valueClick?: (v: string) => void
 }
 

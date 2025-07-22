@@ -1,9 +1,13 @@
 import { Router } from 'express';
 var router = Router();
-import { getActors, getActor, getActorImagePath, generateImageForActor, updateActor } from '../videoRepository';
+import { getActors, getActor, getActorImagePath, generateImageForActor, updateActor, getAllActorTags } from '../videoRepository';
 
 router.get('/', function (req, res) {
     res.json(getActors())
+})
+
+router.get('/tags', function (req, res) {
+    res.json(getAllActorTags())
 })
 
 router.get('/:actorId', function (req, res) {
