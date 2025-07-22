@@ -59,7 +59,7 @@ const ActorEditPanel = (props: ActorEditPanelProps) => {
     }
 
     const updateTempValue = (field: ActorsEditField, value: any) => {
-        let fieldValues = tempFields
+        let fieldValues = { ...tempFields }
         switch (field) {
             case ActorsEditField.Name:
                 fieldValues.name = value
@@ -85,8 +85,6 @@ const ActorEditPanel = (props: ActorEditPanelProps) => {
         tempActor.name = tempFields.name
         tempActor.birthYear = tempFields.birthYear
         tempActor.tags = tempFields.tags
-
-        console.log(tempActor)
 
         appContext.updateActor(tempActor)
         props.toggleDisplay()

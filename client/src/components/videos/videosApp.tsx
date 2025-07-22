@@ -51,16 +51,23 @@ const VideosApp = (props: VideosAppProps) => {
     const videos = videosFromJson(data)
     setAllVideos(videos)
 
-    const videoTagsRes = await fetch(`${apiBaseUrl}/videos/tags`)
-    const videoTagsData = await videoTagsRes.json()
-    setAllVideoTags(videoTagsData as IVideoTag[])
-
-    const actorTagsRes = await fetch(`${apiBaseUrl}/actors/tags`)
-    const actorTagsData = await actorTagsRes.json()
-    setAllActorTags(actorTagsData as IActorTag[])
+    await fillVideoTags()
+    await fillActorTags()
     
     await fillActors(videos)
     await fillSources()
+  }
+
+  const fillVideoTags = async () => {
+    const videoTagsRes = await fetch(`${apiBaseUrl}/videos/tags`)
+    const videoTagsData = await videoTagsRes.json()
+    setAllVideoTags(videoTagsData as IVideoTag[])
+  }
+
+  const fillActorTags = async () => {
+    const actorTagsRes = await fetch(`${apiBaseUrl}/actors/tags`)
+    const actorTagsData = await actorTagsRes.json()
+    setAllActorTags(actorTagsData as IActorTag[])
   }
 
   const fillActors = async (videos: IVideo[]) => {
@@ -108,6 +115,7 @@ const VideosApp = (props: VideosAppProps) => {
       if (currentVideo?.id === data.video.id) {
         setCurrentVideo(vData)
       }
+      await fillVideoTags()
     }
   }
 
@@ -130,6 +138,7 @@ const VideosApp = (props: VideosAppProps) => {
         }
       }
       setAllActors(newActors)
+      await fillActorTags()
     }
   }
 

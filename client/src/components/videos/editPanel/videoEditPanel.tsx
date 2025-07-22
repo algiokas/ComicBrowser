@@ -67,7 +67,7 @@ const VideoEditPanel = (props: VideoEditPanelProps) => {
     }
 
     const updateTempValue = (field: VideosEditField, value: any) => {
-        let fieldValues = tempFields
+        let fieldValues = { ...tempFields }
         switch (field) {
             case VideosEditField.Title:
                 fieldValues.title = value

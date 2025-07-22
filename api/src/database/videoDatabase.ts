@@ -386,8 +386,5 @@ export function getAllActorTags(): ActorTag[] {
 
 export function getActorTags(actorId: number): ActorTag[] {
   const tags = _ACTORTAGS.selectTagsByActorId.all(actorId) as ActorTag[]
-  if (tags.length > 0) {
-    console.log(`Actor ${actorId} - tags found`)
-  } 
   return tags
 }

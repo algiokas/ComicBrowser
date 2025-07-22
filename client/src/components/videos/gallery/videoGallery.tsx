@@ -48,7 +48,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
     }, [items, galleryPage, appContext.videoListingPage])
 
     useEffect(() => {
-        console.log(`update image load state: [${imageLoadState.getBits().map(b => b ? 1 : 0).join(',')}]`)
+        //console.log(`update image load state: [${imageLoadState.getBits().map(b => b ? 1 : 0).join(',')}]`)
         if (imageLoadState.allTrue()) {
             appContext.setLoadingModal(false)
         }
