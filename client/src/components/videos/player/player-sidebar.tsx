@@ -130,6 +130,22 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
                                 </div>
                                 : null
                         }
+                        
+                        <div className="player-video-info-tags">
+                            <h4 className="tags-header">Tags:</h4>
+                            <div className="tags-list">
+                            {
+                                appContext.currentVideo.tags.map((tag, i) => {
+                                    return (
+                                        <div key={i} className="player-tag info-item clickable">
+                                            {tag.name}
+                                        </div>
+                                    )
+                                })
+                            }
+                            </div>
+
+                        </div>
                         <div className="player-video-controls">
                             <div className="player-video-controls-row">
                                 <button type="button" onClick={() => { advanceVideoTime(-50) }}>

@@ -16,6 +16,10 @@
     filter: $black-to-favorite-filter;
 }
 
+.svg-icon-red {
+    filter: $black-to-red-filter;
+}
+
 .text-icon {
     width: 16px;
     height: 16px;
@@ -31,6 +35,12 @@
 }
   
 .favorite-icon {
+    padding: 10px;
+    margin: auto 0;
+    cursor: pointer;
+}
+
+.tags-icon {
     padding: 10px;
     margin: auto 0;
     cursor: pointer;

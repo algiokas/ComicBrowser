@@ -24,6 +24,7 @@
         margin: auto;
 
         &-container {
+            width: 1920px;
             display: flex;
             padding: 25px;
         }
@@ -94,6 +95,25 @@
                 }
             }
 
+            &-tags {
+                margin: 10px 0;
+
+                & .tags-header {
+                    padding-bottom: 5px;
+                    margin: 0;
+                    margin-right: auto;
+                    margin-bottom: 6px;
+                    border-bottom: 1px solid $gray-3;
+                }
+
+                & .tags-list {
+
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                }
+
+            }
 
         }
 

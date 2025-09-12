@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import StarsImage from "../../../img/svg/stars.svg";
+import TagsImage from "../../../img/svg/tags.svg";
 import type IActor from "../../../interfaces/actor";
 import type IVideo from "../../../interfaces/video";
 import { getVideoThumbnailUrl } from "../../../util/helpers";
@@ -57,6 +58,14 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
           }
         </div>
         <div className={props.video.isFavorite ? "caption favorite" : "caption"}>
+          <div className="tags-icon">
+            {
+              props.video.tags.length > 0 ?
+              <img className="svg-icon-red" src={TagsImage.toString()} alt="Video Tags"></img>
+              :
+              <img className="svg-icon-disabled" src={TagsImage.toString()} alt="Video Tags"></img>
+            }
+          </div>
           <div className="caption-text">
             <span className="subtitle">
               {
