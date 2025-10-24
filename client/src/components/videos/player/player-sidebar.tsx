@@ -137,7 +137,7 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
                             {
                                 appContext.currentVideo.tags.map((tag, i) => {
                                     return (
-                                        <div key={i} className="player-tag info-item clickable">
+                                        <div key={i} className="player-tag info-item clickable" onClick={() => searchTag(tag.name)}>
                                             {tag.name}
                                         </div>
                                     )

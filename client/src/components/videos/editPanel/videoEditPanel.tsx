@@ -131,6 +131,7 @@ const VideoEditPanel = (props: VideoEditPanelProps) => {
                     tempValue={tempFields.tags}
                     updateTempValue={updateTempValue}
                     valueRange={appContext.allVideoTags.sort((a, b) => a.name.localeCompare(b.name))}
+                    multiSelect={true}
                     valueClick={props.searchTag}
                     getDisplayString={(t) => t?.name ?? ''}
                     getValueFromDisplayString={(str) => { return appContext.allVideoTags.find((t) => t.name == str) ?? null }}

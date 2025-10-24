@@ -3,17 +3,20 @@ import Check2Img from "../../../img/svg/check2.svg";
 import PencilSquareImg from "../../../img/svg/pencil-square.svg";
 import PlusImg from "../../../img/svg/plus-symbol.svg";
 import XImg from "../../../img/svg/x.svg";
-import { ActorsEditField, VideosEditField } from "../../../util/enums";
+import { type EditField } from "../../../util/enums";
+import EditPanelDropdown from "./editPanel-dropdown";
+import EditPanelMultiSelect from "./editPanel-multiSelect";
 
 interface EditPanelRowProps<T> {
-    editField: VideosEditField,
+    editField: EditField,
     tempValue: T[],
     valueRange?: T[],
+    multiSelect?: boolean,
     hideTextInput?: boolean,
     getDisplayString: (x: T | null) => string,
     getValueFromDisplayString: (str: string) => T | null,
     getValueFromTextInput?: (str: string) => T | null,
-    updateTempValue(field: VideosEditField | ActorsEditField, value: any): void,
+    updateTempValue(field: EditField, value: any): void,
     valueClick?: (v: string) => void
 }
 
@@ -48,11 +51,23 @@ function EditPanelRowMulti<T>(props: EditPanelRowProps<T>) {
 
     const handleTextInputKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            addToCollection()
+            addFieldValueToCollection()
         }
     }
 
-    const addToCollection = () => {
+    const addToCollection = (v: T) => {
+        if (v) {
+            setCollection([...collection, v])
+        }
+    }
+
+    const removeValueFromCollection = (v: T) => {
+        if (v) {
+            setCollection([...collection.filter(i => props.getDisplayString(i) !== props.getDisplayString(v))])
+        }
+    }
+
+    const addFieldValueToCollection = () => {
         if (fieldValue) {
             setCollection([...collection, fieldValue])
             setFieldValue(null)
@@ -89,17 +104,12 @@ function EditPanelRowMulti<T>(props: EditPanelRowProps<T>) {
                     <div className="edit-panel-row-inner edit-mode">
                         <div className="edit-panel-row-value">
                             {
-                                props.valueRange ?
-                                    <select className="edit-panel-row-dropdown" onChange={handleDropdownChange} id={`${props.editField.toString().toLowerCase()}-dropdown`} >
-                                        <option value=''>{`-- Select ${props.editField} --`}</option>
-                                        {
-                                            props.valueRange.map((v, i) => {
-                                                if (!collection.some(item => props.getDisplayString(item) === props.getDisplayString(v))) {
-                                                    return (<option key={i} value={props.getDisplayString(v)}>{props.getDisplayString(v)}</option>)
-                                                }
-                                            })
-                                        }
-                                    </select>
+                                props.valueRange && !props.multiSelect ?
+                                    <EditPanelDropdown<T> editField={props.editField}
+                                        valueRange={props.valueRange}
+                                        collection={collection}
+                                        getDisplayString={props.getDisplayString}
+                                        handleDropdownChange={handleDropdownChange}/>
                                     : null
                             }
                             {
@@ -110,15 +120,25 @@ function EditPanelRowMulti<T>(props: EditPanelRowProps<T>) {
                                             onChange={handleTextInputChange}
                                             onKeyDown={handleTextInputKey}>
                                         </input>
-                                        <button type="button" onClick={addToCollection}>
+                                        <button type="button" onClick={addFieldValueToCollection}>
                                             <img className="svg-icon text-icon" src={PlusImg.toString()} alt="remove collection item"></img>
                                         </button>
                                     </div>
                                     : null
                             }
+                            {
+                                props.valueRange && props.multiSelect ?
+                                    <EditPanelMultiSelect<T>
+                                        valueRange={props.valueRange}
+                                        collection={collection}
+                                        getDisplayString={props.getDisplayString}
+                                        addToCollection={addToCollection}
+                                        removeFromCollection={removeValueFromCollection}/>
+                                    : null
+                            }
                             <div className="edit-panel-row-collection">
                                 {
-                                    collection ?
+                                    collection && !props.multiSelect ?
                                         collection.map((item, i) => {
                                             return <div className="edit-panel-row-collection-item" key={i}>
                                                 <span className="item-value">
@@ -181,3 +201,5 @@ function EditPanelRowMulti<T>(props: EditPanelRowProps<T>) {
 }
 
 export default EditPanelRowMulti
+
+

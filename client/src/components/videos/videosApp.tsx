@@ -271,6 +271,8 @@ const VideosApp = (props: VideosAppProps) => {
 
   const viewSources = () => { setViewMode(VideosViewMode.Sources) }
 
+  const viewTags = () => { setViewMode(VideosViewMode.Tags) }
+
   const setLoadingModal = (show: boolean, text?: string) => {
     setLoadingModalText(text ?? "")
     setShowLoadingModal(show)
@@ -293,6 +295,11 @@ const VideosApp = (props: VideosAppProps) => {
       text: "Sources",
       viewMode: VideosViewMode.Sources,
       clickHandler: viewSources
+    },
+    {
+      text: "Tags",
+      viewMode: VideosViewMode.Tags,
+      clickHandler: viewTags
     },
     {
       text: "Current Video",

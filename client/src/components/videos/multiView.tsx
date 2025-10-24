@@ -1,7 +1,8 @@
 import type { IVideoSearchQuery } from "../../interfaces/searchQuery";
-import { ActorsSortOrder, VideosSortOrder, VideosViewMode } from "../../util/enums";
+import { ActorsSortOrder, VideosViewMode } from "../../util/enums";
 import ActorGallery from "./gallery/actorGallery";
 import SourceGallery from "./gallery/sourceGallery";
+import TagsGallery from "./gallery/tagsGallery";
 import VideoGallery from "./gallery/videoGallery";
 import LoadingView from "./loadingView";
 import Player from "./player/player";
@@ -27,6 +28,10 @@ const MultiView = (props: MultiViewProps) => {
         case VideosViewMode.Sources:
             return (
                 <SourceGallery />
+            )
+        case VideosViewMode.Tags:
+            return (
+                <TagsGallery />
             )
         case VideosViewMode.Player:
             return (

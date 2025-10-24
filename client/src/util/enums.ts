@@ -20,6 +20,7 @@ export const VideosViewMode = {
   Actors: "Actors",
   Sources: "Sources",
   Player: "Player",
+  Tags: "Tags",
   SearchResults: "SearchResults",
 } as const;
 export type VideosViewMode = (typeof VideosViewMode)[keyof typeof VideosViewMode];
@@ -79,3 +80,11 @@ export const ActorsEditField = {
   Tags: "Tags",
 } as const;
 export type ActorsEditField = (typeof ActorsEditField)[keyof typeof ActorsEditField];
+
+export type EditField = VideosEditField | ActorsEditField
+
+export const TagType = {
+  Video: "Video",
+  Actor: "Actor"
+} as const;
+export type TagType = (typeof TagType)[keyof typeof TagType];

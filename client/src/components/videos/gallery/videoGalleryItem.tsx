@@ -11,7 +11,8 @@ interface VideoGalleryItemProps {
   bodyClickHandler?: (data: IVideo, index: number) => void,
   favoriteClickHandler?: (data: IVideo) => void,
   subTitleItemClickHandler?: (actor: IActor) => void,
-  onImageLoad?: (idx: number) => void
+  onImageLoad?: (idx: number) => void,
+  children?: React.ReactNode
 }
 
 const VideoGalleryItem = (props: VideoGalleryItemProps) => {
@@ -52,41 +53,44 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
               <img
                 src={thumbnailImageUrl}
                 alt={`${props.video.title} thumbnail`}
-                onLoad={() => { if (props.onImageLoad) props.onImageLoad(props.index)}}>
+                onLoad={() => { if (props.onImageLoad) props.onImageLoad(props.index) }}>
               </img>
               : null
           }
         </div>
-        <div className={props.video.isFavorite ? "caption favorite" : "caption"}>
-          <div className="tags-icon">
-            {
-              props.video.tags.length > 0 ?
-              <img className="svg-icon-red" src={TagsImage.toString()} alt="Video Tags"></img>
-              :
-              <img className="svg-icon-disabled" src={TagsImage.toString()} alt="Video Tags"></img>
-            }
-          </div>
-          <div className="caption-text">
-            <span className="subtitle">
-              {
-                props.video.actors.map((actor, i) => {
-                  return (
-                    <span key={i} onClick={(e) => subtitleClick(e, actor)}>{actor.name}</span>
-                  )
-                })
-              }
-            </span>
-            <span className="title">{props.video.title}</span>
-          </div>
-          <div className="favorite-icon" onClick={props.favoriteClickHandler ? favoriteClick : undefined}>
-            {
-              props.video.isFavorite ?
-                <img className="svg-icon-favorite" src={StarsImage.toString()} alt="remove from favorites"></img>
-                :
-                <img className="svg-icon-disabled test" src={StarsImage.toString()} alt="add to favorites"></img>
-            }
-          </div>
-        </div>
+        {
+          props.children ? <div className="caption">{props.children}</div> :
+            <div className={props.video.isFavorite ? "caption favorite" : "caption"}>
+              <div className="tags-icon">
+                {
+                  props.video.tags.length > 0 ?
+                    <img className="svg-icon-red" src={TagsImage.toString()} alt="Video Tags"></img>
+                    :
+                    <img className="svg-icon-disabled" src={TagsImage.toString()} alt="Video Tags"></img>
+                }
+              </div>
+              <div className="caption-text">
+                <span className="subtitle">
+                  {
+                    props.video.actors.map((actor, i) => {
+                      return (
+                        <span key={i} onClick={(e) => subtitleClick(e, actor)}>{actor.name}</span>
+                      )
+                    })
+                  }
+                </span>
+                <span className="title">{props.video.title}</span>
+              </div>
+              <div className="favorite-icon" onClick={props.favoriteClickHandler ? favoriteClick : undefined}>
+                {
+                  props.video.isFavorite ?
+                    <img className="svg-icon-favorite" src={StarsImage.toString()} alt="remove from favorites"></img>
+                    :
+                    <img className="svg-icon-disabled test" src={StarsImage.toString()} alt="add to favorites"></img>
+                }
+              </div>
+            </div>
+        }
       </div>
     </div>
   )

@@ -209,4 +209,21 @@
             border-color: $pink-1;
         }
     }
+
+    & .multiselect {
+        display: flex;
+        padding: 8px;
+
+        &-inner {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        &-item {
+            &.selected {
+                box-shadow: inset -1px 0px 3px 3px $pink-1;
+            }
+        }
+    }
 }
