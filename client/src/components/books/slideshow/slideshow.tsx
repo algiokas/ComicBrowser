@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react";
-import type IBook from "../../../interfaces/book";
-import type { IBookSearchQuery } from "../../../interfaces/searchQuery";
-import type ISlideshow from "../../../interfaces/slideshow";
+import type { Book } from "../../../types/book";
+import type { IBookSearchQuery } from "../../../types/searchQuery";
+import type { Slideshow } from "../../../types/slideshow";
 import { BooksViewMode } from "../../../util/enums";
 import { GetPagePathMulti, getSlideshowBookByPage } from "../../../util/helpers";
 import GridPage from "./gridPage";
 import Sidebar from "./slideshow-sidebar";
 
 interface SlideshowProps {
-    slideshow: ISlideshow,
+    slideshow: Slideshow,
     currentPage: number,
     viewMode: BooksViewMode,
 
     setCurrentPage(n: number): void,
-    addButtonHandler(book: IBook): void,
+    addButtonHandler(book: Book): void,
     removeButtonHandler(index: number): void,
     emptySlideshow(): void,
-    updateBook(book: IBook): void,
+    updateBook(book: Book): void,
     deleteBook(bookId: number): void,
     viewSearchResults(query?: IBookSearchQuery): void,
     createCollection(collectionName: string, coverBookId: number): void
@@ -139,7 +139,7 @@ const Slideshow = (props: SlideshowProps) => {
         }
     }
 
-    const firstPageOfBook = (book: IBook, bookIndex: number) => {
+    const firstPageOfBook = (book: Book, bookIndex: number) => {
         let pageIndex = 0;
         for (let i = 0; i < bookIndex; i++) {
             pageIndex += props.slideshow.books[i].pageCount

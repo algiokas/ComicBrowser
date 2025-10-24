@@ -1,13 +1,13 @@
-import type IBook from "./book"
+import type { Book } from "./book"
 
-export default interface ISlideshow {
+export type Slideshow = {
     id: number | null,
     name: string,
     pageCount: number,
-    books: IBook[]
+    books: Book[]
 }
 
-export interface ICollection extends ISlideshow {
+export type Collection = Slideshow & {
     coverBookId: number,
     coverPageId: number,
     coverImage: string

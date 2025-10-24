@@ -1,21 +1,21 @@
 import { useState } from "react";
-import type { ICollection } from "../../../interfaces/slideshow";
+import type { Collection } from "../../../types/slideshow";
 import PageSelect from "../../shared/pageSelect"
 import type { BaseGalleryProps } from "../../shared/baseGallery"
 import CollectionGalleryItem from "./collectionGalleryItem";
 import { GetCoverPath, GetPagePathByID } from "../../../util/helpers";
 
 
-interface CollectionGalleryProps extends BaseGalleryProps<ICollection> {
-    viewCollection(col: ICollection): void
+interface CollectionGalleryProps extends BaseGalleryProps<Collection> {
+    viewCollection(col: Collection): void
 }
 
 const CollectionGallery = (props: CollectionGalleryProps) => {
-    const [items, setItems] = useState<ICollection[]>(props.allItems)
+    const [items, setItems] = useState<Collection[]>(props.allItems)
     const [galleryPage, setGalleryPage] = useState<number>(0)
     const [totalPages, setTotalPages] = useState<number>(0)
 
-    const getTotalPages = (items: ICollection[]): number => {
+    const getTotalPages = (items: Collection[]): number => {
         if (items) {
             return Math.max(1, Math.ceil(items.length / props.pageSize))
         }
@@ -34,13 +34,13 @@ const CollectionGallery = (props: CollectionGalleryProps) => {
         setGalleryPage(pageNum)
     }
 
-    const getCurrentGalleryPage = (): ICollection[] => {
+    const getCurrentGalleryPage = (): Collection[] => {
         let pageStart = galleryPage * props.pageSize;
         let pageEnd = (galleryPage + 1) * props.pageSize;
         return items.slice(pageStart, pageEnd)
     }
 
-    const getCollectionCover = (col: ICollection): string => {
+    const getCollectionCover = (col: Collection): string => {
         if (col.coverImage) {
             console.log(`Cover images not supported: ${col.coverImage}`)
             return ''

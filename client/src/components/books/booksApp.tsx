@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import type { SubAppProps } from "../../App";
-import type IBook from "../../interfaces/book";
-import type INavItem from "../../interfaces/navItem";
-import type { IBookSearchQuery } from "../../interfaces/searchQuery";
-import type ISlideshow from "../../interfaces/slideshow";
-import type { ICollection } from "../../interfaces/slideshow";
+import type { Book } from "../../types/book";
+import type { NavItem } from "../../types/navItem";
+import type { IBookSearchQuery } from "../../types/searchQuery";
+import type { Slideshow } from "../../types/slideshow";
+import type { Collection } from "../../types/slideshow";
 import { BooksViewMode } from "../../util/enums";
 import { filterAlphanumeric, isAlphanumeric } from "../../util/helpers";
 import Navigation from "../shared/navigation";
@@ -17,18 +17,18 @@ interface BooksAppProps extends SubAppProps {
 
 export interface BooksAppState {
   galleryPageSize: number,
-  allBooks: IBook[],
-  allCollections: ICollection[],
+  allBooks: Book[],
+  allCollections: Collection[],
   viewMode: BooksViewMode,
   singleBookPage: number,
   slideshowPage: number,
-  currentBook: IBook | null,
-  currentSlideshow: ISlideshow,
+  currentBook: Book | null,
+  currentSlideshow: Slideshow,
   currentSearchQuery: IBookSearchQuery,
   slideshowInterval: number,
 }
 
-const getEmptySlideshow = (): ISlideshow => {
+const getEmptySlideshow = (): Slideshow => {
   return {
     id: null,
     name: "",
@@ -48,13 +48,13 @@ const getEmptyQuery = (): IBookSearchQuery => {
 }
 
 function BooksApp(props: BooksAppProps) {
-  const [allBooks, setAllBooks] = useState<IBook[]>([])
-  const [allCollections, setAllCollections] = useState<ICollection[]>([])
+  const [allBooks, setAllBooks] = useState<Book[]>([])
+  const [allCollections, setAllCollections] = useState<Collection[]>([])
   const [viewMode, setViewMode] = useState<BooksViewMode>(BooksViewMode.Loading)
   const [singleBookPage, setSingleBookPage] = useState<number>(0)
   const [slideshowPage, setSlideshowPage] = useState<number>(0)
-  const [currentBook, setCurrentBook] = useState<IBook | null>(null)
-  const [currentSlideshow, setCurrentSlideshow] = useState<ISlideshow>(getEmptySlideshow())
+  const [currentBook, setCurrentBook] = useState<Book | null>(null)
+  const [currentSlideshow, setCurrentSlideshow] = useState<Slideshow>(getEmptySlideshow())
   const [currentSearchQuery, setCurrentSearchQuery] = useState<IBookSearchQuery>(getEmptyQuery())
   const [slideshowInterval, setSlideshowInterval] = useState<number>(5)
   const [galleryPageSize, setGalleryPageSize] = useState<number>(12)
@@ -77,7 +77,7 @@ function BooksApp(props: BooksAppProps) {
 
 
   const bookFromJson = (e: any): any => {
-    let newBook = e as IBook
+    let newBook = e as Book
     if (e.addedDate) {
       newBook.addedDate = new Date(e.addedDate)
     }
@@ -86,8 +86,8 @@ function BooksApp(props: BooksAppProps) {
     return newBook
   }
 
-  const booksFromJson = (bookJson: any): IBook[] => {
-    let bookList: IBook[] = []
+  const booksFromJson = (bookJson: any): Book[] => {
+    let bookList: Book[] = []
     if (!bookJson || bookJson.length < 1) console.log("booksFromJson - no books in input")
     bookJson.forEach((e: any): any => {
       let newBook = bookFromJson(e)
@@ -96,8 +96,8 @@ function BooksApp(props: BooksAppProps) {
     return bookList
   }
 
-  const collectionFromJson = (c: any, booksList: IBook[]): ICollection => {
-    const newCollection: ICollection = {
+  const collectionFromJson = (c: any, booksList: Book[]): Collection => {
+    const newCollection: Collection = {
       id: c.id,
       name: c.name,
       coverImage: c.coverImage,
@@ -118,7 +118,7 @@ function BooksApp(props: BooksAppProps) {
     return newCollection
   }
 
-  const getCollections = async (books: IBook[]) => {
+  const getCollections = async (books: Book[]) => {
     const res = await fetch(`${apiBaseUrl}/books/collections/all`, { method: 'get' })
     const data = await res.json()
     setAllCollections(data.map((c: any) => collectionFromJson(c, books)))
@@ -142,7 +142,7 @@ function BooksApp(props: BooksAppProps) {
     setCurrentSlideshow(getEmptySlideshow())
   }
 
-  const updateBook = async (book: IBook) => {
+  const updateBook = async (book: Book) => {
     const res = await fetch(`${apiBaseUrl}/books/${book.id}/update`, {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
@@ -205,7 +205,7 @@ function BooksApp(props: BooksAppProps) {
   //#endregion
 
   //#region initialization
-  const generateBookSearchTerms = (book: IBook): string[] => {
+  const generateBookSearchTerms = (book: Book): string[] => {
     const terms = new Set<string>();
 
     terms.add(book.id.toString())
@@ -270,7 +270,7 @@ function BooksApp(props: BooksAppProps) {
   //#endregion
 
   //#region navigation
-  const viewBook = (book: IBook) => {
+  const viewBook = (book: Book) => {
     setViewMode(BooksViewMode.SingleBook)
     setCurrentBook(book)
     setSingleBookPage(0)
@@ -319,12 +319,12 @@ function BooksApp(props: BooksAppProps) {
     setViewMode(BooksViewMode.Collections)
   }
 
-  const viewCollection = (col: ICollection) => {
+  const viewCollection = (col: Collection) => {
     setViewMode(BooksViewMode.Slideshow)
     setCurrentSlideshow(col)
   }
 
-  const getLeftNavItems = (): INavItem[] => {
+  const getLeftNavItems = (): NavItem[] => {
     return [
       {
         text: "Listing",
@@ -358,7 +358,7 @@ function BooksApp(props: BooksAppProps) {
     ]
   }
 
-  const getRightNavItems = (): INavItem[] => {
+  const getRightNavItems = (): NavItem[] => {
     return [
       {
         text: "Import Books",
@@ -373,8 +373,8 @@ function BooksApp(props: BooksAppProps) {
   //#endregion
 
   //#region slideshow
-  const addBookToSlideshow = (book: IBook) => {
-    const newSlideshow: ISlideshow = {
+  const addBookToSlideshow = (book: Book) => {
+    const newSlideshow: Slideshow = {
       id: currentSlideshow.id,
       name: currentSlideshow.name,
       pageCount: currentSlideshow.pageCount + book.pageCount,

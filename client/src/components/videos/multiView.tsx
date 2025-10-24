@@ -1,4 +1,4 @@
-import type { IVideoSearchQuery } from "../../interfaces/searchQuery";
+import type { IVideoSearchQuery } from "../../types/searchQuery";
 import { ActorsSortOrder, VideosViewMode } from "../../util/enums";
 import ActorGallery from "./gallery/actorGallery";
 import SourceGallery from "./gallery/sourceGallery";

@@ -1,12 +1,12 @@
 import React, { useContext, useState } from "react";
-import type IActor from "../../../interfaces/actor";
-import type IVideo from "../../../interfaces/video";
+import type { Actor } from "../../../types/actor";
+import type { Video } from "../../../types/video";
 import PlayerSidebar, { type PlayerSidebarProps } from "./player-sidebar";
 import { VideosAppContext } from "../videosAppContext";
 
 export interface PlayerProps {
-    videoFavoriteClick?: (video: IVideo) => void,
-    actorFavoriteClick?: (actor: IActor) => void
+    videoFavoriteClick?: (video: Video) => void,
+    actorFavoriteClick?: (actor: Actor) => void
 }
 
 const Player = (props: PlayerProps) => {

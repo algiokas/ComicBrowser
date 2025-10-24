@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import type IVideoSource from "../../../interfaces/videoSource";
+import type { VideoSource } from "../../../types/videoSource";
 import { getSourceImageUrl } from "../../../util/helpers";
 
 interface SourceGalleryItemProps {
     index: number,
-    source: IVideoSource,
-    bodyClickHandler?: (data: IVideoSource, index: number) => void,
-    favoriteClickHandler?: (data: IVideoSource) => void,
+    source: VideoSource,
+    bodyClickHandler?: (data: VideoSource, index: number) => void,
+    favoriteClickHandler?: (data: VideoSource) => void,
 }
 
 const SourceGalleryItem = (props: SourceGalleryItemProps) => {

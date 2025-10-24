@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import type IBook from "../../../interfaces/book";
-import type { IBookSearchQuery } from "../../../interfaces/searchQuery";
+import type { Book } from "../../../types/book";
+import type { IBookSearchQuery } from "../../../types/searchQuery";
 import { GetCoverPath } from "../../../util/helpers";
 import Modal from "../../shared/modal";
 import GalleryItem from "../coverGallery/galleryItem";
 import EditPanel from "../editPanel/editPanel";
 
 interface BookInfoProps {
-    book: IBook,
-    addButtonHandler(book: IBook): void,
+    book: Book,
+    addButtonHandler(book: Book): void,
     unhidePage(pageNum: number): void,
-    updateBook(book: IBook): void,
+    updateBook(book: Book): void,
     deleteBook(bookId: number): void,
     viewSearchResults(query?: IBookSearchQuery): void
 }
@@ -53,7 +53,7 @@ const BookInfo = (props: BookInfoProps) => {
         setShowEditModal(!showEditModal)
     }
 
-    const favoriteClick = (book: IBook) => {
+    const favoriteClick = (book: Book) => {
         console.log("toggle favorite for book: " + book.id)
         if (props.updateBook) {
             book.isFavorite = !book.isFavorite; //toggle value

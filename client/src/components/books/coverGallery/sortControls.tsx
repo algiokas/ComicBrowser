@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import type IBook from "../../../interfaces/book";
+import type { Book } from "../../../types/book";
 import { BooksSortOrder } from "../../../util/enums";
 import { getAlphabet, getBookAuthor } from "../../../util/helpers";
 
 interface SortControlsProps {
     sortOrder: BooksSortOrder,
-    bookList: IBook[],
+    bookList: Book[],
     pageSize: number,
     sortBooks(order: BooksSortOrder): void,
     setPage(pageNum: number): void
@@ -35,16 +35,16 @@ const SortControls = (props: SortControlsProps) => {
     const firstGalleryMatchForIndex = (indexKey: string): number => {
         let firstMatch = 0
         let hasFindFunction = false
-        let findFunction = (b: IBook) => {}
+        let findFunction = (b: Book) => {}
         switch (props.sortOrder) {
             case BooksSortOrder.Author:
-                findFunction = (b: IBook) => { 
+                findFunction = (b: Book) => { 
                     return indexKey.toLowerCase() === getBookAuthor(b).substring(0,1).toLowerCase() 
                 }
                 hasFindFunction = true
                 break;
             case BooksSortOrder.Artist:
-                findFunction = (b: IBook) => { 
+                findFunction = (b: Book) => { 
                     if (b.artists.length < 1 || !b.artists[0]) {
                         return false 
                     }
@@ -53,7 +53,7 @@ const SortControls = (props: SortControlsProps) => {
                 hasFindFunction = true
                 break;
             case BooksSortOrder.Title:
-                findFunction = (b: IBook) => { 
+                findFunction = (b: Book) => { 
                     return indexKey.toLowerCase() === b.title.substring(0,1).toLowerCase() 
                 }
                 hasFindFunction = true

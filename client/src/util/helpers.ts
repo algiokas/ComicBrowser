@@ -1,10 +1,10 @@
-import type IActor from "../interfaces/actor";
-import type IBook from "../interfaces/book"
-import type ISlideshow from "../interfaces/slideshow";
-import type IVideo from "../interfaces/video";
-import type IVideoSource from "../interfaces/videoSource";
+import type { Actor } from "../types/actor";
+import type { Book } from "../types/book"
+import type { Slideshow } from "../types/slideshow";
+import type { Video } from "../types/video";
+import type { VideoSource } from "../types/videoSource";
 
-export function GetCoverPath(book: IBook): string {
+export function GetCoverPath(book: Book): string {
     const basePath = import.meta.env.VITE_API_BASE_URL
     if (basePath) {
         return basePath + `/books/${book.id}/page/0`
@@ -35,25 +35,25 @@ async function shortNumericHash(input: string, digits = 8): Promise<number> {
     return num % (10 ** digits);
 }
 
-export async function getVideoThumbnailUrl(video: IVideo): Promise<string> {
+export async function getVideoThumbnailUrl(video: Video): Promise<string> {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
     const versionHash = await shortNumericHash(video.thumbnailId)
     return `${apiBaseUrl}/videos/thumbnail/${video.id}?v=${versionHash}`
 }
 
-export async function getActorImageUrl(actor: IActor): Promise<string> {
+export async function getActorImageUrl(actor: Actor): Promise<string> {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
     const versionHash = await shortNumericHash(actor.imageFile)
     return `${apiBaseUrl}/actors/${actor.id}/image?v=${versionHash}`
 }
 
-export async function getSourceImageUrl(source: IVideoSource, small?: boolean): Promise<string> {
+export async function getSourceImageUrl(source: VideoSource, small?: boolean): Promise<string> {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
     const versionHash = await shortNumericHash(small ? source.imageFileSmall : source.imageFileLarge)
     return `${apiBaseUrl}/videos/sources/${source.id}/image${small ? 'small' : 'large'}?v=${versionHash}`
 }
 
-export function GetPagePath(book: IBook, pageNum: number): string {
+export function GetPagePath(book: Book, pageNum: number): string {
     if (!book) {
         console.log("GetPagePath - book cannot be null")
     }
@@ -66,7 +66,7 @@ export function GetPagePath(book: IBook, pageNum: number): string {
     return GetPagePathByID(book.id, pageNum)
 }
 
-export function getSlideshowBookByPage(slideshow: ISlideshow, pageNum: number): IBook | null {
+export function getSlideshowBookByPage(slideshow: Slideshow, pageNum: number): Book | null {
     const books = slideshow.books
     if (books.length < 1) {
         return null
@@ -86,7 +86,7 @@ export function getSlideshowBookByPage(slideshow: ISlideshow, pageNum: number): 
     return null
 }
 
-export function GetPagePathMulti(books: IBook[], pageNum: number): string {
+export function GetPagePathMulti(books: Book[], pageNum: number): string {
     if (books.length < 2) {
         return GetPagePath(books[0], pageNum)
     }
@@ -103,7 +103,7 @@ export function GetPagePathMulti(books: IBook[], pageNum: number): string {
     return ""
 }
 
-export function GetRelativePage(books: IBook[], bookNum: number, pageNum: number): number {
+export function GetRelativePage(books: Book[], bookNum: number, pageNum: number): number {
     if (bookNum < 1) return pageNum
     let prevBookPages = 0
     for (let i = 0; i < bookNum && books.length; i++) {
@@ -112,7 +112,7 @@ export function GetRelativePage(books: IBook[], bookNum: number, pageNum: number
     return prevBookPages + pageNum
 }
 
-export function getBookAuthor(book: IBook) {
+export function getBookAuthor(book: Book) {
     if (book.artGroup)
         return book.artGroup
     if (book.artists && book.artists.length > 0)

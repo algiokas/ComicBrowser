@@ -1,4 +1,4 @@
-import type IActor from "../../../interfaces/actor"
+import type { Actor } from "../../../types/actor"
 import { ActorsSortOrder } from "../../../util/enums"
 import PageSelect from "../../shared/pageSelect"
 import ActorGalleryItem from "./actorGalleryItem"
@@ -19,7 +19,7 @@ const ActorGallery = (props: ActorGalleryProps) => {
 
     const appContext = useContext(VideosAppContext)
 
-    const [items, setItems] = useState<IActor[]>([])
+    const [items, setItems] = useState<Actor[]>([])
     const [sortOrder, setSortOrder] = useState<ActorsSortOrder>(initialSortOrder)
     const [totalPages, setTotalPages] = useState<number>(0)
 
@@ -27,9 +27,9 @@ const ActorGallery = (props: ActorGalleryProps) => {
         updateItems(appContext.allActors)
     }, [appContext.allActors])
 
-    const previousActors = useRef([] as IActor[])
+    const previousActors = useRef([] as Actor[])
 
-    const updateItems = (actors: IActor[]) => {
+    const updateItems = (actors: Actor[]) => {
         const newIds = actors.map(a => a.id)
         const oldIds = previousActors.current.map(a => a.id)
         if (!scalarArrayCompare(newIds, oldIds)) {
@@ -43,7 +43,7 @@ const ActorGallery = (props: ActorGalleryProps) => {
         previousActors.current = actors
     }
 
-    const getSortedActors = (actors: IActor[], sortOrder: ActorsSortOrder): IActor[] => {
+    const getSortedActors = (actors: Actor[], sortOrder: ActorsSortOrder): Actor[] => {
         let sortedCopy = [...actors]
         switch (sortOrder) {
             case ActorsSortOrder.Name:
@@ -73,7 +73,7 @@ const ActorGallery = (props: ActorGalleryProps) => {
         return sortedCopy
     }
 
-    const getTotalPages = (Actors: IActor[]): number => {
+    const getTotalPages = (Actors: Actor[]): number => {
         if (Actors) {
             return Math.max(1, Math.ceil(Actors.length / appContext.galleryPageSize))
         }
@@ -92,17 +92,17 @@ const ActorGallery = (props: ActorGalleryProps) => {
         appContext.setActorListingPage(pageNum)
     }
 
-    const getCurrentgalleryPage = (): IActor[] => {
+    const getCurrentgalleryPage = (): Actor[] => {
         let pageStart = appContext.actorListingPage * appContext.galleryPageSize;
         let pageEnd = (appContext.actorListingPage + 1) * appContext.galleryPageSize;
         return items.slice(pageStart, pageEnd)
     }
 
-    const bodyClick = (a: IActor) => {
+    const bodyClick = (a: Actor) => {
         appContext.viewSearchResults({ actor: a.name })
     }
 
-    const favoriteClick = (a: IActor) => {
+    const favoriteClick = (a: Actor) => {
         console.log("toggle favorite for actor: " + a.id)
         a.isFavorite = !a.isFavorite; //toggle value
         appContext.updateActor(a)

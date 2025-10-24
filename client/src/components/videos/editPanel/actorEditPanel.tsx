@@ -1,22 +1,21 @@
 import { useContext, useState } from "react"
-import type IActor from "../../../interfaces/actor"
-import type { IActorTag } from "../../../interfaces/actor"
 import EditPanelRow from "./editPanel-row"
 import EditPanelRowMulti from "./editPanel-row-multi"
-import EditPanelRowStatic from "./editPanel-row-static"
 import { VideosAppContext } from "../videosAppContext"
 import { ActorsEditField } from "../../../util/enums"
+import type { Actor } from "../../../types/actor"
+import type { ActorTag } from "../../../types/tags"
 
 
 interface ActorEditPanelProps {
-    actor: IActor,
+    actor: Actor,
     toggleDisplay(): void
 }
 
 interface ActorEditFields {
     name: string,
     birthYear: number,
-    tags: IActorTag[],
+    tags: ActorTag[],
 }
 
 const ActorEditPanel = (props: ActorEditPanelProps) => {
@@ -105,13 +104,13 @@ const ActorEditPanel = (props: ActorEditPanelProps) => {
                     getDisplayString={(s) => s.toString()}
                     getValueFromDisplayString={(s) => Number(s)}
                     updateTempValue={updateTempValue} />
-                <EditPanelRowMulti<IActorTag> editField={ActorsEditField.Tags}
+                <EditPanelRowMulti<ActorTag> editField={ActorsEditField.Tags}
                     tempValue={tempFields.tags}
                     updateTempValue={updateTempValue}
                     valueRange={appContext.allActorTags.sort((a, b) => a.name.localeCompare(b.name))}
                     getDisplayString={(t) => t?.name ?? ''}
                     getValueFromDisplayString={(str) => { return appContext.allActorTags.find((t) => t.name == str) ?? null }}
-                    getValueFromTextInput={(str) => { return { id: -1, name: str } }}
+                    getValueFromTextInput={(str) => { return { id: -1, name: str, tagType: 'actor' } }}
                 />
             </div>
             <div className="edit-panel-controls">

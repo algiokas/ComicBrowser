@@ -1,13 +1,13 @@
-import type { IVideoSearchQuery } from "../../../interfaces/searchQuery"
-import type IVideo from "../../../interfaces/video"
+import type { IVideoSearchQuery } from "../../../types/searchQuery"
+import type { Video } from "../../../types/video"
 import { VideosSortOrder } from "../../../util/enums"
 import PageSelect from "../../shared/pageSelect"
 import VideoGalleryItem from "./videoGalleryItem"
-import type IActor from "../../../interfaces/actor"
+import type { Actor } from "../../../types/actor"
 import VideoSortControls from "./videoSortControls"
 import ActorDetail from "./actorDetail"
 import { useContext, useEffect, useRef, useState } from "react"
-import type IVideoSource from "../../../interfaces/videoSource"
+import type { VideoSource } from "../../../types/videoSource"
 import SourceDetail from "./sourceDetail"
 import { VideosAppContext } from "../videosAppContext"
 import { scalarArrayCompare } from "../../../util/helpers"
@@ -21,20 +21,20 @@ interface VideoGalleryProps {
 }
 
 const VideoGallery = (props: VideoGalleryProps) => {
-    const initialSortOrder = props.sortOrder ?? VideosSortOrder.Favorite
+    const initialSortOrder = props.sortOrder ?? VideosSortOrder.Random
 
     const appContext = useContext(VideosAppContext)
 
-    const [items, setItems] = useState<IVideo[]>([])
+    const [items, setItems] = useState<Video[]>([])
     const [galleryPage, setGalleryPage] = useState<number>(0)
     const [totalPages, setTotalPages] = useState<number>(0)
     const [sortOrder, setSortOrder] = useState<VideosSortOrder>(initialSortOrder)
-    const [actorListingActor, setActorListingActor] = useState<IActor | null>(null)
-    const [sourceListingSource, setSourceListingSource] = useState<IVideoSource | null>(null)
+    const [actorListingActor, setActorListingActor] = useState<Actor | null>(null)
+    const [sourceListingSource, setSourceListingSource] = useState<VideoSource | null>(null)
     const [imageLoadState, setImageLoadState] = useState<BitArray>(new BitArray(props.pageSize))
     const [disabledSortOrders, setDisabledSortOrder] = useState<VideosSortOrder[]>([])
 
-    const previousVideos = useRef([] as IVideo[])
+    const previousVideos = useRef([] as Video[])
     const previousQuery = useRef({} as IVideoSearchQuery | undefined)
 
 
@@ -54,7 +54,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
         }
     }, [imageLoadState])
 
-    const updateItems = (videos: IVideo[], query?: IVideoSearchQuery) => {
+    const updateItems = (videos: Video[], query?: IVideoSearchQuery) => {
         if (query) {
             const newIds = videos.map(v => v.id)
             const oldIds = previousVideos.current.map(v => v.id)
@@ -83,7 +83,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
         previousQuery.current = query
     }
 
-    const getSortedVideos = (Videos: IVideo[], sortOrder: VideosSortOrder): IVideo[] => {
+    const getSortedVideos = (Videos: Video[], sortOrder: VideosSortOrder): Video[] => {
         let sortedCopy = [...Videos]
         switch (sortOrder) {
             case VideosSortOrder.Title:
@@ -133,7 +133,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
         return sortedCopy
     }
 
-    const getFilteredVideos = (videos: IVideo[], searchQuery?: IVideoSearchQuery): IVideo[] => {
+    const getFilteredVideos = (videos: Video[], searchQuery?: IVideoSearchQuery): Video[] => {
         let results = videos
         if (!searchQuery) return results
         if (searchQuery.actor) {
@@ -181,7 +181,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
         }
     }
 
-    const getTotalPages = (Videos: IVideo[]): number => {
+    const getTotalPages = (Videos: Video[]): number => {
         if (Videos) {
             return Math.max(1, Math.ceil(Videos.length / props.pageSize))
         }
@@ -200,7 +200,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
         return props.query ? galleryPage : appContext.videoListingPage
     }
 
-    const getCurrentGalleryPageItems = (videos: IVideo[]): IVideo[] => {
+    const getCurrentGalleryPageItems = (videos: Video[]): Video[] => {
         let pageStart = getGalleryPage() * props.pageSize;
         let pageEnd = (getGalleryPage() + 1) * props.pageSize;
 
@@ -208,15 +208,15 @@ const VideoGallery = (props: VideoGalleryProps) => {
         return galleryItems
     }
 
-    const bodyClick = (Video: IVideo) => {
+    const bodyClick = (Video: Video) => {
         appContext.watchVideo(Video)
     }
 
-    const subtitleClick = (a: IActor) => {
+    const subtitleClick = (a: Actor) => {
         appContext.viewSearchResults({ actor: a.name })
     }
 
-    const favoriteClick = (video: IVideo) => {
+    const favoriteClick = (video: Video) => {
         console.log("toggle favorite for video: " + video.id)
 
         video.isFavorite = !video.isFavorite; //toggle value

@@ -3,25 +3,25 @@ import Slideshow from "./slideshow/slideshow";
 import LoadingView from "./loadingView";
 import { BooksViewMode } from "../../util/enums";
 import { BooksSortOrder } from "../../util/enums";
-import type IBook from "../../interfaces/book";
-import type { IBookSearchQuery } from "../../interfaces/searchQuery";
+import type { Book } from "../../types/book";
+import type { IBookSearchQuery } from "../../types/searchQuery";
 import type { BooksAppState } from "./booksApp";
 import CollectionGallery from "./coverGallery/collectionGallery";
-import type { ICollection } from "../../interfaces/slideshow";
+import type { Collection } from "../../types/slideshow";
 
 interface MultiViewProps extends BooksAppState {
-    viewBook(book: IBook): void,
+    viewBook(book: Book): void,
     viewSlideshow(): void,
     viewListing(): void,
     viewCurrentBook(): void,
     viewSearchResults(query?: IBookSearchQuery): void,
-    viewCollection(col: ICollection): void,
-    addBookToSlideshow(book: IBook): void,
+    viewCollection(col: Collection): void,
+    addBookToSlideshow(book: Book): void,
     removeBookFromSlideshow(index: number): void,
     setSlideshowInterval(interval: number): void,
     setCurrentPage(n: number): void,
     resetSlideshow(): void,
-    updateBook(book: IBook): void,
+    updateBook(book: Book): void,
     deleteBook(bookId: number): void,
     importBooks(): void,
     createCollection(collectionName: string, coverBookId: number): void

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import type IVideo from "../../../interfaces/video";
+import type { Video } from "../../../types/video";
 import { VideosSortOrder } from "../../../util/enums";
 import { getAlphabet } from "../../../util/helpers";
 
 interface VideoSortControlsProps {
     sortOrder: VideosSortOrder,
-    videoList: IVideo[],
+    videoList: Video[],
     pageSize: number,
     sortVideos(order: VideosSortOrder): void,
     setPage(pageNum: number): void,
@@ -36,10 +36,10 @@ const VideoSortControls = (props: VideoSortControlsProps) => {
     const firstGalleryMatchForIndex = (indexKey: string): number => {
         let firstMatch = 0
         let hasFindFunction = false
-        let findFunction = (b: IVideo) => { }
+        let findFunction = (b: Video) => { }
         switch (props.sortOrder) {
             case VideosSortOrder.Actor:
-                findFunction = (b: IVideo) => {
+                findFunction = (b: Video) => {
                     if (b.actors.length < 1 || !b.actors[0]) {
                         return false
                     }
@@ -48,7 +48,7 @@ const VideoSortControls = (props: VideoSortControlsProps) => {
                 hasFindFunction = true
                 break;
             case VideosSortOrder.Title:
-                findFunction = (b: IVideo) => {
+                findFunction = (b: Video) => {
                     return indexKey.toLowerCase() === b.title.substring(0, 1).toLowerCase()
                 }
                 hasFindFunction = true

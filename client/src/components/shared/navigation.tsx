@@ -1,15 +1,15 @@
-import type INavItem from "../../interfaces/navItem";
-import type { ISearchQuery } from "../../interfaces/searchQuery";
+import type { NavItem } from "../../types/navItem";
+import type { BaseSearchQuery } from "../../types/searchQuery";
 import { NavLogo } from "./navLogo";
 import NavSearch from "./navSearch";
 
 interface NavProps {
   viewMode: string,
   showSearch: boolean,
-  leftNavItems: INavItem[],
-  rightNavItems: INavItem[],
+  leftNavItems: NavItem[],
+  rightNavItems: NavItem[],
   logoClick(): void,
-  viewSearchResults(query?: ISearchQuery): void
+  viewSearchResults(query?: BaseSearchQuery): void
 }
 
 const Navigation = (props: NavProps) => {

@@ -1,4 +1,4 @@
-import type { IBookSearchQuery } from "../../../interfaces/searchQuery";
+import type { IBookSearchQuery } from "../../../types/searchQuery";
 
 const baseURL = import.meta.env.VITE_BOOK_SOURCE_URL
 

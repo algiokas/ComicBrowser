@@ -1,33 +1,32 @@
 import { useEffect, useState } from "react";
 import type { SubAppProps } from "../../App";
-import type IActor from "../../interfaces/actor";
-import type INavItem from "../../interfaces/navItem";
-import type { IVideoSearchQuery } from "../../interfaces/searchQuery";
-import type IVideo from "../../interfaces/video";
-import type IVideoSource from "../../interfaces/videoSource";
-import { VideosViewMode } from "../../util/enums";
+import type { Actor } from "../../types/actor";
+import type { NavItem } from "../../types/navItem";
+import type { IVideoSearchQuery } from "../../types/searchQuery";
+import type { ActorTag, VideoTag } from "../../types/tags";
+import type { Video } from "../../types/video";
+import type { VideoSource } from "../../types/videoSource";
+import { TagType, VideosViewMode } from "../../util/enums";
 import { actorFromJson, actorsFromJson, getActorImageUrlWithFallback, getEmptyQuery, videoFromJson, videosFromJson } from "../../util/videoUtils";
 import Modal from "../shared/modal";
 import Navigation from "../shared/navigation";
 import type { FileWithData } from "./gallery/sourceDetail";
 import MultiView from "./multiView";
-import { VideosAppContext, type VideosAppHandlers, type VideosAppState } from "./videosAppContext";
-import type { IVideoTag } from "../../interfaces/video";
-import type { IActorTag } from "../../interfaces/actor";
+import { type VideosAppHandlers, type VideosAppState, VideosAppContext } from "./videosAppContext";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
 interface VideosAppProps extends SubAppProps { }
 
 const VideosApp = (props: VideosAppProps) => {
-  const [allVideos, setAllVideos] = useState<IVideo[]>([])
-  const [allActors, setAllActors] = useState<IActor[]>([])
-  const [allSources, setAllSources] = useState<IVideoSource[]>([])
-  const [allVideoTags, setAllVideoTags] = useState<IVideoTag[]>([])
-  const [allActorTags, setAllActorTags] = useState<IActorTag[]>([])
+  const [allVideos, setAllVideos] = useState<Video[]>([])
+  const [allActors, setAllActors] = useState<Actor[]>([])
+  const [allSources, setAllSources] = useState<VideoSource[]>([])
+  const [allVideoTags, setAllVideoTags] = useState<VideoTag[]>([])
+  const [allActorTags, setAllActorTags] = useState<ActorTag[]>([])
 
   const [viewMode, setViewMode] = useState<VideosViewMode>(VideosViewMode.Loading)
-  const [currentVideo, setCurrentVideo] = useState<IVideo | null>(null)
+  const [currentVideo, setCurrentVideo] = useState<Video | null>(null)
   const [currentSearchQuery, setCurrentSearchQuery] = useState<IVideoSearchQuery>(getEmptyQuery())
   const [showLoadingModal, setShowLoadingModal] = useState<boolean>(false)
   const [loadingModalText, setLoadingModalText] = useState<string>("")
@@ -61,16 +60,18 @@ const VideosApp = (props: VideosAppProps) => {
   const fillVideoTags = async () => {
     const videoTagsRes = await fetch(`${apiBaseUrl}/videos/tags`)
     const videoTagsData = await videoTagsRes.json()
-    setAllVideoTags(videoTagsData as IVideoTag[])
+    const videoTags = videoTagsData.map((t: Omit<VideoTag, 'tagType'>) => { return {...t, tagType: 'video'} as VideoTag})
+    setAllVideoTags(videoTags as VideoTag[])
   }
 
   const fillActorTags = async () => {
     const actorTagsRes = await fetch(`${apiBaseUrl}/actors/tags`)
     const actorTagsData = await actorTagsRes.json()
-    setAllActorTags(actorTagsData as IActorTag[])
+    const actorTags = actorTagsData.map((t: Omit<ActorTag, 'tagType'>) => { return {...t, tagType: 'actor'} as ActorTag})
+    setAllActorTags(actorTags as ActorTag[])
   }
 
-  const fillActors = async (videos: IVideo[]) => {
+  const fillActors = async (videos: Video[]) => {
     const res = await fetch(`${apiBaseUrl}/actors`)
     const data = await res.json()
     const actors = await actorsFromJson(data, videos)
@@ -78,28 +79,28 @@ const VideosApp = (props: VideosAppProps) => {
     updateAllVideoActors(videos, actors)
   }
 
-  const updateAllVideoActors = (videos: IVideo[], actors: IActor[]): void => {
+  const updateAllVideoActors = (videos: Video[], actors: Actor[]): void => {
     const newVideosList = videos
-    newVideosList.forEach((v: IVideo) => { updateVideoActors(v, actors) })
+    newVideosList.forEach((v: Video) => { updateVideoActors(v, actors) })
     setAllVideos(newVideosList)
   }
 
-  const updateVideoActors = (v: IVideo, actors: IActor[]) => {
+  const updateVideoActors = (v: Video, actors: Actor[]) => {
     if (v.actors.length > 0) {
-      v.actors = v.actors.map((a: IActor) => actors.find(x => x.id === a.id)).filter(a => a !== undefined)
+      v.actors = v.actors.map((a: Actor) => actors.find(x => x.id === a.id)).filter(a => a !== undefined)
     }
   }
 
   const fillSources = async () => {
     const res = await fetch(`${apiBaseUrl}/videos/sources`)
     const data = await res.json()
-    const sources = data.map((s: any) => s as IVideoSource)
+    const sources = data.map((s: any) => s as VideoSource)
     setAllSources(sources)
   }
   //#endregion
 
   //#region API
-  const updateVideo = async (video: IVideo) => {
+  const updateVideo = async (video: Video) => {
     const res = await fetch(`${apiBaseUrl}/videos/${video.id}/update`, {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
@@ -119,7 +120,7 @@ const VideosApp = (props: VideosAppProps) => {
     }
   }
 
-  const updateActor = async (actor: IActor) => {
+  const updateActor = async (actor: Actor) => {
     const res = await fetch(`${apiBaseUrl}/actors/${actor.id}/update`, {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
@@ -128,7 +129,7 @@ const VideosApp = (props: VideosAppProps) => {
     const data = await res.json()
     if (data.success) {
       console.log("Actor " + actor.id + " Updated")
-      const newActors: IActor[] = []
+      const newActors: Actor[] = []
       for (const a of allActors) {
         if (a.id === data.actor.id) {
           const newActor = await actorFromJson(data.actor, allVideos)
@@ -234,7 +235,7 @@ const VideosApp = (props: VideosAppProps) => {
       for (let i = 0; i < allSources.length; i++) {
         if (allSources[i] && allSources[i].id === data.source.id) {
           let sources = allSources
-          sources[i] = data.source as IVideoSource
+          sources[i] = data.source as VideoSource
           setAllSources(sources)
           setShowLoadingModal(false)
         }
@@ -243,7 +244,7 @@ const VideosApp = (props: VideosAppProps) => {
   }
 
   //#region View Mode
-  const watchVideo = (video: IVideo) => {
+  const watchVideo = (video: Video) => {
     setCurrentVideo(video)
     setViewMode(VideosViewMode.Player)
   }
@@ -280,7 +281,7 @@ const VideosApp = (props: VideosAppProps) => {
   //#endregion
 
   //#region Nav Items
-  const leftNavItems: INavItem[] = [
+  const leftNavItems: NavItem[] = [
     {
       text: "Videos",
       viewMode: VideosViewMode.Listing,
@@ -313,7 +314,7 @@ const VideosApp = (props: VideosAppProps) => {
     }
   ]
 
-  const rightNavItems: INavItem[] = [
+  const rightNavItems: NavItem[] = [
     {
       text: "Import Videos",
       clickHandler: importVideos

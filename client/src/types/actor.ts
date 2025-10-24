@@ -1,4 +1,6 @@
-export default interface IActor {
+import type { ActorTag } from "./tags"
+
+export type Actor = {
     id: number,
     name: string,
     imageFile: string,
@@ -6,10 +8,5 @@ export default interface IActor {
     isFavorite: boolean,  
     imageUrl: string,
     birthYear: number,
-    tags: IActorTag[]
-}
-
-export interface IActorTag {
-    id: number,
-    name: string
+    tags: ActorTag[]
 }

@@ -1,12 +1,13 @@
-import type IActor from "../../../interfaces/actor";
+import type { Actor } from "../../../types/actor";
 import StarsImage from "../../../img/svg/stars.svg"
 
 
-interface ActorGalleryItemProps{
+interface ActorGalleryItemProps {
   index: number,
-  actor: IActor,
-  bodyClickHandler?: (data: IActor, index: number) => void,
-  favoriteClickHandler?: (data: IActor) => void,
+  actor: Actor,
+  bodyClickHandler?: (data: Actor, index: number) => void,
+  favoriteClickHandler?: (data: Actor) => void,
+  children?: React.ReactNode
 }
 
 const ActorGalleryItem = (props: ActorGalleryItemProps) => {
@@ -26,19 +27,22 @@ const ActorGalleryItem = (props: ActorGalleryItemProps) => {
     <div className="actorgallery" key={props.actor.id}>
       <div className="actorgallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
         <img className="actorgallery-image" src={props.actor.imageUrl} alt={`${props.actor.name} thumbnail`}></img>
-        <div className={props.actor.isFavorite ? "caption favorite" : "caption"}>
-          <div className="caption-text">
-            <span className="title">{props.actor.name}</span>
-          </div>
-          <div className="favorite-icon" onClick={props.favoriteClickHandler ? favoriteClick : undefined}>
-            {
-              props.actor.isFavorite ?
-                <img className="svg-icon-favorite" src={StarsImage.toString()} alt="remove from favorites"></img>
-                :
-                <img className="svg-icon-disabled test" src={StarsImage.toString()} alt="add to favorites"></img>
-            }
-          </div>
-        </div>
+        {
+          props.children ? <div className="caption">{props.children}</div> :
+            <div className={props.actor.isFavorite ? "caption favorite" : "caption"}>
+              <div className="caption-text">
+                <span className="title">{props.actor.name}</span>
+              </div>
+              <div className="favorite-icon" onClick={props.favoriteClickHandler ? favoriteClick : undefined}>
+                {
+                  props.actor.isFavorite ?
+                    <img className="svg-icon-favorite" src={StarsImage.toString()} alt="remove from favorites"></img>
+                    :
+                    <img className="svg-icon-disabled test" src={StarsImage.toString()} alt="add to favorites"></img>
+                }
+              </div>
+            </div>
+        }
       </div>
     </div>
   )

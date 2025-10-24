@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import type IActor from "../../../interfaces/actor";
+import type { Actor } from "../../../types/actor";
 import { ActorsSortOrder } from "../../../util/enums";
 import { getAlphabet } from "../../../util/helpers";
 
 interface ActorSortControlsProps {
     sortOrder: ActorsSortOrder,
-    actorList: IActor[],
+    actorList: Actor[],
     pageSize: number,
     sortVideos(order: ActorsSortOrder): void,
     setPage(pageNum: number): void
@@ -35,10 +35,10 @@ const ActorSortControls = (props: ActorSortControlsProps) => {
     const firstGalleryMatchForIndex = (indexKey: string): number => {
         let firstMatch = 0
         let hasFindFunction = false
-        let findFunction = (a: IActor) => { }
+        let findFunction = (a: Actor) => { }
         switch (props.sortOrder) {
             case ActorsSortOrder.Name:
-                findFunction = (a: IActor) => {
+                findFunction = (a: Actor) => {
                     return indexKey.toLowerCase() === a.name.substring(0, 1).toLowerCase()
                 }
                 hasFindFunction = true

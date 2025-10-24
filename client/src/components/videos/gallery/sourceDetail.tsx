@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from "react";
-import type IVideoSource from "../../../interfaces/videoSource";
+import type { VideoSource } from "../../../types/videoSource";
 import { getSourceImageUrl } from "../../../util/helpers";
 import { VideosAppContext } from "../videosAppContext";
 
 interface SourceDetailProps {
-    source: IVideoSource,
+    source: VideoSource,
 }
 
 export interface FileWithData {

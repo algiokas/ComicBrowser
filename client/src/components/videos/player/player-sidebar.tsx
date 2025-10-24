@@ -1,4 +1,4 @@
-import type IActor from "../../../interfaces/actor"
+import type { Actor } from "../../../types/actor"
 import Modal from "../../shared/modal"
 import VideoEditPanel from "../editPanel/videoEditPanel"
 import CameraIcon from "../../../img/svg/camera.svg";
@@ -6,7 +6,7 @@ import StarsIcon from "../../../img/svg/stars.svg";
 import type { PlayerProps } from "./player"
 import { useContext } from "react";
 import { VideosAppContext } from "../videosAppContext";
-import type IVideo from "../../../interfaces/video";
+import type { Video } from "../../../types/video";
 
 export interface PlayerSidebarProps extends PlayerProps {
     videoRef: React.RefObject<HTMLVideoElement | null>
@@ -52,7 +52,7 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
         }
     }
 
-    const generateActorImage = (e: React.MouseEvent, actor: IActor): void => {
+    const generateActorImage = (e: React.MouseEvent, actor: Actor): void => {
         if (actor && appContext.currentVideo && props.videoRef.current) {
             e.stopPropagation()
             let timeMs = Math.round(props.videoRef.current.currentTime * 1000)
@@ -64,12 +64,12 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
     const videoFavoriteClick = (e: React.MouseEvent) => {
         if (appContext.currentVideo) {
             e.stopPropagation()
-            const tempVideo: IVideo = { ...appContext.currentVideo, isFavorite: !appContext.currentVideo.isFavorite }
+            const tempVideo: Video = { ...appContext.currentVideo, isFavorite: !appContext.currentVideo.isFavorite }
             appContext.updateVideo(tempVideo)
         }
     }
 
-    const actorFavoriteClick = (e: React.MouseEvent, a: IActor) => {
+    const actorFavoriteClick = (e: React.MouseEvent, a: Actor) => {
         e.stopPropagation()
         a.isFavorite = !a.isFavorite; //toggle value
         appContext.updateActor(a)

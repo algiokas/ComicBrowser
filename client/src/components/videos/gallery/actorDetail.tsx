@@ -1,13 +1,13 @@
 import { useContext, useState } from "react";
 import StarsImage from "../../../img/svg/stars.svg";
-import type IActor from "../../../interfaces/actor";
-import { VideosAppContext } from "../videosAppContext";
+import type { Actor } from "../../../types/actor";
 import { getActorAge, getActorVideoCount } from "../../../util/videoUtils";
-import ActorEditPanel from "../editPanel/actorEditPanel";
 import Modal from "../../shared/modal";
+import ActorEditPanel from "../editPanel/actorEditPanel";
+import { VideosAppContext } from "../videosAppContext";
 
 interface ActorDetailProps {
-    actor: IActor,
+    actor: Actor,
 }
 
 const ActorDetail = (props: ActorDetailProps) => {

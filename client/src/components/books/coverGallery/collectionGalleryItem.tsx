@@ -1,8 +1,8 @@
 
 import type { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
-import type { ICollection } from "../../../interfaces/slideshow";
+import type { Collection } from "../../../types/slideshow";
 
-const CollectionGalleryItem = (props: BaseGalleryItemProps<ICollection>) => {
+const CollectionGalleryItem = (props: BaseGalleryItemProps<Collection>) => {
   const bodyClick = (e: React.MouseEvent) => {
     if (props.bodyClickHandler)
       props.bodyClickHandler(props.data, props.index)

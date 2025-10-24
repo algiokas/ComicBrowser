@@ -1,16 +1,16 @@
 import { useContext, useState } from "react";
-import type IActor from "../../../interfaces/actor";
-import type IVideo from "../../../interfaces/video";
-import type IVideoSource from "../../../interfaces/videoSource";
+import type { Video } from "../../../types/video";
+import type { VideoSource } from "../../../types/videoSource";
 import { VideosEditField } from "../../../util/enums";
 import EditPanelRow from "./editPanel-row";
 import EditPanelRowMulti from "./editPanel-row-multi";
 import EditPanelRowStatic from "./editPanel-row-static";
 import { VideosAppContext } from "../videosAppContext";
-import type { IVideoTag } from "../../../interfaces/video";
+import type { Actor } from "../../../types/actor";
+import type { VideoTag } from "../../../types/tags";
 
 interface VideoEditPanelProps {
-    video: IVideo,
+    video: Video,
     toggleDisplay(): void
 
     searchActor(a: string): void,
@@ -20,9 +20,9 @@ interface VideoEditPanelProps {
 
 interface VideoEditFields {
     title: string,
-    actors: IActor[],
-    tags: IVideoTag[],
-    source: IVideoSource
+    actors: Actor[],
+    tags: VideoTag[],
+    source: VideoSource
 }
 
 const VideoEditPanel = (props: VideoEditPanelProps) => {
@@ -120,14 +120,14 @@ const VideoEditPanel = (props: VideoEditPanelProps) => {
                     getDisplayString={(s) => s}
                     getValueFromDisplayString={(s) => s}
                     updateTempValue={updateTempValue} />
-                <EditPanelRowMulti<IActor> editField={VideosEditField.Actors}
+                <EditPanelRowMulti<Actor> editField={VideosEditField.Actors}
                     tempValue={tempFields.actors}
                     updateTempValue={updateTempValue}
                     valueRange={appContext.allActors.sort((a, b) => a.name.localeCompare(b.name))}
                     valueClick={props.searchActor}
                     getDisplayString={(a) => a?.name ?? ''}
                     getValueFromDisplayString={(str) => { return appContext.allActors.find((a) => a.name == str) ?? null }} />
-                <EditPanelRowMulti<IVideoTag> editField={VideosEditField.Tags}
+                <EditPanelRowMulti<VideoTag> editField={VideosEditField.Tags}
                     tempValue={tempFields.tags}
                     updateTempValue={updateTempValue}
                     valueRange={appContext.allVideoTags.sort((a, b) => a.name.localeCompare(b.name))}
@@ -135,9 +135,9 @@ const VideoEditPanel = (props: VideoEditPanelProps) => {
                     valueClick={props.searchTag}
                     getDisplayString={(t) => t?.name ?? ''}
                     getValueFromDisplayString={(str) => { return appContext.allVideoTags.find((t) => t.name == str) ?? null }}
-                    getValueFromTextInput={(str) => { return { id: -1, name: str }}}
+                    getValueFromTextInput={(str) => { return { id: -1, name: str, tagType: 'video' }}}
                     />
-                <EditPanelRow<IVideoSource> editField={VideosEditField.Source}
+                <EditPanelRow<VideoSource> editField={VideosEditField.Source}
                     tempValue={tempFields.source}
                     updateTempValue={updateTempValue}
                     valueRange={appContext.allSources.sort((a, b) => a.name.localeCompare(b.name))}

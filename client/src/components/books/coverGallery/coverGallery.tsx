@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import type IBook from "../../../interfaces/book";
-import type { IBookSearchQuery } from "../../../interfaces/searchQuery";
+import type { Book } from "../../../types/book";
+import type { IBookSearchQuery } from "../../../types/searchQuery";
 import { BooksSortOrder } from "../../../util/enums";
 import { GetCoverPath, getBookAuthor } from "../../../util/helpers";
 import PageSelect from "../../shared/pageSelect";
@@ -9,17 +9,17 @@ import GalleryItem from "./galleryItem";
 import SortControls from "./sortControls";
 
 interface CoverGalleryProps {
-    allBooks: IBook[],
+    allBooks: Book[],
     pageSize: number,
 
     sortOrder?: BooksSortOrder,
     query?: IBookSearchQuery,
     showFilters?: boolean,
 
-    viewBook(book: IBook): void,
-    updateBook(book: IBook): void,
+    viewBook(book: Book): void,
+    updateBook(book: Book): void,
     viewSearchResults(query?: IBookSearchQuery): void
-    addBookToSlideshow(book : IBook): void
+    addBookToSlideshow(book : Book): void
 }
 
 const CoverGallery = (props: CoverGalleryProps) => {
@@ -27,7 +27,7 @@ const CoverGallery = (props: CoverGalleryProps) => {
 
     const [ galleryPage, setGalleryPage ] = useState<number>(0)
     const [ currentPageSize, setCurrentPageSize ] = useState<number>(props.allBooks.length < props.pageSize ? props.allBooks.length : props.pageSize)
-    const [ bookList, setBookList ] = useState<IBook[]>([])
+    const [ bookList, setBookList ] = useState<Book[]>([])
     const [ totalPages, setTotalPages ] = useState<number>(0)
     const [ sortOrder, setSortOrder ] = useState<BooksSortOrder>(initialSortOrder)
 
@@ -35,7 +35,7 @@ const CoverGallery = (props: CoverGalleryProps) => {
         updateBookList(props.allBooks, props.query)
     }, [ props.allBooks, props.query ])
 
-     const updateBookList = (books: IBook[], query?: IBookSearchQuery) => {
+     const updateBookList = (books: Book[], query?: IBookSearchQuery) => {
         if (query) {
             const filteredBooks = getFilteredBooks(books, query)
             const sortedBooks = getSortedBooks(filteredBooks, initialSortOrder)
@@ -49,14 +49,14 @@ const CoverGallery = (props: CoverGalleryProps) => {
         }
      }
 
-    const getTotalPages = (books: IBook[]): number => {
+    const getTotalPages = (books: Book[]): number => {
         if (books) {
             return Math.max(1, Math.ceil(books.length / props.pageSize))
         }
         return 1
     }
 
-    const getSortedBooks = (books: IBook[], sortOrder: BooksSortOrder): IBook[] => {
+    const getSortedBooks = (books: Book[], sortOrder: BooksSortOrder): Book[] => {
         let sortedCopy = [...books]
         switch (sortOrder) {
             case BooksSortOrder.Title:
@@ -107,7 +107,7 @@ const CoverGallery = (props: CoverGalleryProps) => {
         return sortedCopy
     }
 
-    const getFilteredBooks = (books: IBook[], searchQuery: IBookSearchQuery): IBook[] => {
+    const getFilteredBooks = (books: Book[], searchQuery: IBookSearchQuery): Book[] => {
         let results = books
         if (searchQuery.artists) {
             let queryArtists = searchQuery.artists.split(',').map(s => s.toLowerCase())
@@ -159,14 +159,14 @@ const CoverGallery = (props: CoverGalleryProps) => {
         }
     }
 
-    const getItemSubtitle = (book: IBook): string => {
+    const getItemSubtitle = (book: Book): string => {
         if (sortOrder === BooksSortOrder.Author) {
             return getBookAuthor(book)
         }
         return book.artists.join(', ')
     }
 
-    const getCurrentGalleryPage = (): IBook[] => {
+    const getCurrentGalleryPage = (): Book[] => {
         let pageStart = galleryPage * props.pageSize;
         let pageEnd = (galleryPage+1) * props.pageSize;
         return bookList.slice(pageStart, pageEnd)
@@ -184,11 +184,11 @@ const CoverGallery = (props: CoverGalleryProps) => {
         setGalleryPage(pageNum)
     }
 
-    const bodyClick = (book: IBook, bookIndex: number) => {
+    const bodyClick = (book: Book, bookIndex: number) => {
         props.viewBook(book)
     }
 
-    const subTitleClick = (book: IBook) => {
+    const subTitleClick = (book: Book) => {
         let subtitle = getItemSubtitle(book)
         
         if (subtitle === book.artGroup) {
@@ -201,7 +201,7 @@ const CoverGallery = (props: CoverGalleryProps) => {
         }      
     }
 
-    const favoriteClick = (book: IBook) => {
+    const favoriteClick = (book: Book) => {
         console.log("toggle favorite for book: " + book.id)
         if (props.updateBook) {
             book.isFavorite = !book.isFavorite; //toggle value

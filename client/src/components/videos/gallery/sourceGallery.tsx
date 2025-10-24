@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import type IVideoSource from "../../../interfaces/videoSource";
+import type { VideoSource } from "../../../types/videoSource";
 import PageSelect from "../../shared/pageSelect";
 import SourceGalleryItem from "./sourceGalleryItem";
 import { VideosAppContext } from "../videosAppContext";
@@ -11,7 +11,7 @@ const SourceGallery = (props: SourceGalleryProps) => {
 
     const appContext = useContext(VideosAppContext)
 
-    const getTotalPages = (items: IVideoSource[]): number => {
+    const getTotalPages = (items: VideoSource[]): number => {
         if (items) {
             return Math.max(1, Math.ceil(items.length / appContext.galleryPageSize))
         }
@@ -27,13 +27,13 @@ const SourceGallery = (props: SourceGalleryProps) => {
         }
     }, [appContext.allSources])
 
-    const getCurrentGalleryPage = (): IVideoSource[] => {
+    const getCurrentGalleryPage = (): VideoSource[] => {
         let pageStart = galleryPage * appContext.galleryPageSize;
         let pageEnd = (galleryPage + 1) * appContext.galleryPageSize;
         return appContext.allSources.slice(pageStart, pageEnd)
     }
 
-    const bodyClick = (s: IVideoSource) => {
+    const bodyClick = (s: VideoSource) => {
         appContext.viewSearchResults({ source: s.name })
     }
 

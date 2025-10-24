@@ -1,22 +1,21 @@
 import { createContext } from "react";
-import type IActor from "../../interfaces/actor";
-import type { IVideoSearchQuery } from "../../interfaces/searchQuery";
-import type IVideo from "../../interfaces/video";
-import type IVideoSource from "../../interfaces/videoSource";
+import type { Actor } from "../../types/actor";
+import type { IVideoSearchQuery } from "../../types/searchQuery";
+import type { Video } from "../../types/video";
+import type { VideoSource } from "../../types/videoSource";
 import { VideosViewMode } from "../../util/enums";
 import type { FileWithData } from "./gallery/sourceDetail";
-import type { IVideoTag } from "../../interfaces/video";
-import type { IActorTag } from "../../interfaces/actor";
+import type { VideoTag, ActorTag } from "../../types/tags";
 
 export type VideosAppState = {
     galleryPageSize: number,
-    allVideos: IVideo[],
-    allActors: IActor[],
-    allSources: IVideoSource[],
-    allVideoTags: IVideoTag[],
-    allActorTags: IActorTag[],
+    allVideos: Video[],
+    allActors: Actor[],
+    allSources: VideoSource[],
+    allVideoTags: VideoTag[],
+    allActorTags: ActorTag[],
     viewMode: VideosViewMode,
-    currentVideo: IVideo | null,
+    currentVideo: Video | null,
     currentSearchQuery: IVideoSearchQuery,
     showLoadingModal: boolean,
     loadingModalText: string,
@@ -26,7 +25,7 @@ export type VideosAppState = {
 }
 
 export type VideosAppHandlers = {
-    watchVideo: (video: IVideo) => void,
+    watchVideo: (video: Video) => void,
     viewListing: () => void,
     viewActors: () => void,
     viewCurrentVideo: () => void,
@@ -35,10 +34,10 @@ export type VideosAppHandlers = {
     setActorListingPage: (n: number) => void,
     setLoadingModal: (show: boolean, text?: string) => void
 
-    updateVideo: (video: IVideo) => Promise<void>,
+    updateVideo: (video: Video) => Promise<void>,
     deleteVideo: (videoId: number) => Promise<void>,
     setThumbnailToTime: (videoId: number, timeMs: number) => Promise<void>,
-    updateActor: (actor: IActor) => void,
+    updateActor: (actor: Actor) => void,
     generateImageForActor: (videoId: number, actorId: number, timeMs: number) => void,
     uploadSourceImage: (sourceId: number, imageSize: 'small' | 'large', fileData: FileWithData) => void,
 }

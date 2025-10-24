@@ -1,10 +1,11 @@
 import { useContext, useState } from "react"
 import { VideosAppContext } from "../videosAppContext"
-import type { IVideoTag } from "../../../interfaces/video"
-import type { IActorTag } from "../../../interfaces/actor"
 import { TagType } from "../../../util/enums"
-import type IVideo from "../../../interfaces/video"
+import type { Video } from "../../../types/video"
 import VideoGalleryItem from "./videoGalleryItem"
+import type { VideoTag, ActorTag, VideosAppTag } from "../../../types/tags"
+import type { Actor } from "../../../types/actor"
+import ActorGalleryItem from "./actorGalleryItem"
 
 interface TagsGalleryProps { }
 
@@ -19,7 +20,7 @@ const TagsGallery = (props: TagsGalleryProps) => {
         })
     }
 
-    const getTagsByType = (t: TagType): (IVideoTag | IActorTag)[] => {
+    const getTagsByType = (t: TagType): (VideosAppTag)[] => {
         switch (t) {
             case "Video":
                 return appContext.allVideoTags
@@ -30,7 +31,7 @@ const TagsGallery = (props: TagsGalleryProps) => {
         }
     }
 
-    const getRandomVideoForTag = (t: IVideoTag | IActorTag): IVideo | null => {
+    const getRandomVideoForTag = (t: VideoTag): Video | null => {
         const videosWithTag = appContext.allVideos.filter(v => {
             if (v.tags)
                 return v.tags.some((a) => a.name.toLowerCase() === t.name.toLowerCase())
@@ -39,6 +40,17 @@ const TagsGallery = (props: TagsGalleryProps) => {
 
         const randomIndex = Math.floor(Math.random() * videosWithTag.length)
         return videosWithTag[randomIndex]
+
+    }
+
+    const getRandomActorForTag = (t: ActorTag): Actor | null => {
+        const actorsWithTag = appContext.allActors.filter(a => {
+            if (a.tags)
+                return a.tags.some(at => at.name.toLowerCase() === t.name.toLowerCase())
+        })
+        if (actorsWithTag.length < 1) return null
+        const randomIndex = Math.floor(Math.random() * actorsWithTag.length)
+        return actorsWithTag[randomIndex]
     }
 
     return (
@@ -59,19 +71,34 @@ const TagsGallery = (props: TagsGalleryProps) => {
 
                 <div className="tagsgallery-inner">
                     {
-                        getTagsByType(tagType).map((tag: IVideoTag | IActorTag, i: number) => {
-                            const tagVideo = getRandomVideoForTag(tag)
-                            if (tagVideo) {
-                                return <VideoGalleryItem 
-                                    key={i}
-                                    index={i} 
-                                    video={tagVideo}
-                                    bodyClickHandler={() => searchTag(tag.name)}>
+                        getTagsByType(tagType).map((tag: VideosAppTag, i: number) => {
+                            if (tagType === "Video" && tag.tagType === 'video') {
+                                const tagVideo = getRandomVideoForTag(tag)
+                                if (tagVideo) {
+                                    return <VideoGalleryItem
+                                        key={i}
+                                        index={i}
+                                        video={tagVideo}
+                                        bodyClickHandler={() => searchTag(tag.name)}>
                                         <div className="caption-text">
                                             <span className="title">{tag.name}</span>
                                         </div>
-                                </VideoGalleryItem>
+                                    </VideoGalleryItem>
+                                }
                             }
+                            if (tagType === "Actor" && tag.tagType === 'actor') {
+                                const tagActor = getRandomActorForTag(tag)
+                                if (tagActor) {
+                                    return <ActorGalleryItem key={i}
+                                        index={i}
+                                        actor={tagActor}>
+                                        <div className="caption-text">
+                                            <span className="title">{tag.name}</span>
+                                        </div>
+                                    </ActorGalleryItem>
+                                }
+                            }
+
                         })
                     }
                 </div>

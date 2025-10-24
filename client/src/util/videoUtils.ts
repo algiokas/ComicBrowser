@@ -1,6 +1,6 @@
-import type IActor from "../interfaces/actor";
-import type { IVideoSearchQuery } from "../interfaces/searchQuery";
-import type IVideo from "../interfaces/video";
+import type { Actor } from "../types/actor";
+import type { IVideoSearchQuery } from "../types/searchQuery";
+import type { Video } from "../types/video";
 import { filterAlphanumeric, getActorImageUrl, getVideoThumbnailUrl, isAlphanumeric } from "./helpers";
 
 export const getEmptyQuery = (): IVideoSearchQuery => {
@@ -12,8 +12,8 @@ export const getEmptyQuery = (): IVideoSearchQuery => {
     }
 }
 
-export const videoFromJson = (videoJson: any): IVideo => {
-    let newVideo = videoJson as IVideo
+export const videoFromJson = (videoJson: any): Video => {
+    let newVideo = videoJson as Video
     if (!newVideo.actors) newVideo.actors = []
     if (!newVideo.tags) newVideo.tags = []
     if (videoJson.addedDate) {
@@ -23,8 +23,8 @@ export const videoFromJson = (videoJson: any): IVideo => {
     return newVideo
 }
 
-export const videosFromJson = (videosJson: any): IVideo[] => {
-    let videoList: IVideo[] = []
+export const videosFromJson = (videosJson: any): Video[] => {
+    let videoList: Video[] = []
     if (!videosJson || videosJson.length < 1) console.log("videosFromJson - no videos in input")
     for (const v of videosJson) {
         videoList.push(videoFromJson(v))
@@ -32,15 +32,15 @@ export const videosFromJson = (videosJson: any): IVideo[] => {
     return videoList
 }
 
-export const getActorImageUrlWithFallback = async (actor: IActor, videos: IVideo[]): Promise<string> => {
+export const getActorImageUrlWithFallback = async (actor: Actor, videos: Video[]): Promise<string> => {
     if (actor.imageFile) return getActorImageUrl(actor)
     let matchingVideos = videos.filter((v) => v.actors.some((a) => a.id === actor.id) && v.thumbnailId)
     if (matchingVideos.length > 0) return getVideoThumbnailUrl(matchingVideos[0])
     return ""
 }
 
-export const actorFromJson = async (actorJson: any, videos: IVideo[]): Promise<IActor> => {
-    let newActor = actorJson as IActor
+export const actorFromJson = async (actorJson: any, videos: Video[]): Promise<Actor> => {
+    let newActor = actorJson as Actor
     newActor.isFavorite = actorJson.isFavorite != null && actorJson.isFavorite > 0
     newActor.imageUrl = await getActorImageUrlWithFallback(newActor, videos)
     newActor.birthYear = actorJson.birthYear ?? 1990
@@ -48,8 +48,8 @@ export const actorFromJson = async (actorJson: any, videos: IVideo[]): Promise<I
     return newActor
 }
 
-export const actorsFromJson = async (actorJson: any, videoJson: IVideo[]): Promise<IActor[]> => {
-    let actorList: IActor[] = []
+export const actorsFromJson = async (actorJson: any, videoJson: Video[]): Promise<Actor[]> => {
+    let actorList: Actor[] = []
     if (!actorJson || actorJson.length < 1) console.log("actorsFromJson - no actors in input")
     for (const a of actorJson) {
         const newActor = await actorFromJson(a, videoJson)
@@ -58,12 +58,12 @@ export const actorsFromJson = async (actorJson: any, videoJson: IVideo[]): Promi
     return actorList
 }
 
-export const getActorVideoCount = (actor: IActor, allVideos: IVideo[]): number => {
+export const getActorVideoCount = (actor: Actor, allVideos: Video[]): number => {
     const actorVideos = allVideos.filter(v => v.actors.some(a => a.id === actor.id))
     return actorVideos.length
 }
 
-export const getActorAge = (actor: IActor): number => {
+export const getActorAge = (actor: Actor): number => {
     const currentYear = new Date().getFullYear()
     return currentYear - actor.birthYear
 }
@@ -81,7 +81,7 @@ const getComponentTerms = (str: string): string[] => {
     return terms
 }
 
-const generateVideoSearchTerms = (video: IVideo): string[] => {
+const generateVideoSearchTerms = (video: Video): string[] => {
     const terms = new Set<string>();
 
     terms.add(video.id.toString())

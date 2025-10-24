@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import coverIcon from "../../../img/svg/book-half.svg";
-import type ISlideshow from "../../../interfaces/slideshow";
+import type { Slideshow } from "../../../types/slideshow";
 import { GetCoverPath } from "../../../util/helpers";
 import GalleryItem from "../coverGallery/galleryItem";
 
 interface SavePanelProps {
-    currentSlideshow: ISlideshow,
+    currentSlideshow: Slideshow,
     toggleDisplay(): void,
     createCollection(collectionName: string, coverBookId: number): void
 }

@@ -1,4 +1,4 @@
-export default interface INavItem {
+export type NavItem = {
     text: string,
     viewMode?: string,
     counter?: number,

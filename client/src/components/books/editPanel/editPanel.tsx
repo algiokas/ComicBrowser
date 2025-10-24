@@ -1,13 +1,13 @@
 import { useState } from "react";
-import type IBook from "../../../interfaces/book";
+import type { Book } from "../../../types/book";
 import { BooksEditField } from "../../../util/enums";
 import EditPanelRow from "./editPanel-row";
 import EditPanelRowMulti from "./editPanel-row-multi";
 import EditPanelRowStatic from "./editPanel-row-static";
 
 interface EditPanelProps {
-    book: IBook,
-    updateBook(book: IBook): void,
+    book: Book,
+    updateBook(book: Book): void,
     deleteBook(bookId: number): void,
     toggleDisplay(): void
 

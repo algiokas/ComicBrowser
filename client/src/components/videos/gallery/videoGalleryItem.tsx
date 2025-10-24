@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import StarsImage from "../../../img/svg/stars.svg";
 import TagsImage from "../../../img/svg/tags.svg";
-import type IActor from "../../../interfaces/actor";
-import type IVideo from "../../../interfaces/video";
+import type { Actor } from "../../../types/actor";
+import type { Video } from "../../../types/video";
 import { getVideoThumbnailUrl } from "../../../util/helpers";
 
 interface VideoGalleryItemProps {
   index: number,
-  video: IVideo,
-  bodyClickHandler?: (data: IVideo, index: number) => void,
-  favoriteClickHandler?: (data: IVideo) => void,
-  subTitleItemClickHandler?: (actor: IActor) => void,
+  video: Video,
+  bodyClickHandler?: (data: Video, index: number) => void,
+  favoriteClickHandler?: (data: Video) => void,
+  subTitleItemClickHandler?: (actor: Actor) => void,
   onImageLoad?: (idx: number) => void,
   children?: React.ReactNode
 }
@@ -37,7 +37,7 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
       props.favoriteClickHandler(props.video)
     }
   }
-  const subtitleClick = (e: React.MouseEvent, actor: IActor) => {
+  const subtitleClick = (e: React.MouseEvent, actor: Actor) => {
     if (props.subTitleItemClickHandler) {
       e.stopPropagation()
       props.subTitleItemClickHandler(actor)

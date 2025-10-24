@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import ChevronRightImg from "../../../img/svg/chevron-right.svg";
-import type IBook from "../../../interfaces/book";
-import type { IBookSearchQuery } from "../../../interfaces/searchQuery";
-import type ISlideshow from "../../../interfaces/slideshow";
+import type { Book } from "../../../types/book";
+import type { IBookSearchQuery } from "../../../types/searchQuery";
+import type { Slideshow } from "../../../types/slideshow";
 import { BooksViewMode } from "../../../util/enums";
 import { GetCoverPath } from "../../../util/helpers";
 import Modal from "../../shared/modal";
@@ -13,7 +13,7 @@ import BookInfo from "./slideshow-sidebar-bookInfo";
 
 interface SidebarProps {
     showSidebar: boolean,
-    slideshow: ISlideshow,
+    slideshow: Slideshow,
     currentPage: number,
     pageCount: number,
     intervalLength: number,
@@ -31,11 +31,11 @@ interface SidebarProps {
     setPage(n: number): void,
     resetPage(): void,
 
-    galleryItemClickHandler(book: IBook, bookIndex: number): void,
-    addButtonHandler(book: IBook): void,
+    galleryItemClickHandler(book: Book, bookIndex: number): void,
+    addButtonHandler(book: Book): void,
     removeButtonHandler(index: number): void,
     emptySlideshow(): void,
-    updateBook(book: IBook): void,
+    updateBook(book: Book): void,
     deleteBook(bookId: number): void,
     viewSearchResults(query?: IBookSearchQuery): void,
     createCollection(collectionName: string, coverBookId: number): void

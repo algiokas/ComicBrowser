@@ -2,18 +2,18 @@ import React from "react";
 import MinusImg from "../../../img/svg/minus-symbol.svg";
 import PlusImg from "../../../img/svg/plus-symbol.svg";
 import StarsImage from "../../../img/svg/stars.svg";
-import type IBook from "../../../interfaces/book";
+import type { Book } from "../../../types/book";
 
 interface GalleryItemProps {
   index: number,
-  book: IBook,
+  book: Book,
   coverUrl: string,
   subtitle: string,
-  bodyClickHandler?: (book: IBook, bookIndex: number) => void,
-  addButtonHandler?: (book: IBook) => void,
+  bodyClickHandler?: (book: Book, bookIndex: number) => void,
+  addButtonHandler?: (book: Book) => void,
   removeButtonHandler?: (index: number) => void,
-  subTitleClickHandler?: (book: IBook) => void,
-  favoriteClickHandler?: (book: IBook) => void,
+  subTitleClickHandler?: (book: Book) => void,
+  favoriteClickHandler?: (book: Book) => void,
   hideFavorites?: boolean
   overlayIcon?: React.FunctionComponent<React.SVGAttributes<SVGElement>>
 }
