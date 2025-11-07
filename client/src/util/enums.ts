@@ -22,6 +22,7 @@ export const VideosViewMode = {
   Player: "Player",
   Tags: "Tags",
   SearchResults: "SearchResults",
+  UpdateThumbnails: "UpdateThumbnails",
 } as const;
 export type VideosViewMode = (typeof VideosViewMode)[keyof typeof VideosViewMode];
 

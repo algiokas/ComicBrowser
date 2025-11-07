@@ -107,10 +107,20 @@
                 }
 
                 & .tags-list {
-
                     display: flex;
                     flex-direction: row;
                     flex-wrap: wrap;
+
+                    & .player-tag {
+                        display: flex;
+                        flex-direction: row;
+
+                        & .imagegen {
+                            margin-top: auto;
+                            margin-bottom: auto;
+                            margin-left: 5px;
+                        }
+                    }
                 }
 
             }

@@ -60,8 +60,10 @@ export const _SOURCES = Object.freeze({
 export const _VIDEOTAGS = Object.freeze({
   insert: db.prepare(`INSERT INTO ${tables.videoTags} (name) VALUES (?)`),
   selectAll: db.prepare(`SELECT * FROM ${tables.videoTags}`),
+  selectById: db.prepare(`SELECT * FROM ${tables.videoTags} WHERE id = ?`),
   selectByName: db.prepare(`SELECT * FROM ${tables.videoTags} WHERE name = ?`),
   selectTagsByVideoId: db.prepare(`SELECT ${tables.videoTags}.id, ${tables.videoTags}.name FROM ${tables.videoTagsRef} JOIN ${tables.videoTags} ON ${tables.videoTagsRef}.tagId = ${tables.videoTags}.id WHERE ${tables.videoTagsRef}.videoId = ?`),
+  updateImageFile: db.prepare(`UPDATE ${tables.videoTags} SET imageFile = ? WHERE id = ?`),
   delete: db.prepare(`DELETE FROM ${tables.videoTags} WHERE id = ?`)
 })
 
@@ -75,8 +77,10 @@ export const _VIDEOTAGSREF = Object.freeze({
 export const _ACTORTAGS = Object.freeze({
   insert: db.prepare(`INSERT INTO ${tables.actorTags} (name) VALUES (?)`),
   selectAll: db.prepare(`SELECT * FROM ${tables.actorTags}`),
+  selectById: db.prepare(`SELECT * FROM ${tables.actorTags} WHERE id = ?`),
   selectByName: db.prepare(`SELECT * FROM ${tables.actorTags} WHERE name = ?`),
   selectTagsByActorId: db.prepare(`SELECT ${tables.actorTags}.id, ${tables.actorTags}.name FROM ${tables.actorTagsRef} JOIN ${tables.actorTags} ON ${tables.actorTagsRef}.tagId = ${tables.actorTags}.id WHERE ${tables.actorTagsRef}.actorId = ?`),
+  updateImageFile: db.prepare(`UPDATE ${tables.actorTags} SET imageFile = ? WHERE id = ?`),
   delete: db.prepare(`DELETE FROM ${tables.actorTags} WHERE id = ?`)
 })
 

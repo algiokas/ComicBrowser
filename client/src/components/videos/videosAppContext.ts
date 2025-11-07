@@ -3,7 +3,7 @@ import type { Actor } from "../../types/actor";
 import type { IVideoSearchQuery } from "../../types/searchQuery";
 import type { Video } from "../../types/video";
 import type { VideoSource } from "../../types/videoSource";
-import { VideosViewMode } from "../../util/enums";
+import { TagType, VideosViewMode } from "../../util/enums";
 import type { FileWithData } from "./gallery/sourceDetail";
 import type { VideoTag, ActorTag } from "../../types/tags";
 
@@ -39,6 +39,7 @@ export type VideosAppHandlers = {
     setThumbnailToTime: (videoId: number, timeMs: number) => Promise<void>,
     updateActor: (actor: Actor) => void,
     generateImageForActor: (videoId: number, actorId: number, timeMs: number) => void,
+    generateImageForTag: (tagId: number, tagType: TagType, videoId: number, timeMs: number) => void,
     uploadSourceImage: (sourceId: number, imageSize: 'small' | 'large', fileData: FileWithData) => void,
 }
 
@@ -73,5 +74,6 @@ export const VideosAppContext = createContext<VideosAppState & VideosAppHandlers
     setThumbnailToTime: async () => { },
     updateActor: async () => { },
     generateImageForActor: async () => { },
+    generateImageForTag: async () => { },
     uploadSourceImage: async () => { },
 })

@@ -1,5 +1,5 @@
 import type { IVideoSearchQuery } from "../../types/searchQuery";
-import { ActorsSortOrder, VideosViewMode } from "../../util/enums";
+import { ActorsSortOrder, VideosSortOrder, VideosViewMode } from "../../util/enums";
 import ActorGallery from "./gallery/actorGallery";
 import SourceGallery from "./gallery/sourceGallery";
 import TagsGallery from "./gallery/tagsGallery";
@@ -40,6 +40,7 @@ const MultiView = (props: MultiViewProps) => {
         case VideosViewMode.SearchResults:
             return (
                 <VideoGallery
+                    sortOrder={VideosSortOrder.ID}
                     query={props.currentSearchQuery}
                     pageSize={props.galleryPageSize} />
             )

@@ -20,11 +20,16 @@ function EditPanelMultiSelect<T>(props: EditPanelMultiSelectProps<T>) {
             props.addToCollection(value)
     }
 
+    const getDisplayItems = (): T[] => {
+        const newCollectionItems = props.collection.filter(i => !props.valueRange.some(v => props.getDisplayString(v) === props.getDisplayString(i)))
+        return [...props.valueRange, ...newCollectionItems].toSorted((a, b) => props.getDisplayString(a).localeCompare(props.getDisplayString(b)))
+    }
+
     return (
         <div className="multiselect">
             <div className="multiselect-inner">
                 {
-                    props.valueRange.map((v, i) => {
+                    getDisplayItems().map((v, i) => {
                         return (
                             <div className={"multiselect-item click-item clickable" + (inCollection(v) ? " selected" : "")} 
                                 key={i} onClick={() => addOrRemoveItem(v)}>

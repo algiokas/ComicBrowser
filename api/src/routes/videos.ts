@@ -103,8 +103,39 @@ router.post('/thumbnail/:videoId/generate/:timeMs', function (req, res) {
     }
     videoRepository.generateThumbnailExisting(videoId, req.params.timeMs, (thumbResult) => {
         console.log("Generated thumbnail for video " + req.params.videoId + " at " + req.params.timeMs + "ms")
+        videoRepository.removeDefaultThumbnailTag(videoId)
         res.json(thumbResult)
     })
+})
+
+router.post('/tags/thumbnail/:tagId/generate/:videoId/:timeMs', function (req, res) {
+    const tagId = Number(req.params.tagId)
+    if (isNaN(tagId)) {
+        res.status(500).send(`Internal Server Error: parameter tagId must be a number - provided value: ${req.params.tagId}`)
+    }
+    const videoId = Number(req.params.videoId)
+    if (isNaN(videoId)) {
+        res.status(500).send(`Internal Server Error: parameter videoId must be a number - provided value: ${req.params.videoId}`)
+    }
+
+    videoRepository.generateImageForTag(tagId, "video", videoId, req.params.timeMs, (imageResult) => {
+        console.log(`Generate thumbnail for video tag ${tagId} From video ${videoId} @${req.params.timeMs}ms`)
+        res.json(imageResult)
+    })
+})
+
+router.get('/tags/thumbnail/:tagId', function (req, res) {
+    const tagId = Number(req.params.tagId)
+    if (isNaN(tagId)) {
+        res.status(500).send(`Internal Server Error: parameter tagId must be a number - provided value: ${req.params.tagId}`)
+        return
+    }
+
+    let fpath = videoRepository.getTagImagePath(tagId, 'video')
+    if (fpath) res.sendFile(fpath, {});
+    else {
+        res.sendStatus(404).end();
+    }
 })
 
 router.delete('/:videoId', function (req, res) {
@@ -175,6 +206,11 @@ router.get('/:videoId', function (req, res) {
     else {
         res.sendStatus(404).end();
     }
+})
+
+router.get('/audit/setdefaultthumbnailtag', function (req, res) {
+    const vUpdates = videoRepository.setDefaultThumbnailTag()
+    res.json({ resul: `Added "Default Thumbnail" tag to ${vUpdates} videos`})
 })
 
 export default router

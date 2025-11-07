@@ -1,6 +1,7 @@
 import type { Actor } from "../types/actor";
 import type { Book } from "../types/book"
 import type { Slideshow } from "../types/slideshow";
+import type { VideosAppTag } from "../types/tags";
 import type { Video } from "../types/video";
 import type { VideoSource } from "../types/videoSource";
 
@@ -51,6 +52,14 @@ export async function getSourceImageUrl(source: VideoSource, small?: boolean): P
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
     const versionHash = await shortNumericHash(small ? source.imageFileSmall : source.imageFileLarge)
     return `${apiBaseUrl}/videos/sources/${source.id}/image${small ? 'small' : 'large'}?v=${versionHash}`
+}
+
+export async function getTagImageUrl(tag: VideosAppTag): Promise<string> {
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
+    if (!tag.imageFile) return ''
+    const versionHash = await shortNumericHash(tag.imageFile)
+    const tagTypeSegment = tag.tagType + "s"
+    return `${apiBaseUrl}/${tagTypeSegment}/tags/thumbnail/${tag.id}?v=${versionHash}`
 }
 
 export function GetPagePath(book: Book, pageNum: number): string {

@@ -6,11 +6,12 @@ import { Response } from 'express';
 
 import 'dotenv/config';
 import { generateImageFromVideo, GenerateThumbnailResult, VideoScreenshotOptions } from './ffmpeg';
-import { ActorRow, ClientActor, VideoFileData, ImportVideosResult, ClientVideo, SourceRow, UpdateActorResult, VideoRow, UpdateVideoResult, UpdateSourceResult, ClientSource } from './types/video';
+import { ActorRow, ClientActor, VideoFileData, ImportVideosResult, ClientVideo, SourceRow, UpdateActorResult, VideoRow, UpdateVideoResult, UpdateSourceResult, ClientSource, VideosTagType } from './types/video';
 import { getTimestampString, PLACEHOLDER_SOURCE, stripNonAlphanumeric } from './util';
 
 const dataDir = process.env.VIDEOS_DATA_DIR!
 const videosDir = path.join(dataDir, '/videos');
+const tagImageDir = path.join(dataDir, '/images/tags')
 const thumbnailDir = path.join(dataDir, '/images/thumbnails');
 const actorImageDir = path.join(dataDir, '/images/actors')
 const sourceImageDir = path.join(dataDir, '/images/sources')
@@ -127,6 +128,14 @@ export function getThumbnailFilePath(videoId: number) {
     return path.join(thumbnailDir, thumbFile + ".png")
 }
 
+export function getTagImagePath(tagId: number, tagType: VideosTagType) {
+    var tag = videoDatabase.getTagById(tagId, tagType)
+    if (tag && tag.imageFile) {
+        return path.join(tagImageDir, tag.imageFile + ".png")
+    }
+}
+
+
 function generateThumbnail(video: VideoRow | ClientVideo, options: VideoScreenshotOptions, callback?: (result: GenerateThumbnailResult) => void) {
     if (!video.filePath) {
         console.error(`Video ${video.id} - missing filePath`)
@@ -186,6 +195,55 @@ function generateActorImage(actor: ActorRow, video: VideoRow, options: VideoScre
     } catch (err) {
         console.log(err)
         return null
+    }
+}
+
+function generateTagImageName(tagId: number, tagType: VideosTagType, index: number) {
+    return `${tagType}Tag_${tagId}_${index}`
+}
+
+function getTagImageName(tagId: number, tagType: VideosTagType) {
+    var imgIndex = 0
+    var fname = generateTagImageName(tagId, tagType, imgIndex)
+    while (fs.existsSync(path.join(tagImageDir, fname + '.png'))) {
+        imgIndex++
+        fname = generateTagImageName(tagId, tagType, imgIndex)
+    }
+    return fname
+}
+
+function generateTagImage(tagId: number, tagType: VideosTagType, tagName: string, video: VideoRow, options: VideoScreenshotOptions, callback: (result: GenerateThumbnailResult) => void) {
+    if (!video.filePath) {
+        console.error(`Video ${video.id} - missing filePath`)
+        callback({ success: false })
+        return null
+    }
+    const videoPath = path.join(videosDir, video.filePath)
+    const imgFileName = options.outputFileName ?? getTagImageName(tagId, tagType)
+    options.outputFileName = imgFileName
+    options.outputDir = options.outputDir ?? tagImageDir
+    try {
+        generateImageFromVideo(videoPath, options, () => {
+            videoDatabase.setTagImageFile(tagId, imgFileName, tagType)
+            let result: GenerateThumbnailResult = { success: true }
+            const resultTag = { id: tagId, name: tagName, imageFile: imgFileName }
+            if (tagType === 'video') result.videoTag = resultTag
+            else result.actorTag = resultTag
+            
+            callback(result)
+        })
+    } catch (err) {
+        console.log(err)
+        return null
+    }
+}
+
+export function generateImageForTag(tagId: number, tagType: VideosTagType, videoId: number, timeMs: string, callback: (result: GenerateThumbnailResult) => void) {
+    const video = videoDatabase.getVideoById(videoId)
+    const tag = videoDatabase.getTagById(tagId, tagType)
+    if (video && tag) {
+        let ts = getTimestampString(timeMs)
+        generateTagImage(tagId, tagType, tag.name ?? '', video, { timestamp: ts }, callback)
     }
 }
 
@@ -589,3 +647,26 @@ export function getAllActorTags() {
     return videoDatabase.getAllActorTags()
 }
 
+const DEFAULT_THUMBNAIL_TAG = 'Default Thumbnail'
+
+export function setDefaultThumbnailTag() {
+    console.log("Get All Videos")
+    let rows = videoDatabase.getVideos()
+    let videosUpdated = 0
+    if (rows && rows.length > 0) {
+        for (const v of rows) {
+            if (v.thumbnailId?.endsWith('-0')) {
+                const addedTags = videoDatabase.insertTagsForVideo(v.id, [ DEFAULT_THUMBNAIL_TAG ])
+                if (addedTags.length > 0) videosUpdated++
+            }
+        }
+    }
+    return videosUpdated
+}
+
+export function removeDefaultThumbnailTag(videoId: number) {
+    const videoTags = videoDatabase.getVideoTags(videoId)
+    if (videoTags.some(t => t.name === DEFAULT_THUMBNAIL_TAG)) {
+        videoDatabase.removeTagsFromVideo(videoId, [ DEFAULT_THUMBNAIL_TAG ])
+    }
+}

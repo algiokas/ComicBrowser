@@ -75,14 +75,18 @@ export interface VideoActor {
   actorId: number;
 };
 
+export type VideosTagType = "video" | "actor"
+
 export interface ActorTag {
   id: number;
   name: string | null;
+  imageFile: string | null;
 };
 
 export interface VideoTag {
   id: number;
   name: string | null;
+  imageFile: string | null;
 };
 
 export interface ActorTagsRef {

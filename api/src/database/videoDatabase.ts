@@ -1,5 +1,5 @@
 import Database from "better-sqlite3"
-import { ActorRow, SourceRow, VideoRow, VideoActor, VideoFileData, VideoTag, VideoTagsRef, ActorTag, ActorTagsRef } from '../types/video';
+import { ActorRow, SourceRow, VideoRow, VideoActor, VideoFileData, VideoTag, VideoTagsRef, ActorTag, ActorTagsRef, VideosTagType } from '../types/video';
 import { _VIDEOS, _ACTORS, _VIDEOACTORS, _SOURCES, _VIDEOTAGS, _VIDEOTAGSREF, _ACTORTAGS, _ACTORTAGSREF } from './videoQueries';
 import { RunResultExisting } from '../types/shared';
 
@@ -380,6 +380,12 @@ export function getVideoTags(videoId: number): VideoTag[] {
   return tags
 }
 
+export function setTagImageFile(tagId: number, imageFileName: string, tagType: VideosTagType): Database.RunResult {
+  if (tagType === 'video')
+    return _VIDEOTAGS.updateImageFile.run(imageFileName, tagId)
+  return _ACTORTAGS.updateImageFile.run(imageFileName, tagId)
+}
+
 export function getAllActorTags(): ActorTag[] {
   return _ACTORTAGS.selectAll.all() as ActorTag[]
 }
@@ -387,4 +393,9 @@ export function getAllActorTags(): ActorTag[] {
 export function getActorTags(actorId: number): ActorTag[] {
   const tags = _ACTORTAGS.selectTagsByActorId.all(actorId) as ActorTag[]
   return tags
+}
+
+export function getTagById(tagId: number, tagType: VideosTagType): ActorTag | VideoTag | undefined {
+  if (tagType === 'video') return _VIDEOTAGS.selectById.get(tagId) as VideoTag
+  return _ACTORTAGS.selectById.get(tagId) as ActorTag
 }

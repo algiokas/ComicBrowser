@@ -12,18 +12,21 @@ interface VideoGalleryItemProps {
   favoriteClickHandler?: (data: Video) => void,
   subTitleItemClickHandler?: (actor: Actor) => void,
   onImageLoad?: (idx: number) => void,
+  imageUrl?: string,
   children?: React.ReactNode
 }
 
 const VideoGalleryItem = (props: VideoGalleryItemProps) => {
-  const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string>('')
+  const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string>(props.imageUrl ?? '')
 
   useEffect(() => {
     const updateThumbnail = async () => {
       const thumbnailUrl = await getVideoThumbnailUrl(props.video)
       setThumbnailImageUrl(thumbnailUrl)
     }
-    updateThumbnail()
+    if (!props.imageUrl) {
+      updateThumbnail()
+    }
   }, [props.video])
 
   const bodyClick = (e: React.MouseEvent) => {

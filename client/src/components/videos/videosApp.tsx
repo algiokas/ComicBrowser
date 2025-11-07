@@ -185,6 +185,7 @@ const VideosApp = (props: VideosAppProps) => {
         if (allVideos[i] && allVideos[i].id === data.video.id) {
           let videos = allVideos
           videos[i].thumbnailId = data.video.thumbnailId
+          videos[i].tags = videos[i].tags.filter(t => t.name !== 'Default Thumbnail')
           setAllVideos(videos)
           setShowLoadingModal(false)
         }
@@ -218,6 +219,48 @@ const VideosApp = (props: VideosAppProps) => {
           setShowLoadingModal(false)
         }
       }
+    }
+  }
+
+  const updateVideoTagImage = (tagId: number, imageFile: string) => {
+      for (let i = 0; i < allVideoTags.length; i++) {
+        if (allVideoTags[i] && allVideoTags[i].id === tagId) {
+          let videoTags = allVideoTags
+          videoTags[i].imageFile = imageFile
+          setAllVideoTags(videoTags)
+          break;
+        }
+      }
+  }
+
+    const updateActorTagImage = (tagId: number, imageFile: string) => {
+      for (let i = 0; i < allActorTags.length; i++) {
+        if (allActorTags[i] && allActorTags[i].id === tagId) {
+          let videoTags = allActorTags
+          videoTags[i].imageFile = imageFile
+          setAllActorTags(allActorTags)
+          break;
+        }
+      }
+  }
+
+  const generateImageForTag = async (tagId: number, tagType: TagType, videoId: number, timeMs: number) => {
+    console.log(`Generating image for ${tagType} tag: ${tagId} from video ${videoId} @${timeMs}ms`)
+    setLoadingModal(true, `Generating image for ${tagType} tag ${tagId}`)
+    const tagTypeSegment = `${tagType.toLowerCase()}s`
+    const res = await fetch(`${apiBaseUrl}/${tagTypeSegment}/tags/thumbnail/${tagId}/generate/${videoId}/${timeMs}`, {
+      method: 'post'
+    })
+    const data = await res.json()
+    if (data.success) {
+      if (tagType === 'Video') {
+        console.log(`Successfully generated and updated tag image for tag ${tagId} - new image: ${data.videoTag.imageFile}`)
+        updateVideoTagImage(tagId, data.videoTag.imageFile)
+      } else {
+        console.log(`Successfully generated and updated tag image for tag ${tagId} - new image: ${data.actorTag.imageFile}`)
+        updateActorTagImage(tagId, data.actorTag.imageFile)
+      }
+      setShowLoadingModal(false)
     }
   }
 
@@ -350,6 +393,7 @@ const VideosApp = (props: VideosAppProps) => {
     setThumbnailToTime: setThumbnailToTime,
     updateActor: updateActor,
     generateImageForActor: generateImageForActor,
+    generateImageForTag: generateImageForTag,
     uploadSourceImage: uploadSourceImage
   }
 

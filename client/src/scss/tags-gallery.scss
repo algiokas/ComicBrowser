@@ -39,4 +39,37 @@
             text-decoration: none;
         }
     }
+
+    &-typeSelect {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 1em;
+
+        & div {
+            background-color: $gray-1;
+            padding: .5em 1.5em;
+            margin: 2px;
+            border: 2px solid $gray-3;
+            font-weight: 550;
+            font-size: 16px;
+
+            &:last-child {
+                margin-right: auto;
+                border-radius: 0 10px 10px 0;
+            }
+
+            &:first-child {
+                margin-left: auto;
+                border-radius: 10px 0 0 10px;
+            }
+
+            &.selected {
+                border: 2px solid $yellow-highlight;
+                box-sizing: border-box;
+            }
+        }
+
+
+
+    }
 }

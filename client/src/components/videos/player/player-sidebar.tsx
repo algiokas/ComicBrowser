@@ -7,6 +7,8 @@ import type { PlayerProps } from "./player"
 import { useContext } from "react";
 import { VideosAppContext } from "../videosAppContext";
 import type { Video } from "../../../types/video";
+import type { VideosAppTag } from "../../../types/tags";
+import type { TagType } from "../../../util/enums";
 
 export interface PlayerSidebarProps extends PlayerProps {
     videoRef: React.RefObject<HTMLVideoElement | null>
@@ -58,6 +60,15 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
             let timeMs = Math.round(props.videoRef.current.currentTime * 1000)
             console.log('generate actor image at ' + timeMs + 'ms')
             appContext.generateImageForActor(appContext.currentVideo.id, actor.id, timeMs)
+        }
+    }
+
+    const generateTagImage = (e: React.MouseEvent, tag: VideosAppTag, tagType: TagType): void => {
+        if (tag && appContext.currentVideo && props.videoRef.current) {
+            e.stopPropagation()
+            let timeMs = Math.round(props.videoRef.current.currentTime * 1000)
+            console.log('generate actor image at ' + timeMs + 'ms')
+            appContext.generateImageForTag(tag.id, tagType, appContext.currentVideo.id, timeMs)
         }
     }
 
@@ -130,19 +141,22 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
                                 </div>
                                 : null
                         }
-                        
+
                         <div className="player-video-info-tags">
                             <h4 className="tags-header">Tags:</h4>
                             <div className="tags-list">
-                            {
-                                appContext.currentVideo.tags.map((tag, i) => {
-                                    return (
-                                        <div key={i} className="player-tag info-item clickable" onClick={() => searchTag(tag.name)}>
-                                            {tag.name}
-                                        </div>
-                                    )
-                                })
-                            }
+                                {
+                                    appContext.currentVideo.tags.toSorted((a, b) => a.name.localeCompare(b.name)).map((tag, i) => {
+                                        return (
+                                            <div key={i} className="player-tag info-item clickable" onClick={() => searchTag(tag.name)}>
+                                                <span>{tag.name}</span>
+                                                <div className="imagegen" onClick={(e) => generateTagImage(e, tag, 'Video')}>
+                                                    <img className="svg-icon-favorite" src={CameraIcon.toString()} alt={"Generate image for " + tag.name}></img>
+                                                </div>
+                                            </div>
+                                        )
+                                    })
+                                }
                             </div>
 
                         </div>

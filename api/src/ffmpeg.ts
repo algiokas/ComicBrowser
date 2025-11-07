@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 import path from 'path';
-import { ActorRow, ClientActor, ClientVideo, VideoRow } from './types/video';
+import { ActorRow, ActorTag, ClientActor, ClientVideo, VideoRow, VideoTag } from './types/video';
 
 export interface VideoScreenshotOptions {
     timestamp?: string;
@@ -11,7 +11,9 @@ export interface VideoScreenshotOptions {
 export interface GenerateThumbnailResult {
     success: boolean,
     video?: VideoRow | ClientVideo,
-    actor?: ActorRow | ClientActor
+    actor?: ActorRow | ClientActor,
+    videoTag?: VideoTag,
+    actorTag?: ActorTag
 }
 
 export function generateImageFromVideo(videoPath: string, options: VideoScreenshotOptions, callback: () => void): void {
