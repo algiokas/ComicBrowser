@@ -3,7 +3,7 @@ import type { SubAppProps } from "../../App";
 import type { Actor } from "../../types/actor";
 import type { NavItem } from "../../types/navItem";
 import type { IVideoSearchQuery } from "../../types/searchQuery";
-import type { ActorTag, VideoTag } from "../../types/tags";
+import { type VideosAppTag, type ActorTag, type VideoTag } from "../../types/tags";
 import type { Video } from "../../types/video";
 import type { VideoSource } from "../../types/videoSource";
 import { TagType, VideosViewMode } from "../../util/enums";
@@ -27,6 +27,7 @@ const VideosApp = (props: VideosAppProps) => {
 
   const [viewMode, setViewMode] = useState<VideosViewMode>(VideosViewMode.Loading)
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null)
+  const [currentMassTaggerTag, setCurrentMassTaggerTag] = useState<VideosAppTag | null>(null)
   const [currentSearchQuery, setCurrentSearchQuery] = useState<IVideoSearchQuery>(getEmptyQuery())
   const [showLoadingModal, setShowLoadingModal] = useState<boolean>(false)
   const [loadingModalText, setLoadingModalText] = useState<string>("")
@@ -317,6 +318,8 @@ const VideosApp = (props: VideosAppProps) => {
 
   const viewTags = () => { setViewMode(VideosViewMode.Tags) }
 
+  const viewMassTagger = () => { setViewMode(VideosViewMode.MassTagger)}
+
   const setLoadingModal = (show: boolean, text?: string) => {
     setLoadingModalText(text ?? "")
     setShowLoadingModal(show)
@@ -406,6 +409,7 @@ const VideosApp = (props: VideosAppProps) => {
     allActorTags: allActorTags,
     viewMode: viewMode,
     currentVideo: currentVideo,
+    currentMassTaggerTag: currentMassTaggerTag,
     currentSearchQuery: currentSearchQuery,
     showLoadingModal: showLoadingModal,
     loadingModalText: loadingModalText,

@@ -37,6 +37,17 @@ const TagsGalleryItem = (props: TagsGalleryItemProps) => {
         return ''
     }
 
+    const getItemCount = (): number => {
+        if (props.tag.tagType === 'video') {
+            return appContext.allVideos.filter(v => v.tags.some(t => t.id === props.tag.id)).length
+        }
+
+        if (props.tag.tagType === 'actor') {
+            return appContext.allActors.filter(v => v.tags.some(t => t.id === props.tag.id)).length
+        }
+        return 0
+    }
+
     const getRandomVideoForTag = (t: VideoTag): Video | null => {
         const videosWithTag = appContext.allVideos.filter(v => {
             if (v.tags)
@@ -72,9 +83,9 @@ const TagsGalleryItem = (props: TagsGalleryItemProps) => {
     }
 
     return (
-        <div className="videogallery" key={props.tag.name}>
-            <div className="videogallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
-                <div className="videogallery-image">
+        <div className="tagsgallery-item" key={props.tag.name}>
+            <div className="tagsgallery-item-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
+                <div className="tagsgallery-item-image">
                     {
                         thumbnailImageUrl ?
                             <img
@@ -86,6 +97,9 @@ const TagsGalleryItem = (props: TagsGalleryItemProps) => {
                     }
                 </div>
                 <div className="caption">
+                    <div className="caption-count">
+                        <span>{getItemCount()}</span>
+                    </div>
                     <div className="caption-text">
                         <span className="title">{props.tag.name}</span>
                     </div>

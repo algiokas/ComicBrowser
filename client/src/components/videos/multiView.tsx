@@ -1,6 +1,7 @@
 import type { IVideoSearchQuery } from "../../types/searchQuery";
 import { ActorsSortOrder, VideosSortOrder, VideosViewMode } from "../../util/enums";
 import ActorGallery from "./gallery/actorGallery";
+import MassTagger from "./gallery/massTagger";
 import SourceGallery from "./gallery/sourceGallery";
 import TagsGallery from "./gallery/tagsGallery";
 import VideoGallery from "./gallery/videoGallery";
@@ -47,6 +48,10 @@ const MultiView = (props: MultiViewProps) => {
         case VideosViewMode.Loading:
             return (
                 <LoadingView></LoadingView>
+            )
+        case VideosViewMode.MassTagger:
+            return (
+                <MassTagger></MassTagger>
             )
         default:
             console.log("INVALID VIEWMODE")

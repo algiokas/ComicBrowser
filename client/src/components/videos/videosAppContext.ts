@@ -5,7 +5,7 @@ import type { Video } from "../../types/video";
 import type { VideoSource } from "../../types/videoSource";
 import { TagType, VideosViewMode } from "../../util/enums";
 import type { FileWithData } from "./gallery/sourceDetail";
-import type { VideoTag, ActorTag } from "../../types/tags";
+import type { VideoTag, ActorTag, VideosAppTag } from "../../types/tags";
 
 export type VideosAppState = {
     galleryPageSize: number,
@@ -16,6 +16,7 @@ export type VideosAppState = {
     allActorTags: ActorTag[],
     viewMode: VideosViewMode,
     currentVideo: Video | null,
+    currentMassTaggerTag: VideosAppTag | null,
     currentSearchQuery: IVideoSearchQuery,
     showLoadingModal: boolean,
     loadingModalText: string,
@@ -52,6 +53,7 @@ export const VideosAppContext = createContext<VideosAppState & VideosAppHandlers
     allActorTags: [],
     viewMode: VideosViewMode.Loading,
     currentVideo: null,
+    currentMassTaggerTag: null,
     currentSearchQuery: {},
     showLoadingModal: false,
     loadingModalText: '',

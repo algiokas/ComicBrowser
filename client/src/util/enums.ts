@@ -22,7 +22,7 @@ export const VideosViewMode = {
   Player: "Player",
   Tags: "Tags",
   SearchResults: "SearchResults",
-  UpdateThumbnails: "UpdateThumbnails",
+  MassTagger: "MassTagger",
 } as const;
 export type VideosViewMode = (typeof VideosViewMode)[keyof typeof VideosViewMode];
 

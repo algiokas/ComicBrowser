@@ -1,7 +1,7 @@
 import { useContext, useState } from "react"
 import { VideosAppContext } from "../videosAppContext"
 import { TagType } from "../../../util/enums"
-import type { VideosAppTag } from "../../../types/tags"
+import type { VideosAppTag, VideoTag } from "../../../types/tags"
 import TagsGalleryItem from "./tagsGalleryItem"
 
 interface TagsGalleryProps { }
@@ -17,12 +17,18 @@ const TagsGallery = (props: TagsGalleryProps) => {
         })
     }
 
+    const nameSort = (a: VideosAppTag, b: VideosAppTag): number => {
+        if (a.name === "Default Thumbnail") return -1
+        return a.name.localeCompare(b.name)
+    }
+    const idSort = (a: VideosAppTag, b: VideosAppTag): number => b.id - a.id
+
     const getTagsByType = (t: TagType): (VideosAppTag)[] => {
         switch (t) {
             case "Video":
-                return appContext.allVideoTags.toSorted((a, b) => a.name.localeCompare(b.name))
+                return appContext.allVideoTags.toSorted(nameSort)//a.name.localeCompare(b.name))
             case "Actor":
-                return appContext.allActorTags.toSorted((a, b) => a.name.localeCompare(b.name))
+                return appContext.allActorTags.toSorted(nameSort)
             default:
                 return []
         }
@@ -54,34 +60,6 @@ const TagsGallery = (props: TagsGalleryProps) => {
                                 tag={tag}
                                 bodyClickHandler={() => searchTag(tag.name)}>
                             </TagsGalleryItem>
-                            // if (tagType === "Video" && tag.tagType === 'video') {
-                            //     const tagVideo = getRandomVideoForTag(tag)
-                            //     if (tagVideo) {
-                            //         return <VideoGalleryItem
-                            //             key={i}
-                            //             index={i}
-                            //             video={tagVideo}
-                            //             imageUrl=''
-                            //             bodyClickHandler={() => searchTag(tag.name)}>
-                            //             <div className="caption-text">
-                            //                 <span className="title">{tag.name}</span>
-                            //             </div>
-                            //         </VideoGalleryItem>
-                            //     }
-                            // }
-                            // if (tagType === "Actor" && tag.tagType === 'actor') {
-                            //     const tagActor = getRandomActorForTag(tag)
-                            //     if (tagActor) {
-                            //         return <ActorGalleryItem key={i}
-                            //             index={i}
-                            //             actor={tagActor}>
-                            //             <div className="caption-text">
-                            //                 <span className="title">{tag.name}</span>
-                            //             </div>
-                            //         </ActorGalleryItem>
-                            //     }
-                            // }
-
                         })
                     }
                 </div>

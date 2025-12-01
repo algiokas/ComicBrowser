@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import type { Video } from "../../../types/video";
 import type { VideoSource } from "../../../types/videoSource";
 import { VideosEditField } from "../../../util/enums";
@@ -135,7 +135,7 @@ const VideoEditPanel = (props: VideoEditPanelProps) => {
                     valueClick={props.searchTag}
                     getDisplayString={(t) => t?.name ?? ''}
                     getValueFromDisplayString={(str) => { return appContext.allVideoTags.find((t) => t.name == str) ?? null }}
-                    getValueFromTextInput={(str) => { return { id: -1, name: str, tagType: 'video' }}}
+                    getValueFromTextInput={(str) => { return { id: -1, name: str, tagType: 'video' } as VideoTag}}
                     />
                 <EditPanelRow<VideoSource> editField={VideosEditField.Source}
                     tempValue={tempFields.source}
