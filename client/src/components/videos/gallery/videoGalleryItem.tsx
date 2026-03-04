@@ -8,12 +8,15 @@ import { getVideoThumbnailUrl } from "../../../util/helpers";
 interface VideoGalleryItemProps {
   index: number,
   video: Video,
+  imageUrl?: string,
+  children?: React.ReactNode,
+  lazyload?: boolean
+  secondaryClickIconUrl?: string,
   bodyClickHandler?: (data: Video, index: number) => void,
   favoriteClickHandler?: (data: Video) => void,
   subTitleItemClickHandler?: (actor: Actor) => void,
+  secondaryClickHandler?: (data: Video) => void,
   onImageLoad?: (idx: number) => void,
-  imageUrl?: string,
-  children?: React.ReactNode
 }
 
 const VideoGalleryItem = (props: VideoGalleryItemProps) => {
@@ -46,6 +49,12 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
       props.subTitleItemClickHandler(actor)
     }
   }
+  const secondaryClick = (e: React.MouseEvent, video: Video) => {
+    if (props.secondaryClickHandler) {
+      e.stopPropagation()
+      props.secondaryClickHandler(video)
+    }
+  }
 
   return (
     <div className="videogallery" key={props.video.title}>
@@ -56,7 +65,8 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
               <img
                 src={thumbnailImageUrl}
                 alt={`${props.video.title} thumbnail`}
-                onLoad={() => { if (props.onImageLoad) props.onImageLoad(props.index) }}>
+                onLoad={() => { if (props.onImageLoad) props.onImageLoad(props.index) }}
+                loading={props.lazyload ? 'lazy' : 'eager'}>
               </img>
               : null
           }
@@ -93,6 +103,15 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
                 }
               </div>
             </div>
+        }
+        {
+          props.secondaryClickHandler ? 
+          <button className="add-button" onClick={(e) => secondaryClick(e, props.video)}>
+            {
+              props.secondaryClickIconUrl ? <img className="svg-icon" src={props.secondaryClickIconUrl}></img> : null
+            }   
+          </button>
+          : null
         }
       </div>
     </div>

@@ -1,10 +1,11 @@
-import { useContext, useState } from "react";
-import type { VideoTag } from "../../../types/tags";
+import { useContext, useEffect, useMemo, useState } from "react";
+import type { VideosAppTag, VideoTag } from "../../../types/tags";
 import type { Video } from "../../../types/video";
 import { VideosAppContext } from "../videosAppContext";
 import VideoSortControls from "./videoSortControls";
 import { VideosSortOrder } from "../../../util/enums";
 import VideoGalleryItem from "./videoGalleryItem";
+import EyeImage from "../../../img/svg/eye-fill.svg"
 
 
 interface MassTaggerProps {
@@ -17,11 +18,29 @@ const MassTagger = (props: MassTaggerProps) => {
     const initialSortOrder = props.sortOrder ?? VideosSortOrder.ID
     const [sortOrder, setSortOrder] = useState<VideosSortOrder>(initialSortOrder)
 
+    const handleScroll = () => {
+        //console.log('scroll test ' + window.scrollY)
+        appContext.setMassTaggerScrollPosition(window.scrollY)
+    }
+
+    useEffect(() => {
+        console.log('Scroll To: ' + appContext.massTaggerScrollPosition)
+        window.scrollTo(0, appContext.massTaggerScrollPosition)
+        window.addEventListener('scroll', handleScroll)
+        return () => {
+            window.removeEventListener('scroll', handleScroll)
+        }
+    }, [])
+
     const bodyClick = (video: Video) => {
         if (appContext.currentMassTaggerTag && appContext.currentMassTaggerTag.tagType === "video") {
             video.tags.push(appContext.currentMassTaggerTag)
             appContext.updateVideo(video)
         }
+    }
+
+    const secondaryClick = (video: Video) => {
+        appContext.watchVideo(video)
     }
 
     const getSortedVideos = (): Video[] => {
@@ -74,6 +93,10 @@ const MassTagger = (props: MassTaggerProps) => {
         return sortedCopy
     }
 
+    const sortedVideos = useMemo(() => {
+        return getSortedVideos();
+    }, [appContext.allVideos, sortOrder]);
+
     const scrollTop = () => {
         window.scrollTo(0, 0)
     }
@@ -82,23 +105,58 @@ const MassTagger = (props: MassTaggerProps) => {
         setSortOrder(order)
     }
 
+    const setTagToApply = (tagId: string) => {
+        const tag = appContext.allVideoTags.find(t => t.id.toString() === tagId)
+        if (tag) {
+            appContext.setMassTaggerTag(tag)
+        }
+    }
+
+    const containsTag = (video: Video): boolean => {
+        return video.tags.some(t => t.id === appContext.currentMassTaggerTag?.id)
+    }
+
+    const alphaSort = (a: VideosAppTag, b: VideosAppTag): number => {
+        return a.name.localeCompare(b.name)
+    }
+
+
+
     return (
         <div className="videogallery-container dark-theme">
+            <div className="tag-select-container">
+                <div className="tag-select-inner">
+                    <select className="tag-select"
+                        id="tag-select-dropdown"
+                        onChange={(e) => setTagToApply(e.target.value)}
+                        value={appContext.currentMassTaggerTag?.id ?? 0}>
+                        {
+                            appContext.allVideoTags.toSorted(alphaSort).map((t, i) => {
+                                return <option value={t.id} key={i}>{t.name}</option>
+                            })
+                        }
+                    </select>
+                </div>
+            </div>
             <div className="videogallery-container-header">
                 <VideoSortControls sortOrder={sortOrder}
                     videoList={appContext.allVideos}
                     pageSize={appContext.allVideos.length}
                     sortVideos={sortVideos}
-                    setPage={scrollTop}/>
+                    setPage={scrollTop} />
             </div>
-            <div className="videogallery-container-inner" style={{ 'visibility': (appContext.showLoadingModal ? 'hidden' : 'visible') }}>
+            <div className="videogallery-container-inner"
+                style={{ 'visibility': (appContext.showLoadingModal ? 'hidden' : 'visible') }}>
                 {
-                    getSortedVideos().map((video, i) => {
+                    sortedVideos.filter(v => !containsTag(v)).map((video, i) => {
                         return <VideoGalleryItem
                             key={i}
                             index={i}
                             video={video}
                             bodyClickHandler={bodyClick}
+                            lazyload={true}
+                            secondaryClickHandler={secondaryClick}
+                            secondaryClickIconUrl={EyeImage}
                         ></VideoGalleryItem>
                     })
                 }

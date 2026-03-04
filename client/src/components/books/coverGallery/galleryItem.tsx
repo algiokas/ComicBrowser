@@ -14,8 +14,8 @@ interface GalleryItemProps {
   removeButtonHandler?: (index: number) => void,
   subTitleClickHandler?: (book: Book) => void,
   favoriteClickHandler?: (book: Book) => void,
-  hideFavorites?: boolean
-  overlayIcon?: React.FunctionComponent<React.SVGAttributes<SVGElement>>
+  hideFavorites?: boolean,
+  overlayIcon?: string
 }
 
 const GalleryItem = (props: GalleryItemProps) => {

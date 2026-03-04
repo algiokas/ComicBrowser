@@ -28,6 +28,7 @@ const VideosApp = (props: VideosAppProps) => {
   const [viewMode, setViewMode] = useState<VideosViewMode>(VideosViewMode.Loading)
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null)
   const [currentMassTaggerTag, setCurrentMassTaggerTag] = useState<VideosAppTag | null>(null)
+  const [massTaggerScrollPosition, setMassTaggerScrollPosition] = useState<number>(0)
   const [currentSearchQuery, setCurrentSearchQuery] = useState<IVideoSearchQuery>(getEmptyQuery())
   const [showLoadingModal, setShowLoadingModal] = useState<boolean>(false)
   const [loadingModalText, setLoadingModalText] = useState<string>("")
@@ -310,6 +311,13 @@ const VideosApp = (props: VideosAppProps) => {
     }
   }
 
+  const massTag = (tag: VideosAppTag) => {
+    setCurrentMassTaggerTag(tag)
+    if (viewMode !== VideosViewMode.MassTagger) {
+      setViewMode(VideosViewMode.MassTagger)
+    }
+  }
+
   const viewListing = () => { setViewMode(VideosViewMode.Listing) }
 
   const viewActors = () => { setViewMode(VideosViewMode.Actors) }
@@ -362,6 +370,11 @@ const VideosApp = (props: VideosAppProps) => {
 
   const rightNavItems: NavItem[] = [
     {
+      text: "Mass Tagger",
+      viewMode: VideosViewMode.MassTagger,
+      clickHandler: viewMassTagger
+    },
+    {
       text: "Import Videos",
       clickHandler: importVideos
     },
@@ -387,6 +400,8 @@ const VideosApp = (props: VideosAppProps) => {
     viewActors: viewActors,
     viewCurrentVideo: viewCurrentVideo,
     viewSearchResults: viewSearchResults,
+    setMassTaggerTag: massTag,
+    setMassTaggerScrollPosition: setMassTaggerScrollPosition,
     setVideoListingPage: (n: number) => { setVideoListingPage(n) },
     setActorListingPage: (n: number) => { setActorListingPage(n) },
     setLoadingModal: setLoadingModal,
@@ -410,6 +425,7 @@ const VideosApp = (props: VideosAppProps) => {
     viewMode: viewMode,
     currentVideo: currentVideo,
     currentMassTaggerTag: currentMassTaggerTag,
+    massTaggerScrollPosition: massTaggerScrollPosition,
     currentSearchQuery: currentSearchQuery,
     showLoadingModal: showLoadingModal,
     loadingModalText: loadingModalText,
