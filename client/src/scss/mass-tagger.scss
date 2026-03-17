@@ -14,10 +14,12 @@
         position: sticky;
         top: 0;
         z-index: 5;
+        width: 20%;
+        margin: 0 auto 7px auto;
     }
 
     &-inner {
-        padding: 10px;
+        padding: 5px;
         background-color: $gray-3;
     }
 
@@ -30,7 +32,11 @@
         padding: 10px;
         transition: 0.4s;
     }
+}
 
-
-
+.mass-tagger-item-wrapper {
+    flex: 0 0 19%;
+    position: relative;
+    margin: auto;
+    margin-bottom: 2em;
 }

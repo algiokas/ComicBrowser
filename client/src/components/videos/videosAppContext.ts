@@ -3,7 +3,7 @@ import type { Actor } from "../../types/actor";
 import type { IVideoSearchQuery } from "../../types/searchQuery";
 import type { Video } from "../../types/video";
 import type { VideoSource } from "../../types/videoSource";
-import { TagType, VideosViewMode } from "../../util/enums";
+import { TagType, VideosSortOrder, VideosViewMode } from "../../util/enums";
 import type { FileWithData } from "./gallery/sourceDetail";
 import type { VideoTag, ActorTag, VideosAppTag } from "../../types/tags";
 
@@ -17,6 +17,8 @@ export type VideosAppState = {
     viewMode: VideosViewMode,
     currentVideo: Video | null,
     currentMassTaggerTag: VideosAppTag | null,
+    massTaggerSortOrder: VideosSortOrder,
+    massTaggerAnchorVideoId: number | null,
     massTaggerScrollPosition: number,
     currentSearchQuery: IVideoSearchQuery,
     showLoadingModal: boolean,
@@ -33,6 +35,8 @@ export type VideosAppHandlers = {
     viewCurrentVideo: () => void,
     viewSearchResults: (query?: IVideoSearchQuery) => void,
     setMassTaggerTag: (tag: VideosAppTag) => void,
+    setMassTaggerSortOrder: (order: VideosSortOrder) => void,
+    setMassTaggerAnchorVideoId: (id: number | null) => void,
     setMassTaggerScrollPosition: (pos: number) => void,
     setVideoListingPage: (n: number) => void,
     setActorListingPage: (n: number) => void,
@@ -57,6 +61,8 @@ export const VideosAppContext = createContext<VideosAppState & VideosAppHandlers
     viewMode: VideosViewMode.Loading,
     currentVideo: null,
     currentMassTaggerTag: null,
+    massTaggerSortOrder: VideosSortOrder.ID,
+    massTaggerAnchorVideoId: null,
     massTaggerScrollPosition: 0,
     currentSearchQuery: {},
     showLoadingModal: false,
@@ -71,6 +77,8 @@ export const VideosAppContext = createContext<VideosAppState & VideosAppHandlers
     viewCurrentVideo: () => { },
     viewSearchResults: () => { },
     setMassTaggerTag: () => { },
+    setMassTaggerSortOrder: () => { },
+    setMassTaggerAnchorVideoId: () => { },
     setMassTaggerScrollPosition: () => { },
     setVideoListingPage: () => { },
     setActorListingPage: () => { },

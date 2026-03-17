@@ -6,7 +6,7 @@ import type { IVideoSearchQuery } from "../../types/searchQuery";
 import { type VideosAppTag, type ActorTag, type VideoTag } from "../../types/tags";
 import type { Video } from "../../types/video";
 import type { VideoSource } from "../../types/videoSource";
-import { TagType, VideosViewMode } from "../../util/enums";
+import { TagType, VideosSortOrder, VideosViewMode } from "../../util/enums";
 import { actorFromJson, actorsFromJson, getActorImageUrlWithFallback, getEmptyQuery, videoFromJson, videosFromJson } from "../../util/videoUtils";
 import Modal from "../shared/modal";
 import Navigation from "../shared/navigation";
@@ -29,6 +29,8 @@ const VideosApp = (props: VideosAppProps) => {
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null)
   const [currentMassTaggerTag, setCurrentMassTaggerTag] = useState<VideosAppTag | null>(null)
   const [massTaggerScrollPosition, setMassTaggerScrollPosition] = useState<number>(0)
+  const [massTaggerSortOrder, setMassTaggerSortOrder] = useState<VideosSortOrder>(VideosSortOrder.ID)
+  const [massTaggerAnchorVideoId, setMassTaggerAnchorVideoId] = useState<number | null>(null)
   const [currentSearchQuery, setCurrentSearchQuery] = useState<IVideoSearchQuery>(getEmptyQuery())
   const [showLoadingModal, setShowLoadingModal] = useState<boolean>(false)
   const [loadingModalText, setLoadingModalText] = useState<string>("")
@@ -54,7 +56,7 @@ const VideosApp = (props: VideosAppProps) => {
 
     await fillVideoTags()
     await fillActorTags()
-    
+
     await fillActors(videos)
     await fillSources()
   }
@@ -62,14 +64,14 @@ const VideosApp = (props: VideosAppProps) => {
   const fillVideoTags = async () => {
     const videoTagsRes = await fetch(`${apiBaseUrl}/videos/tags`)
     const videoTagsData = await videoTagsRes.json()
-    const videoTags = videoTagsData.map((t: Omit<VideoTag, 'tagType'>) => { return {...t, tagType: 'video'} as VideoTag})
+    const videoTags = videoTagsData.map((t: Omit<VideoTag, 'tagType'>) => { return { ...t, tagType: 'video' } as VideoTag })
     setAllVideoTags(videoTags as VideoTag[])
   }
 
   const fillActorTags = async () => {
     const actorTagsRes = await fetch(`${apiBaseUrl}/actors/tags`)
     const actorTagsData = await actorTagsRes.json()
-    const actorTags = actorTagsData.map((t: Omit<ActorTag, 'tagType'>) => { return {...t, tagType: 'actor'} as ActorTag})
+    const actorTags = actorTagsData.map((t: Omit<ActorTag, 'tagType'>) => { return { ...t, tagType: 'actor' } as ActorTag })
     setAllActorTags(actorTags as ActorTag[])
   }
 
@@ -225,25 +227,25 @@ const VideosApp = (props: VideosAppProps) => {
   }
 
   const updateVideoTagImage = (tagId: number, imageFile: string) => {
-      for (let i = 0; i < allVideoTags.length; i++) {
-        if (allVideoTags[i] && allVideoTags[i].id === tagId) {
-          let videoTags = allVideoTags
-          videoTags[i].imageFile = imageFile
-          setAllVideoTags(videoTags)
-          break;
-        }
+    for (let i = 0; i < allVideoTags.length; i++) {
+      if (allVideoTags[i] && allVideoTags[i].id === tagId) {
+        let videoTags = allVideoTags
+        videoTags[i].imageFile = imageFile
+        setAllVideoTags(videoTags)
+        break;
       }
+    }
   }
 
-    const updateActorTagImage = (tagId: number, imageFile: string) => {
-      for (let i = 0; i < allActorTags.length; i++) {
-        if (allActorTags[i] && allActorTags[i].id === tagId) {
-          let videoTags = allActorTags
-          videoTags[i].imageFile = imageFile
-          setAllActorTags(allActorTags)
-          break;
-        }
+  const updateActorTagImage = (tagId: number, imageFile: string) => {
+    for (let i = 0; i < allActorTags.length; i++) {
+      if (allActorTags[i] && allActorTags[i].id === tagId) {
+        let videoTags = allActorTags
+        videoTags[i].imageFile = imageFile
+        setAllActorTags(allActorTags)
+        break;
       }
+    }
   }
 
   const generateImageForTag = async (tagId: number, tagType: TagType, videoId: number, timeMs: number) => {
@@ -326,7 +328,7 @@ const VideosApp = (props: VideosAppProps) => {
 
   const viewTags = () => { setViewMode(VideosViewMode.Tags) }
 
-  const viewMassTagger = () => { setViewMode(VideosViewMode.MassTagger)}
+  const viewMassTagger = () => { setViewMode(VideosViewMode.MassTagger) }
 
   const setLoadingModal = (show: boolean, text?: string) => {
     setLoadingModalText(text ?? "")
@@ -402,6 +404,8 @@ const VideosApp = (props: VideosAppProps) => {
     viewSearchResults: viewSearchResults,
     setMassTaggerTag: massTag,
     setMassTaggerScrollPosition: setMassTaggerScrollPosition,
+    setMassTaggerSortOrder: setMassTaggerSortOrder,
+    setMassTaggerAnchorVideoId: setMassTaggerAnchorVideoId,
     setVideoListingPage: (n: number) => { setVideoListingPage(n) },
     setActorListingPage: (n: number) => { setActorListingPage(n) },
     setLoadingModal: setLoadingModal,
@@ -426,6 +430,8 @@ const VideosApp = (props: VideosAppProps) => {
     currentVideo: currentVideo,
     currentMassTaggerTag: currentMassTaggerTag,
     massTaggerScrollPosition: massTaggerScrollPosition,
+    massTaggerSortOrder: massTaggerSortOrder,
+    massTaggerAnchorVideoId: massTaggerAnchorVideoId,
     currentSearchQuery: currentSearchQuery,
     showLoadingModal: showLoadingModal,
     loadingModalText: loadingModalText,
@@ -440,10 +446,10 @@ const VideosApp = (props: VideosAppProps) => {
           modalId="loading-modal"
           displayModal={showLoadingModal}
           toggleModal={() => setLoadingModal(!showLoadingModal)}>
-            <div className="loading-modal-inner">
-              <span className="loader"></span>
-              <span className="loading-modal-text">{loadingModalText}</span>
-            </div>
+          <div className="loading-modal-inner">
+            <span className="loader"></span>
+            <span className="loading-modal-text">{loadingModalText}</span>
+          </div>
         </Modal>
         <Navigation {...navProps}>
         </Navigation>
