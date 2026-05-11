@@ -15,3 +15,7 @@ export type IVideoSearchQuery = BaseSearchQuery & {
     source?: string,
     tag?: string,
 }
+
+export type IActorSearchQuery = BaseSearchQuery & {
+    tag?: string
+}

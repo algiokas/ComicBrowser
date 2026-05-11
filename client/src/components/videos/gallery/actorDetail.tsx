@@ -1,10 +1,13 @@
 import { useContext, useState } from "react";
 import StarsImage from "../../../img/svg/stars.svg";
+import CameraIcon from "../../../img/svg/camera.svg";
 import type { Actor } from "../../../types/actor";
 import { getActorAge, getActorVideoCount } from "../../../util/videoUtils";
 import Modal from "../../shared/modal";
 import ActorEditPanel from "../editPanel/actorEditPanel";
 import { VideosAppContext } from "../videosAppContext";
+import type { TagType } from "../../../util/enums";
+import type { VideosAppTag } from "../../../types/tags";
 
 interface ActorDetailProps {
     actor: Actor,
@@ -22,6 +25,13 @@ const ActorDetail = (props: ActorDetailProps) => {
 
     const toggleEditModal = () => {
         setShowActorEditModal(prev => !prev)
+    }
+
+    const searchTag = (tagName: string) => {
+        console.log(tagName)
+    }
+
+    const generateTagImage = (e: React.MouseEvent, tag: VideosAppTag, tagType: TagType): void => {
     }
 
     return (
@@ -49,6 +59,20 @@ const ActorDetail = (props: ActorDetailProps) => {
                     <div className="actordetail-info-row">
                         <span className="actordetail-info-label">Age: </span>
                         <span className="actordetail-info-value">{getActorAge(props.actor)}</span>
+                    </div>
+                    <div className="tags-list">
+                        {
+                            props.actor.tags.toSorted((a, b) => a.name.localeCompare(b.name)).map((tag, i) => {
+                                return (
+                                    <div key={i} className="player-tag info-item clickable" onClick={() => searchTag(tag.name)}>
+                                        <span>{tag.name}</span>
+                                        <div className="imagegen" onClick={(e) => generateTagImage(e, tag, 'Video')}>
+                                            <img className="svg-icon-favorite" src={CameraIcon.toString()} alt={"Generate image for " + tag.name}></img>
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        }
                     </div>
                 </div>
                 <div className="actordetail-edit">

@@ -35,24 +35,32 @@ function folderToJSON(folderName: string, contents: string[], fileStats: Stats):
         addedDate: Date.now()
     }
 
+    let titleStart = 0;
     output.folderName = folderName
-    if (folderName[0] == '(')
-        output.prefix = folderName.substring(1, folderName.indexOf(')', 1))
+    if (folderName.charAt(0) === '(' || folderName.charAt(0) === '[')
+    {
+        if (folderName[0] == '(')
+            output.prefix = folderName.substring(1, folderName.indexOf(')', 1))
 
-    let artistGroupStart = folderName.indexOf('[', 0)
-    let artistGroupEnd = folderName.indexOf(']', artistGroupStart)
-    let artistGroupString = folderName.substring(artistGroupStart + 1, artistGroupEnd)
+        let artistGroupStart = folderName.indexOf('[', 0)
+        let artistGroupEnd = folderName.indexOf(']', artistGroupStart)
+        let artistGroupString = folderName.substring(artistGroupStart + 1, artistGroupEnd)
 
-    let artistStart = artistGroupString.indexOf('(')
-    if (artistStart < 0) {
-        output.artists = artistGroupString.split(',')
+        let artistStart = artistGroupString.indexOf('(')
+        if (artistStart < 0) {
+            output.artists = artistGroupString.split(',')
+        }
+        else {
+            output.artGroup = artistGroupString.substring(0, artistStart).trim()
+            output.artists = artistGroupString.substring(artistStart + 1, artistGroupString.indexOf(')')).split(',').map(s => s.trim())
+        }
+        titleStart = artistGroupEnd + 1
     }
-    else {
-        output.artGroup = artistGroupString.substring(0, artistStart).trim()
-        output.artists = artistGroupString.substring(artistStart + 1, artistGroupString.indexOf(')')).split(',').map(s => s.trim())
+    else
+    {
+        console.log(`Malformed folder name: ${folderName}`)
     }
 
-    let titleStart = artistGroupEnd + 1
     let suffixRegex = /\([^)]*\)|\[[^\]]*\]|\{[^\]]*\}/g;
     let suffixItems = folderName.substring(titleStart).match(suffixRegex)
     if (suffixItems && suffixItems.length > 0) {
@@ -292,4 +300,8 @@ export function createCollection(req: CreateCollectionRequest) {
 
 export function getCollections() {
     return bookDatabase.getAllCollections()
+}
+
+export function deleteCollection(collectionId: number) {
+    return bookDatabase.deleteCollection(collectionId)
 }

@@ -7,11 +7,13 @@ import { useContext, useEffect, useRef, useState } from "react"
 import { VideosAppContext } from "../videosAppContext"
 import { scalarArrayCompare } from "../../../util/helpers"
 import { getActorVideoCount } from "../../../util/videoUtils"
+import type { IActorSearchQuery } from "../../../types/searchQuery"
 
 
 interface ActorGalleryProps {
     showFilters?: boolean,
     sortOrder?: ActorsSortOrder,
+    query?: IActorSearchQuery
 }
 
 const ActorGallery = (props: ActorGalleryProps) => {
@@ -22,6 +24,7 @@ const ActorGallery = (props: ActorGalleryProps) => {
     const [items, setItems] = useState<Actor[]>([])
     const [sortOrder, setSortOrder] = useState<ActorsSortOrder>(initialSortOrder)
     const [totalPages, setTotalPages] = useState<number>(0)
+    const [videoCounts, setVideoCounts] = useState<Map<number, number>>(new Map<number, number>())
 
     useEffect(() => {
         updateItems(appContext.allActors)
@@ -37,11 +40,22 @@ const ActorGallery = (props: ActorGalleryProps) => {
             setTotalPages(getTotalPages(actors))
             setPage(0)
             setSortOrder(initialSortOrder)
+            getVideoCounts()
         }
-
-
         previousActors.current = actors
     }
+
+    const getVideoCounts = () => {
+        let newVideoCounts = new Map<number, number>()
+        for (const a of appContext.allActors) {
+            newVideoCounts.set(a.id, getActorVideoCount(a, appContext.allVideos))
+        }
+        setVideoCounts(newVideoCounts)
+    }
+
+    // const getVideoTagApperanceCount = (a: Actor): number => {
+        
+    // }
 
     const getSortedActors = (actors: Actor[], sortOrder: ActorsSortOrder): Actor[] => {
         let sortedCopy = [...actors]
@@ -53,7 +67,7 @@ const ActorGallery = (props: ActorGalleryProps) => {
                 break
             case ActorsSortOrder.NumVideos:
                 sortedCopy.sort((a, b) => {
-                    return getActorVideoCount(b, appContext.allVideos) - getActorVideoCount(a, appContext.allVideos)
+                    return (videoCounts.get(b.id) ?? 0) - (videoCounts.get(a.id) ?? 0)
                 })
                 break
             case ActorsSortOrder.Random:
@@ -95,6 +109,7 @@ const ActorGallery = (props: ActorGalleryProps) => {
     const getCurrentgalleryPage = (): Actor[] => {
         let pageStart = appContext.actorListingPage * appContext.galleryPageSize;
         let pageEnd = (appContext.actorListingPage + 1) * appContext.galleryPageSize;
+
         return items.slice(pageStart, pageEnd)
     }
 
@@ -106,6 +121,22 @@ const ActorGallery = (props: ActorGalleryProps) => {
         console.log("toggle favorite for actor: " + a.id)
         a.isFavorite = !a.isFavorite; //toggle value
         appContext.updateActor(a)
+    }
+
+    const getInfoDisplay = (a: Actor): string[] | null => {
+        switch (sortOrder) {
+            case ActorsSortOrder.ID:
+                return ["ID: ", `${a.id}`]
+            case ActorsSortOrder.Name:
+                return null
+            case ActorsSortOrder.NumVideos:
+                return ["Videos: ", `${(videoCounts.get(a.id) ?? 0)}`]
+            case ActorsSortOrder.Random:
+                return null
+            case ActorsSortOrder.Favorite:
+                return null
+        }
+        return null
     }
 
     return (
@@ -123,12 +154,15 @@ const ActorGallery = (props: ActorGalleryProps) => {
             </div>
             <div className="actorgallery-container-inner">
                 {getCurrentgalleryPage().map((actor, i) => {
+                    let infoDisplay = getInfoDisplay(actor)
                     return <ActorGalleryItem
                         key={i}
                         index={i}
                         actor={actor}
                         bodyClickHandler={bodyClick}
                         favoriteClickHandler={favoriteClick}
+                        infoLabel={infoDisplay?.at(0)}
+                        infoValue={infoDisplay?.at(1)}
                     ></ActorGalleryItem>
                 })
 

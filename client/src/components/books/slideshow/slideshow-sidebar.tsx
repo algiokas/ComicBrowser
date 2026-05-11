@@ -38,7 +38,8 @@ interface SidebarProps {
     updateBook(book: Book): void,
     deleteBook(bookId: number): void,
     viewSearchResults(query?: IBookSearchQuery): void,
-    createCollection(collectionName: string, coverBookId: number): void
+    createCollection(collectionName: string, coverBookId: number): void,
+    deleteCollection(collectionId: number): void
 }
 
 interface SidebarState {
@@ -122,6 +123,13 @@ const Sidebar = (props: SidebarProps) => {
         props.setPage(0)
     }
 
+    const deleteCurrentCollection = () => {
+        if (props.slideshow.id) {
+            props.deleteCollection(props.slideshow.id)
+            props.emptySlideshow()
+        }
+    }
+
     return (
         <div className="slideshow-sidebar-container">
             <div className="slideshow-sidebar-toggle stepper-arrow" onClick={props.toggleSidebar}>
@@ -165,14 +173,15 @@ const Sidebar = (props: SidebarProps) => {
                             <div className="slideshow-info">
                                 {
                                     props.slideshow.id !== 0 && props.slideshow.id ?
-                                        <button className="saveupdate-button" onClick={() => { toggleSaveModal() }}>Update Slideshow</button> :
-                                        <button className="saveupdate-button" onClick={() => { toggleSaveModal() }}>Save Slideshow</button>
+                                        <button className="saveupdate-button" onClick={() => { toggleSaveModal() }}>Update Collection</button> :
+                                        <button className="saveupdate-button" onClick={() => { toggleSaveModal() }}>Create Collection</button>
                                 }
                                 <Modal modalId={"saveUpdate-modal"} displayModal={showSaveModal} toggleModal={toggleSaveModal}>
                                     <SavePanel
                                         currentSlideshow={props.slideshow}
                                         toggleDisplay={toggleSaveModal}
-                                        createCollection={props.createCollection} />
+                                        createCollection={props.createCollection}
+                                        deleteCurrentCollection={deleteCurrentCollection} />
                                 </Modal>
                                 {"Slideshow: " + props.slideshow.name + " ID: " + props.slideshow.id}
                             </div>

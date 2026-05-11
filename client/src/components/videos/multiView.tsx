@@ -38,7 +38,7 @@ const MultiView = (props: MultiViewProps) => {
             return (
                 <Player />
             )
-        case VideosViewMode.SearchResults:
+        case VideosViewMode.VideoSearchResults:
             return (
                 <VideoGallery
                     sortOrder={VideosSortOrder.ID}

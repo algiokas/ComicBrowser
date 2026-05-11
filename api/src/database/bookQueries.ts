@@ -5,6 +5,8 @@ export const _BOOKS = Object.freeze({
     selectAll: db.prepare('SELECT * FROM books'),
     selectById: db.prepare('SELECT * FROM books WHERE id = ?'),
     selectByTitle: db.prepare('SELECT * FROM books WHERE title = ?'),
+    selectByOriginalTitle: db.prepare(`SELECT * FROM books WHERE originalTitle = ?`),
+    selectByFolderName: db.prepare(`SELECT * FROM books WHERE folderName = ?`),
     delete: db.prepare('DELETE FROM books WHERE id = ?'),
     updateTitle: db.prepare('UPDATE books SET title = ? WHERE id = ?'),
     updateArtGroup: db.prepare('UPDATE books SET artGroup = ? WHERE id = ?'),
@@ -47,10 +49,12 @@ export const _COLLECTIONS = Object.freeze({
     selectAll: db.prepare('SELECT * FROM collections'),
     selectById: db.prepare('SELECT * FROM collections WHERE id = ?'),
     selectByRowId: db.prepare('SELECT * FROM collections WHERE rowid = ?'),
+    delete: db.prepare(`DELETE FROM collections WHERE id = ?`)
 })
 
 export const _COLLECTIONBOOKS = Object.freeze({
     insert: db.prepare('INSERT INTO collectionBooks (collectionId, bookId, sortOrder) VALUES (?, ?, ?)'),
-    selectByCollectionId: db.prepare('SELECT bookId FROM collectionBooks WHERE collectionID = ? ORDER BY sortOrder')
+    selectByCollectionId: db.prepare('SELECT bookId FROM collectionBooks WHERE collectionId = ? ORDER BY sortOrder'),
+    delete: db.prepare(`DELETE FROM collectionBooks WHERE collectionId = ? AND bookId = ?`)
 })
 

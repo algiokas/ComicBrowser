@@ -24,7 +24,8 @@ interface MultiViewProps extends BooksAppState {
     updateBook(book: Book): void,
     deleteBook(bookId: number): void,
     importBooks(): void,
-    createCollection(collectionName: string, coverBookId: number): void
+    createCollection(collectionName: string, coverBookId: number): void,
+    deleteCollection(collectionId: number): void
 }
 
 const MultiView = (props: MultiViewProps) => {
@@ -43,7 +44,8 @@ const MultiView = (props: MultiViewProps) => {
         updateBook: props.updateBook,
         deleteBook: props.deleteBook,
         viewSearchResults: props.viewSearchResults,
-        createCollection: props.createCollection
+        createCollection: props.createCollection,
+        deleteCollection: props.deleteCollection
     }
 
     switch (props.viewMode) {

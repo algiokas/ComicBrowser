@@ -67,7 +67,7 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
         if (tag && appContext.currentVideo && props.videoRef.current) {
             e.stopPropagation()
             let timeMs = Math.round(props.videoRef.current.currentTime * 1000)
-            console.log('generate actor image at ' + timeMs + 'ms')
+            console.log('generate video tag image at ' + timeMs + 'ms')
             appContext.generateImageForTag(tag.id, tagType, appContext.currentVideo.id, timeMs)
         }
     }

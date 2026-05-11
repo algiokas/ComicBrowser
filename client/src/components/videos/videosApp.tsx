@@ -307,9 +307,9 @@ const VideosApp = (props: VideosAppProps) => {
       let newQuery = { ...getEmptyQuery(), ...query }
       newQuery.filled = true
       setCurrentSearchQuery(newQuery)
-      setViewMode(VideosViewMode.SearchResults)
+      setViewMode(VideosViewMode.VideoSearchResults)
     } else if (currentSearchQuery.filled) {
-      setViewMode(VideosViewMode.SearchResults)
+      setViewMode(VideosViewMode.VideoSearchResults)
     }
   }
 
@@ -365,7 +365,7 @@ const VideosApp = (props: VideosAppProps) => {
     },
     {
       text: "Search Results",
-      viewMode: VideosViewMode.SearchResults,
+      viewMode: VideosViewMode.VideoSearchResults,
       clickHandler: viewSearchResults
     }
   ]

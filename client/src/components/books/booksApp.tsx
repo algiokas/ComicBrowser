@@ -142,6 +142,17 @@ function BooksApp(props: BooksAppProps) {
     setCurrentSlideshow(getEmptySlideshow())
   }
 
+  const deleteCollection = async (collectionId: number) => {
+    const res = await fetch(`${apiBaseUrl}/books/collections/delete/${collectionId}`, {
+      method: 'delete'
+    })
+    const data = await res.json()
+    if (data.changes > 0) {
+      console.log(`Removed collection: ${collectionId}`)
+      setAllCollections(allCollections.filter(c => c.id !== collectionId))
+    }
+  }
+
   const updateBook = async (book: Book) => {
     const res = await fetch(`${apiBaseUrl}/books/${book.id}/update`, {
       method: 'post',
@@ -439,7 +450,8 @@ function BooksApp(props: BooksAppProps) {
     deleteBook: deleteBook,
     importBooks: importBooks,
     createCollection: createCollection,
-    viewCollection: viewCollection
+    viewCollection: viewCollection,
+    deleteCollection: deleteCollection
   }
 
   const appState: BooksAppState = {

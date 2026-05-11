@@ -9,7 +9,7 @@
     border-radius: 0.3em;
 
     &.favorite {
-        box-shadow:  inset -22px 22px 28px -24px $yellow-favorite-glow;
+        box-shadow: inset -22px 22px 28px -24px $yellow-favorite-glow;
     }
 
     &-header {
@@ -43,13 +43,52 @@
         font-size: larger;
         font-weight: bold;
 
+        &-row {
+            display: flex;
+        }
+
+        &-label {
+            margin: 0 5px;
+        }
+
         &-value {
-            color: $pink-1
+            color: $pink-1;
+            margin-right: auto;
+        }
+
+        & .tags-list {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+
+            & .player-tag {
+                display: flex;
+                flex-direction: row;
+
+                & .imagegen {
+                    margin-top: auto;
+                    margin-bottom: auto;
+                    margin-left: 5px;
+                }
+            }
+
+            & .info-item {
+                margin: 5px;
+                padding: 4px 10px;
+                overflow-wrap: break-word;
+                min-width: 0px;
+            }
+
+            & .clickable {
+                background-color: #404040;
+                color: #e619c3;
+                border-radius: 4px;
+            }
         }
     }
 
     & .svg-icon-disabled {
-        
+
         filter: brightness(0);
     }
 }

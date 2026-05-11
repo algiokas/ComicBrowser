@@ -26,6 +26,7 @@
         "request": "launch",
         "url": "http://localhost:5173",
         "webRoot": "${workspaceFolder}/dist",
+        "runtimeArgs": ["--incognito"],
         "sourceMaps": true, 
         "presentation": {
           "hidden": true,

@@ -19,7 +19,8 @@ interface SlideshowProps {
     updateBook(book: Book): void,
     deleteBook(bookId: number): void,
     viewSearchResults(query?: IBookSearchQuery): void,
-    createCollection(collectionName: string, coverBookId: number): void
+    createCollection(collectionName: string, coverBookId: number): void,
+    deleteCollection(collectionId: number): void
 }
 
 export interface IGridPage {
@@ -206,6 +207,7 @@ const Slideshow = (props: SlideshowProps) => {
         deleteBook: props.deleteBook,
         viewSearchResults: props.viewSearchResults,
         createCollection: props.createCollection,
+        deleteCollection: props.deleteCollection,
 
         slideshow: props.slideshow,
         showSidebar: showSidebar,

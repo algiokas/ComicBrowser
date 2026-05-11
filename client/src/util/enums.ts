@@ -21,7 +21,8 @@ export const VideosViewMode = {
   Sources: "Sources",
   Player: "Player",
   Tags: "Tags",
-  SearchResults: "SearchResults",
+  VideoSearchResults: "VideoResults",
+  ActorSearchResults: "ActorResults",
   MassTagger: "MassTagger",
 } as const;
 export type VideosViewMode = (typeof VideosViewMode)[keyof typeof VideosViewMode];
@@ -53,7 +54,7 @@ export const ActorsSortOrder = {
   Name: "AlphaName",
   Favorite: "Favorite",
   Random: "Random",
-  NumVideos: "NumVideos",
+  NumVideos: "NumVideos"
 } as const;
 export type ActorsSortOrder = (typeof ActorsSortOrder)[keyof typeof ActorsSortOrder];
 

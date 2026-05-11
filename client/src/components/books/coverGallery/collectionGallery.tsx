@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Collection } from "../../../types/slideshow";
 import PageSelect from "../../shared/pageSelect"
 import type { BaseGalleryProps } from "../../shared/baseGallery"
@@ -14,6 +14,11 @@ const CollectionGallery = (props: CollectionGalleryProps) => {
     const [items, setItems] = useState<Collection[]>(props.allItems)
     const [galleryPage, setGalleryPage] = useState<number>(0)
     const [totalPages, setTotalPages] = useState<number>(0)
+
+    useEffect(() => {
+        let totalPages = getTotalPages(items)
+        setTotalPages(totalPages)
+    }, [items])
 
     const getTotalPages = (items: Collection[]): number => {
         if (items) {

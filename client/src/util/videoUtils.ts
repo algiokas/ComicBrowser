@@ -33,9 +33,12 @@ export const videosFromJson = (videosJson: any): Video[] => {
 }
 
 export const getActorImageUrlWithFallback = async (actor: Actor, videos: Video[]): Promise<string> => {
-    if (actor.imageFile) return getActorImageUrl(actor)
+    if (actor.imageFile) 
+        return getActorImageUrl(actor)
+    console.log(`Actor image not set for: ${actor.name} (ID: ${actor.id})`)
     let matchingVideos = videos.filter((v) => v.actors.some((a) => a.id === actor.id) && v.thumbnailId)
-    if (matchingVideos.length > 0) return getVideoThumbnailUrl(matchingVideos[0])
+    if (matchingVideos.length > 0) 
+        return getVideoThumbnailUrl(matchingVideos[0])
     return ""
 }
 

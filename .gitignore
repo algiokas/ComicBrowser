@@ -5,7 +5,7 @@ newClient/
 db.sqlite
 .env
 */.env
-api/data/backup
+api/data/*
 api/data/*.sqlite
 api/data/**/*.sqlite
 api/dist

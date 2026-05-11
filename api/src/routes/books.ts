@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getBooks, importBooks, getBookPage, updateBook, deleteBook, getCollections, createCollection } from '../bookRepository';
+import { getBooks, importBooks, getBookPage, updateBook, deleteBook, getCollections, createCollection, deleteCollection } from '../bookRepository';
 var router = Router();
 
 router.get('/', function (req, res, next) {
@@ -79,8 +79,13 @@ router.post('/collections/update/:collectionId', function (req, res) {
 })
 
 router.delete('/collections/delete/:collectionId', function (req, res) {
-    //TODO
-    console.log('NOT IMPLEMENTED - delete collection: ' + req.params.collectionId)
+    const collectionId = Number(req.params.collectionId)
+    if (isNaN(collectionId)) {
+        res.status(500).send(`Internal Server Error: parameter bookId must be a number - provided value: ${collectionId}`)
+        return
+    }
+    console.log(`Deleting collection: ${collectionId}`)
+    res.json(deleteCollection(collectionId))
 })
 
 export default router

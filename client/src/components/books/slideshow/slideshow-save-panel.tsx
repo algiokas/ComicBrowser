@@ -1,18 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import coverIcon from "../../../img/svg/book-half.svg";
-import type { Slideshow } from "../../../types/slideshow";
+import type { Collection, Slideshow } from "../../../types/slideshow";
 import { GetCoverPath } from "../../../util/helpers";
 import GalleryItem from "../coverGallery/galleryItem";
 
 interface SavePanelProps {
     currentSlideshow: Slideshow,
     toggleDisplay(): void,
-    createCollection(collectionName: string, coverBookId: number): void
+    createCollection(collectionName: string, coverBookId: number): void,
+    deleteCurrentCollection(): void
 }
 
 const SavePanel = (props: SavePanelProps) => {
     const [ collectionName, setCollectionName ] = useState<string>(props.currentSlideshow.id !== null ? props.currentSlideshow.name : "")
     const [ selectedCoverIndex, setSelectedCoverIndex ] = useState<number>(0)
+
+    useEffect(() => {
+        let loadedCollection = props.currentSlideshow as Collection;
+        if (loadedCollection && loadedCollection.coverBookId) {
+            for (let i = 0; i < loadedCollection.books.length; i++) {
+                if (loadedCollection.books[i].id === loadedCollection.coverBookId) {
+                    setSelectedCoverIndex(i);
+                    break;
+                }
+            }
+        }
+    }, [props.currentSlideshow.id])
 
     const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCollectionName(e.target.value)
@@ -56,6 +69,10 @@ const SavePanel = (props: SavePanelProps) => {
                         }
                     </div>
                     <div className="savepanel-controls">
+                        {
+                            props.currentSlideshow.id === null ? null :
+                            <button type="button" className="delete-button" onClick={() => props.deleteCurrentCollection()}>DELETE</button>
+                        }
                         <button type="button" onClick={() => saveCollection()}>Save</button>
                     </div>
                 </div>

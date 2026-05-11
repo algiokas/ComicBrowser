@@ -307,6 +307,16 @@
         }
     }
 
+    &-info-display {
+        z-index: 3;
+        border-radius: 3px;
+        margin: 0;
+        padding: 2px 5px;
+        position: absolute;
+        top: 7px;
+        left: 7px;
+        background-color: $gray-2;
+    }
 }
 
 .VideosApp .sourcegallery {

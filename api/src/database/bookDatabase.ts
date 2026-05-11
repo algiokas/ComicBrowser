@@ -195,7 +195,7 @@ function removeBookFromDb(bookId: number) {
 
 export function addBook(bookJson: FolderJSON, replace = false): RunResultExisting | null {
     if (!replace) {
-        let existing = _BOOKS.selectByTitle.get(bookJson.title) as BookRow
+        let existing = _BOOKS.selectByFolderName.get(bookJson.folderName) as BookRow
         if (existing && existing.folderName === bookJson.folderName) {
             console.log('Book: "' + bookJson.title + '" found. Skipping...')
             return { existingRowId: existing.id }
@@ -298,4 +298,13 @@ export function createCollection(cName: string, books: ClientBook[], coverBookId
         _COLLECTIONBOOKS.insert.run(collectionRow.id, books[i].id, i)
     }
     return fillCollection(collectionRow)
+}
+
+export function deleteCollection(collectionId: number): RunResult {
+    const books = _COLLECTIONBOOKS.selectByCollectionId.all(collectionId) as CollectionBook[]
+    for (let i = 0; i < books.length; i++) {
+        let bookId = books[i].bookId
+        _COLLECTIONBOOKS.delete.run(collectionId, bookId)
+    }
+    return _COLLECTIONS.delete.run(collectionId)
 }
