@@ -1,9 +1,9 @@
 import bodyParser from 'body-parser';
-import { Router, Response, Request } from 'express';
+import { Router, Response } from 'express';
 import { createReadStream, statSync } from 'fs';
 import mime from 'mime';
-import * as videoRepository from "../videoRepository";
-import { ImportVideosResult } from '../types/video';
+import * as videoRepository from "../videoRepository.ts";
+import { ImportVideosResult } from '../types/video.ts';
 const router = Router();
 
 router.get('/', function (req, res, next) {

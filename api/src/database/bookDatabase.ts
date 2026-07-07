@@ -1,7 +1,7 @@
 import { RunResult } from 'better-sqlite3'
-import { Artist, BookArtist, BookRow, BookTag, ClientBook, ClientCollection, CollectionBook, CollectionRow, FolderJSON, Tag } from '../types/book'
-import { RunResultExisting } from '../types/shared'
-import { _BOOKS, _ARTISTS, _BOOKARTISTS, _TAGS, _BOOKTAGS, _COLLECTIONS, _COLLECTIONBOOKS } from './bookQueries'
+import { Artist, BookArtist, BookRow, BookTag, ClientBook, ClientCollection, CollectionBook, CollectionRow, FolderJSON, Tag } from '../types/book.ts'
+import { RunResultExisting } from '../types/shared.ts'
+import { _BOOKS, _ARTISTS, _BOOKARTISTS, _TAGS, _BOOKTAGS, _COLLECTIONS, _COLLECTIONBOOKS } from './bookQueries.ts'
 
 function insertBookFromJson(bookJson: FolderJSON): RunResult | null {
     try {

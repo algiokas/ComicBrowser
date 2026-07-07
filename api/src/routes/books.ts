@@ -1,14 +1,14 @@
 import { Router } from 'express';
-import { getBooks, importBooks, getBookPage, updateBook, deleteBook, getCollections, createCollection, deleteCollection } from '../bookRepository';
+import * as bookRepository from '../bookRepository.ts';
 var router = Router();
 
 router.get('/', function (req, res, next) {
-    let books = getBooks()
+    let books = bookRepository.getBooks()
     res.json(books)
 });
 
 router.get('/import', function (req, res, next) {
-    importBooks(res, (res, importResult) => {
+    bookRepository.importBooks(res, (res, importResult) => {
         console.log("imported " + importResult.importCount + " books")
         res.json(importResult)
     })
@@ -27,7 +27,7 @@ router.get('/:bookId/page/:pageNum', function (req, res, next) {
         return
     }
 
-    let fpath = getBookPage(bookId, pageNum);
+    let fpath = bookRepository.getBookPage(bookId, pageNum);
     if (fpath) res.sendFile(fpath, { root: process.env.BOOKS_IMAGE_DIR });
     else {
         res.sendStatus(404).end();
@@ -46,7 +46,7 @@ router.post('/:bookId/update', function (req, res, next) {
         console.log("invalid book data")
     } 
     if (req.body.id.toString() === bookId) {
-        res.json(updateBook(bookId, req.body))
+        res.json(bookRepository.updateBook(bookId, req.body))
     } else {
         res.status(500).send(`Internal Server Error: mismatch between bookId param and request body book ID - ${bookId} vs ${req.body.id}`)
     }
@@ -60,17 +60,17 @@ router.delete('/:bookId', function (req, res) {
     }
 
     console.log('delete book id: ' + bookId)
-    res.json(deleteBook(bookId))
+    res.json(bookRepository.deleteBook(bookId))
 })
 
 router.get('/collections/all', function (req, res) {
     console.log('get all collections')
-    res.json(getCollections())
+    res.json(bookRepository.getCollections())
 })
 
 router.post('/collections/create', function (req, res) {
     console.log('new collection: ' + req.body.name)
-    res.json(createCollection(req.body))
+    res.json(bookRepository.createCollection(req.body))
 })
 
 router.post('/collections/update/:collectionId', function (req, res) {
@@ -85,7 +85,7 @@ router.delete('/collections/delete/:collectionId', function (req, res) {
         return
     }
     console.log(`Deleting collection: ${collectionId}`)
-    res.json(deleteCollection(collectionId))
+    res.json(bookRepository.deleteCollection(collectionId))
 })
 
 export default router

@@ -60,6 +60,11 @@ const ActorGallery = (props: ActorGalleryProps) => {
     const getSortedActors = (actors: Actor[], sortOrder: ActorsSortOrder): Actor[] => {
         let sortedCopy = [...actors]
         switch (sortOrder) {
+            case ActorsSortOrder.ID:
+                sortedCopy.sort((a, b) => {
+                    return a.id - b.id
+                })
+                break
             case ActorsSortOrder.Name:
                 sortedCopy.sort((a, b) => {
                     return a.name.localeCompare(b.name)

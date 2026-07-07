@@ -1,4 +1,4 @@
-import * as bookDatabase from './database/bookDatabase'
+import * as bookDatabase from './database/bookDatabase.ts'
 import { readdir, statSync, readdirSync, Stats } from 'fs';
 import path from 'path';
 import { Response } from 'express';

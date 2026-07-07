@@ -24,6 +24,7 @@
         "name": "WebBrowser",
         "type": "chrome",
         "request": "launch",
+        "noDebug": true,
         "url": "http://localhost:5173",
         "webRoot": "${workspaceFolder}/dist",
         "runtimeArgs": ["--incognito"],
@@ -38,7 +39,8 @@
     "compounds": [
       {
         "name": "Start All",
-        "configurations": ["API", "Client", "WebBrowser"],
+        "configurations": ["API", "Client"],
+        "preLaunchTask": "Chrome Incognito",
         "stopAll": true
       }
     ]

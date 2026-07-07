@@ -1,13 +1,26 @@
 import fs from 'fs';
 import mime from 'mime';
 import path from 'path';
-import * as videoDatabase from '../src/database/videoDatabase';
-import { Response } from 'express';
+import * as videoDatabase from '../src/database/videoDatabase.ts';
+import * as ffmpeg from './ffmpeg.ts';
+import * as util from './util.ts';
+import type { Response } from 'express';
+import type { 
+    ActorRow, 
+    ClientActor, 
+    VideoFileData, 
+    ImportVideosResult, 
+    ClientVideo, 
+    SourceRow, 
+    UpdateActorResult, 
+    VideoRow, 
+    UpdateVideoResult, 
+    UpdateSourceResult, 
+    ClientSource, 
+    VideosTagType 
+} from './types/video.ts';
 
 import 'dotenv/config';
-import { generateImageFromVideo, GenerateThumbnailResult, VideoScreenshotOptions } from './ffmpeg';
-import { ActorRow, ClientActor, VideoFileData, ImportVideosResult, ClientVideo, SourceRow, UpdateActorResult, VideoRow, UpdateVideoResult, UpdateSourceResult, ClientSource, VideosTagType } from './types/video';
-import { getTimestampString, PLACEHOLDER_SOURCE, stripNonAlphanumeric } from './util';
 
 const dataDir = process.env.VIDEOS_DATA_DIR!
 const videosDir = path.join(dataDir, '/videos');
@@ -66,7 +79,7 @@ function fileToJson(parentDir: string, fileName: string, fileStats: fs.Stats): V
 }
 
 function fillVideo(videoRow: VideoRow): ClientVideo {
-    const videoSource = videoDatabase.getSourceById(videoRow.sourceId ?? -1) ?? PLACEHOLDER_SOURCE
+    const videoSource = videoDatabase.getSourceById(videoRow.sourceId ?? -1) ?? util.PLACEHOLDER_SOURCE
     const videoActors = videoDatabase.getVideoActors(videoRow.id)
     const videoTags = videoDatabase.getVideoTags(videoRow.id)
     let video: ClientVideo = {
@@ -136,7 +149,7 @@ export function getTagImagePath(tagId: number, tagType: VideosTagType) {
 }
 
 
-function generateThumbnail(video: VideoRow | ClientVideo, options: VideoScreenshotOptions, callback?: (result: GenerateThumbnailResult) => void) {
+function generateThumbnail(video: VideoRow | ClientVideo, options: ffmpeg.VideoScreenshotOptions, callback?: (result: ffmpeg.GenerateThumbnailResult) => void) {
     if (!video.filePath) {
         console.error(`Video ${video.id} - missing filePath`)
         if (callback) callback({ success: false })
@@ -148,7 +161,7 @@ function generateThumbnail(video: VideoRow | ClientVideo, options: VideoScreensh
     options.outputFileName = thumbFileName
     options.outputDir = options.outputDir ?? thumbnailDir
     try {
-        generateImageFromVideo(videoPath, options, () => {
+        ffmpeg.generateImageFromVideo(videoPath, options, () => {
             videoDatabase.updateThumbnail(video.id, thumbFileName)
             video.thumbnailId = thumbFileName
             if (callback) {
@@ -176,7 +189,7 @@ function getActorImageName(actor: ActorRow) {
     return imgFileName
 }
 
-function generateActorImage(actor: ActorRow, video: VideoRow, options: VideoScreenshotOptions, callback: (result: GenerateThumbnailResult) => void) {
+function generateActorImage(actor: ActorRow, video: VideoRow, options: ffmpeg.VideoScreenshotOptions, callback: (result: ffmpeg.GenerateThumbnailResult) => void) {
     if (!video.filePath) {
         console.error(`Video ${video.id} - missing filePath`)
         callback({ success: false })
@@ -187,7 +200,7 @@ function generateActorImage(actor: ActorRow, video: VideoRow, options: VideoScre
     options.outputFileName = imgFileName
     options.outputDir = options.outputDir ?? actorImageDir
     try {
-        generateImageFromVideo(videoPath, options, () => {
+        ffmpeg.generateImageFromVideo(videoPath, options, () => {
             videoDatabase.updateActorImage(actor.id, imgFileName)
             actor.imageFile = imgFileName
             callback({ success: true, actor: actor })
@@ -212,7 +225,7 @@ function getTagImageName(tagId: number, tagType: VideosTagType) {
     return fname
 }
 
-function generateTagImage(tagId: number, tagType: VideosTagType, tagName: string, video: VideoRow, options: VideoScreenshotOptions, callback: (result: GenerateThumbnailResult) => void) {
+function generateTagImage(tagId: number, tagType: VideosTagType, tagName: string, video: VideoRow, options: ffmpeg.VideoScreenshotOptions, callback: (result: ffmpeg.GenerateThumbnailResult) => void) {
     if (!video.filePath) {
         console.error(`Video ${video.id} - missing filePath`)
         callback({ success: false })
@@ -223,9 +236,9 @@ function generateTagImage(tagId: number, tagType: VideosTagType, tagName: string
     options.outputFileName = imgFileName
     options.outputDir = options.outputDir ?? tagImageDir
     try {
-        generateImageFromVideo(videoPath, options, () => {
+        ffmpeg.generateImageFromVideo(videoPath, options, () => {
             videoDatabase.setTagImageFile(tagId, imgFileName, tagType)
-            let result: GenerateThumbnailResult = { success: true }
+            let result: ffmpeg.GenerateThumbnailResult = { success: true }
             const resultTag = { id: tagId, name: tagName, imageFile: imgFileName }
             if (tagType === 'video') result.videoTag = resultTag
             else result.actorTag = resultTag
@@ -238,19 +251,19 @@ function generateTagImage(tagId: number, tagType: VideosTagType, tagName: string
     }
 }
 
-export function generateImageForTag(tagId: number, tagType: VideosTagType, videoId: number, timeMs: string, callback: (result: GenerateThumbnailResult) => void) {
+export function generateImageForTag(tagId: number, tagType: VideosTagType, videoId: number, timeMs: string, callback: (result: ffmpeg.GenerateThumbnailResult) => void) {
     const video = videoDatabase.getVideoById(videoId)
     const tag = videoDatabase.getTagById(tagId, tagType)
     if (video && tag) {
-        let ts = getTimestampString(timeMs)
+        let ts = util.getTimestampString(timeMs)
         generateTagImage(tagId, tagType, tag.name ?? '', video, { timestamp: ts }, callback)
     }
 }
 
-export function generateThumbnailExisting(videoId: number, timeMs: string, callback: (result: GenerateThumbnailResult) => void) {
+export function generateThumbnailExisting(videoId: number, timeMs: string, callback: (result: ffmpeg.GenerateThumbnailResult) => void) {
     let video = videoDatabase.getVideoById(videoId)
     if (video) {
-        let ts = getTimestampString(timeMs)
+        let ts = util.getTimestampString(timeMs)
         generateThumbnail(video, { timestamp: ts }, callback)
     }
     else {
@@ -258,11 +271,11 @@ export function generateThumbnailExisting(videoId: number, timeMs: string, callb
     }
 }
 
-export function generateImageForActor(actorId: number, videoId: number, timeMs: string, callback: (result: GenerateThumbnailResult) => void) {
+export function generateImageForActor(actorId: number, videoId: number, timeMs: string, callback: (result: ffmpeg.GenerateThumbnailResult) => void) {
     const video = videoDatabase.getVideoById(videoId)
     const actor = videoDatabase.getActorById(actorId)
     if (actor && video) {
-        let timestamp = getTimestampString(timeMs)
+        let timestamp = util.getTimestampString(timeMs)
         generateActorImage(actor, video, { timestamp: timestamp }, callback)
     } else {
         callback({ success: false })
@@ -556,7 +569,7 @@ export function saveSourceImage(sourceId: number, imageSize: "small" | "large", 
         return callback({ success: false, changes: [], error: `No source found with ID: ${sourceId}` })
     }
 
-    const sourceNameSlug = stripNonAlphanumeric(sourceData.name).toLowerCase()
+    const sourceNameSlug = util.stripNonAlphanumeric(sourceData.name).toLowerCase()
 
     let fileNameIndex = 0
     const fileExtenion = mime.getExtension(fileType)

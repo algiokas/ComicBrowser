@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 import path from 'path';
-import { ActorRow, ActorTag, ClientActor, ClientVideo, VideoRow, VideoTag } from './types/video';
+import { ActorRow, ActorTag, ClientActor, ClientVideo, VideoRow, VideoTag } from './types/video.ts';
 
 export interface VideoScreenshotOptions {
     timestamp?: string;

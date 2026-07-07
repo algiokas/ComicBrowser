@@ -1,4 +1,4 @@
-import { BaseResponse } from "./shared";
+import { BaseResponse } from "./shared.ts";
 
 export interface BookRow {
   id: number;

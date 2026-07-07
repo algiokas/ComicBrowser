@@ -15,6 +15,27 @@
           "reveal": "silent",
           "panel": "new"
         }
+      },
+      {
+        "label": "Chrome Incognito",
+        "type": "shell",
+        "windows": {
+          "command": "Start-Process chrome -ArgumentList '--incognito', 'http://localhost:5173'",
+          "options": {
+            "shell": {
+              "executable": "powershell",
+              "args": [
+                "-Command"
+              ]
+            }
+          }
+        },
+        "isBackground": true,
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "never",
+          "close": true
+        }
       }
     ]
   }

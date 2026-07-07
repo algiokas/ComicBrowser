@@ -1,8 +1,8 @@
 import { Router } from 'express';
 var router = Router({mergeParams:true});
-import booksRouter from './books';
-import actorsRouter from './actors';
-import videosRouter from './videos';
+import booksRouter from './books.ts';
+import actorsRouter from './actors.ts';
+import videosRouter from './videos.ts';
 
 router.get('/', function (req, res, next) {
   res.send("API Root");

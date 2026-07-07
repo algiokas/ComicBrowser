@@ -1,7 +1,7 @@
 import Database from "better-sqlite3"
-import { ActorRow, SourceRow, VideoRow, VideoActor, VideoFileData, VideoTag, VideoTagsRef, ActorTag, ActorTagsRef, VideosTagType } from '../types/video';
-import { _VIDEOS, _ACTORS, _VIDEOACTORS, _SOURCES, _VIDEOTAGS, _VIDEOTAGSREF, _ACTORTAGS, _ACTORTAGSREF } from './videoQueries';
-import { RunResultExisting } from '../types/shared';
+import { ActorRow, SourceRow, VideoRow, VideoActor, VideoFileData, VideoTag, VideoTagsRef, ActorTag, ActorTagsRef, VideosTagType } from '../types/video.ts';
+import { _VIDEOS, _ACTORS, _VIDEOACTORS, _SOURCES, _VIDEOTAGS, _VIDEOTAGSREF, _ACTORTAGS, _ACTORTAGSREF } from './videoQueries.ts';
+import { RunResultExisting } from '../types/shared.ts';
 
 function insertVideoFromJson(videoJson: Omit<VideoRow, 'id'>): Database.RunResult | undefined {
   try {

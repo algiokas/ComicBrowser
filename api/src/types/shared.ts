@@ -1,5 +1,3 @@
-import Database from "better-sqlite3";
-
 export interface RunResultExisting {
     changes?: number;
     lastInsertRowid?: number | bigint;

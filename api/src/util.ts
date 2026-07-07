@@ -1,4 +1,4 @@
-import { SourceRow } from "./types/video"
+import { SourceRow } from "./types/video.ts"
 
 export const PLACEHOLDER_SOURCE: SourceRow = {
     id: -1,

@@ -1,4 +1,4 @@
-import { videos_db as db } from './database';
+import { videos_db as db } from './database.ts';
 
 const tables = Object.freeze({
   videos: 'videos',

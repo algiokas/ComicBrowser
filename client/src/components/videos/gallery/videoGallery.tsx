@@ -59,24 +59,26 @@ const VideoGallery = (props: VideoGalleryProps) => {
             const newIds = videos.map(v => v.id)
             const oldIds = previousVideos.current.map(v => v.id)
             if (!previousQuery.current || !scalarArrayCompare(newIds, oldIds)) {
+                const isActorListing = updateActorListingActor()
+                const isSourceListing = updateSourceListingSource()
                 const filteredVideos = getFilteredVideos(videos, query)
-                const sortedVideos = getSortedVideos(filteredVideos, sortOrder)
+                if (isActorListing || isSourceListing)
+                    setSortOrder("Favorite")
+                const sortedVideos = getSortedVideos(filteredVideos, isActorListing || isSourceListing ? "Favorite" : sortOrder)
                 setItems(sortedVideos)
                 setTotalPages(getTotalPages(sortedVideos))
                 setGalleryPage(0)
-                updateActorListingActor()
-                updateSourceListingSource()
                 setImageLoadState(new BitArray(Math.min(props.pageSize, filteredVideos.length)))
             }
         } else {
             const newIds = videos.map(v => v.id)
             const oldIds = previousVideos.current.map(v => v.id)
             if (previousQuery.current || !scalarArrayCompare(newIds, oldIds)) {
+                updateActorListingActor()
+                updateSourceListingSource()
                 setItems(getSortedVideos(videos, initialSortOrder))
                 setTotalPages(getTotalPages(videos))
                 setGalleryPage(0)
-                updateActorListingActor()
-                updateSourceListingSource()
             }
         }
         previousVideos.current = videos
@@ -227,7 +229,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
         setImageLoadState(prev => prev.toggle(idx))
     }
 
-    const updateActorListingActor = () => {
+    const updateActorListingActor = (): boolean => {
         const isActorListing = props.query &&
             props.query.filled &&
             props.query.actor &&
@@ -236,14 +238,15 @@ const VideoGallery = (props: VideoGalleryProps) => {
         if (!isActorListing) {
             setActorListingActor(null)
             setDisabledSortOrder(prev => prev.filter(s => s !== "AlphaActor"))
-            return
+            return false
         }
         const matchingActor = appContext.allActors.find(a => a.name == props.query!.actor) ?? null
         setActorListingActor(matchingActor)
         setDisabledSortOrder(prev => [...prev, "AlphaActor"])
+        return true
     }
 
-    const updateSourceListingSource = () => {
+    const updateSourceListingSource = (): boolean => {
         const isSourceListing = props.query &&
             props.query.filled &&
             props.query.source &&
@@ -252,11 +255,12 @@ const VideoGallery = (props: VideoGalleryProps) => {
         if (!isSourceListing) {
             setSourceListingSource(null)
             setDisabledSortOrder(prev => prev.filter(s => s !== "AlphaSource"))
-            return
+            return false
         }
         const matchingSource = appContext.allSources.find(s => s.name === props.query!.source) ?? null
         setSourceListingSource(matchingSource)
         setDisabledSortOrder(prev => [...prev, "AlphaSource"])
+        return true
     }
 
     return (
