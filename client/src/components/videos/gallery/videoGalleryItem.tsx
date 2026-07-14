@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import StarsImage from "../../../img/svg/stars.svg";
 import TagsImage from "../../../img/svg/tags.svg";
 import type { Actor } from "../../../types/actor";
@@ -17,10 +17,12 @@ interface VideoGalleryItemProps {
   subTitleItemClickHandler?: (actor: Actor) => void,
   secondaryClickHandler?: (data: Video) => void,
   onImageLoad?: (idx: number) => void,
+  onImageError?: (idx: number) => void,
 }
 
 const VideoGalleryItem = (props: VideoGalleryItemProps) => {
   const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string>(props.imageUrl ?? '')
+  const imgRef = useRef<HTMLImageElement>(null)
 
   useEffect(() => {
     const updateThumbnail = async () => {
@@ -31,6 +33,12 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
       updateThumbnail()
     }
   }, [props.video])
+
+  useEffect(() => {
+    if (thumbnailImageUrl && imgRef.current?.complete && props.onImageLoad) {
+      props.onImageLoad(props.index)
+    }
+  }, [thumbnailImageUrl])
 
   const bodyClick = (e: React.MouseEvent) => {
     if (props.bodyClickHandler)
@@ -63,9 +71,11 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
           {
             thumbnailImageUrl ?
               <img
+                ref={imgRef}
                 src={thumbnailImageUrl}
                 alt={`${props.video.title} thumbnail`}
                 onLoad={() => { if (props.onImageLoad) props.onImageLoad(props.index) }}
+                onError={() => { if (props.onImageError) props.onImageError(props.index) }}
                 loading={props.lazyload ? 'lazy' : 'eager'}>
               </img>
               : null

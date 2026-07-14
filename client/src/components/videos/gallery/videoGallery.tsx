@@ -44,7 +44,14 @@ const VideoGallery = (props: VideoGalleryProps) => {
     }, [appContext.allVideos, props.query])
 
     useEffect(() => {
+        const pageItemCount = getCurrentGalleryPageItems(items).length
+        setImageLoadState(new BitArray(pageItemCount))
         appContext.setLoadingModal(true, "Loading Images")
+
+        const timeout = setTimeout(() => {
+            appContext.setLoadingModal(false)
+        }, 8000)
+        return () => clearTimeout(timeout)
     }, [items, galleryPage, appContext.videoListingPage])
 
     useEffect(() => {
@@ -68,7 +75,6 @@ const VideoGallery = (props: VideoGalleryProps) => {
                 setItems(sortedVideos)
                 setTotalPages(getTotalPages(sortedVideos))
                 setGalleryPage(0)
-                setImageLoadState(new BitArray(Math.min(props.pageSize, filteredVideos.length)))
             }
         } else {
             const newIds = videos.map(v => v.id)
@@ -225,8 +231,8 @@ const VideoGallery = (props: VideoGalleryProps) => {
         appContext.updateVideo(video)
     }
 
-    const onImageLoad = (idx: number) => {
-        setImageLoadState(prev => prev.toggle(idx))
+    const onImageResolved = (idx: number) => {
+        setImageLoadState(prev => prev.set(idx, true))
     }
 
     const updateActorListingActor = (): boolean => {
@@ -296,13 +302,14 @@ const VideoGallery = (props: VideoGalleryProps) => {
                 {
                     getCurrentGalleryPageItems(items).map((video, i) => {
                         return <VideoGalleryItem
-                            key={i}
+                            key={video.id}
                             index={i}
                             video={video}
                             bodyClickHandler={bodyClick}
                             subTitleItemClickHandler={subtitleClick}
                             favoriteClickHandler={favoriteClick}
-                            onImageLoad={onImageLoad}
+                            onImageLoad={onImageResolved}
+                            onImageError={onImageResolved}
                         ></VideoGalleryItem>
                     })
                 }
