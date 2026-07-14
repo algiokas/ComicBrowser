@@ -1,0 +1,139 @@
+@use 'vars' as *;
+
+// Panel/gallery container: centered card with padded body
+@mixin gallery-container {
+    clear: both;
+    margin: 10px auto;
+    padding: 10px;
+    border-radius: 5px;
+    width: 90%;
+    background-color: $gray-2;
+}
+
+// A gallery tile (cover/thumbnail cell within a wrapping flex row)
+@mixin gallery-tile($tile-margin: auto) {
+    flex: 0 0 19%;
+    position: relative;
+    margin: $tile-margin;
+    margin-bottom: 2em;
+
+    &-inner {
+        cursor: pointer;
+    }
+}
+
+// Top-rounded tile image
+@mixin tile-image {
+    display: block;
+    border-top-left-radius: .3em;
+    border-top-right-radius: .3em;
+}
+
+// Pink "media" action button (edit/save/update controls)
+@mixin media-button {
+    display: block;
+    justify-content: center;
+    align-items: center;
+    border-radius: 3px;
+    background-color: $gray-1;
+    font-family: $font-family;
+    color: $pink-1;
+    font-weight: 600;
+}
+
+// Label + value pill (filter chips, tag chips)
+@mixin pill {
+    display: flex;
+    flex-direction: row;
+    background-color: $gray-3;
+    border-radius: 10px;
+    font-size: 1.2em;
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+@mixin pill-label {
+    background-color: $gray-1;
+    padding: 8px 8px 8px 16px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    color: $pink-1;
+}
+
+@mixin pill-value {
+    padding: 8px 16px 8px 8px;
+    color: $text-color;
+    text-decoration: none;
+}
+
+// Inline clickable info chip (clickable pink token on gray background)
+@mixin info-item {
+    margin: 5px;
+    padding: 4px 10px;
+    overflow-wrap: break-word;
+    min-width: 0px;
+}
+
+@mixin info-item-clickable {
+    background-color: $gray-1;
+    color: $pink-1;
+    border-radius: 4px;
+}
+
+// Wrapping tag list with image-gen affordance, shared by player + detail views
+@mixin tags-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    .player-tag {
+        display: flex;
+        flex-direction: row;
+
+        .image-gen {
+            margin-top: auto;
+            margin-bottom: auto;
+            margin-left: 5px;
+        }
+    }
+}
+
+// Shared shell for the actor/source detail panels
+@mixin detail-panel {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 20px;
+    padding: 15px 25px 25px 25px;
+    background-color: $gray-3;
+    border-radius: 0.3em;
+
+    &.favorite {
+        box-shadow: inset -22px 22px 28px -24px $yellow-favorite-glow;
+    }
+
+    &-header {
+        display: flex;
+        flex-direction: row;
+        margin: 0 30px;
+
+        .favorite-icon {
+            cursor: pointer;
+            margin-left: auto;
+        }
+    }
+
+    &-inner {
+        display: flex;
+    }
+
+    &-image {
+        margin-right: 25px;
+        margin-left: 25px;
+
+        img {
+            border: 5px solid $gray-2;
+            border-radius: 0.3em;
+            width: 500px;
+        }
+    }
+}

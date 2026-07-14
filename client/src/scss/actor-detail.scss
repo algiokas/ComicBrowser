@@ -1,42 +1,8 @@
 @use 'vars' as *;
+@use 'mixins' as *;
 
-.actordetail {
-    display: flex;
-    flex-direction: column;
-    margin: 10px 20px;
-    padding: 15px 25px 25px 25px;
-    background-color: $gray-3;
-    border-radius: 0.3em;
-
-    &.favorite {
-        box-shadow: inset -22px 22px 28px -24px $yellow-favorite-glow;
-    }
-
-    &-header {
-        display: flex;
-        flex-direction: row;
-        margin: 0 30px;
-
-        & .favorite-icon {
-            cursor: pointer;
-            margin-left: auto;
-        }
-    }
-
-    &-inner {
-        display: flex;
-    }
-
-    &-image {
-        margin-right: 25px;
-        margin-left: 25px;
-
-        & img {
-            border: 5px solid $gray-2;
-            border-radius: 0.3em;
-            width: 500px;
-        }
-    }
+.actor-detail {
+    @include detail-panel;
 
     &-info {
         margin-right: auto;
@@ -56,39 +22,20 @@
             margin-right: auto;
         }
 
-        & .tags-list {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
+        .tags-list {
+            @include tags-list;
 
-            & .player-tag {
-                display: flex;
-                flex-direction: row;
-
-                & .imagegen {
-                    margin-top: auto;
-                    margin-bottom: auto;
-                    margin-left: 5px;
-                }
+            .info-item {
+                @include info-item;
             }
 
-            & .info-item {
-                margin: 5px;
-                padding: 4px 10px;
-                overflow-wrap: break-word;
-                min-width: 0px;
-            }
-
-            & .clickable {
-                background-color: #404040;
-                color: #e619c3;
-                border-radius: 4px;
+            .clickable {
+                @include info-item-clickable;
             }
         }
     }
 
     & .svg-icon-disabled {
-
         filter: brightness(0);
     }
 }

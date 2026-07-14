@@ -1,19 +1,53 @@
 @use 'vars' as *;
+@use 'mixins' as *;
+
+// Sort controls — shared markup across every gallery type
+.sort-select {
+    display: flex;
+    justify-content: center;
+    font-size: large;
+    padding-bottom: 10px;
+}
+
+.sort-order {
+    cursor: pointer;
+    background-color: $gray-1;
+    padding: 5px 20px;
+    margin: 3px 15px;
+    border: 2px solid $black;
+    border-radius: 3px;
+
+    &.selected {
+        border-color: $yellow-highlight;
+    }
+}
+
+.sort-index {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 0 40px 10px 40px;
+    font-size: large;
+
+    &-item {
+        cursor: pointer;
+        background-color: $gray-1;
+        padding: 3px 10px;
+        margin: auto;
+        border: 2px solid $black;
+        border-radius: 3px;
+
+        &.selected {
+            border-color: $yellow-highlight;
+        }
+    }
+}
 
 .BooksApp .gallery {
-    flex: 0 0 19%;
-    position: relative;
-    margin: 3px;
-    margin-bottom: 2em;
-
-    &-inner {
-        cursor: pointer;
-    }
+    @include gallery-tile(3px);
 
     &-image {
-        display: block;
-        border-top-left-radius: .3em;
-        border-top-right-radius: .3em;
+        @include tile-image;
         width: 294px;
 
         &.small {
@@ -22,105 +56,28 @@
     }
 
     &-container {
-        clear: both;
-        margin: 10px auto;
-        padding: 10px;
-        border-radius: 5px;
+        @include gallery-container;
         width: 100%;
         max-width: 1200px;
-        background-color: $gray-2;
 
         &-inner {
             display: flex;
             flex-wrap: wrap;
         }
-
-        .sort {
-            &-select {
-                display: flex;
-                justify-content: center;
-                font-size: large;
-                padding-bottom: 10px;
-            }
-
-            &-order {
-                cursor: pointer;
-                background-color: $gray-1;
-                padding: 5px 20px;
-                margin: 3px 15px;
-                border: 2px solid black;
-                border-radius: 3px;
-    
-                &.selected {
-                    border: 2px solid $yellow-highlight;
-                }
-            }
-
-            &-index {
-                display: flex;
-                flex-direction: row;
-                padding: 0 40px;
-                flex-wrap: wrap;
-                padding-bottom: 10px;
-                font-size: large;
-
-                &-item {
-                    cursor: pointer;
-                    background-color: $gray-1;
-                    padding: 3px 10px;
-                    margin: auto;
-                    border: 2px solid black;
-                    border-radius: 3px;
-        
-                    &.selected {
-                        border: 2px solid $yellow-highlight;
-                    }
-                }
-
-            }
-        }
-
-        .sort-select {
-            display: flex;
-            justify-content: center;
-            font-size: large;
-            padding-bottom: 10px;
-
-            .sort-order {
-                cursor: pointer;
-                background-color: $gray-1;
-                padding: 5px 20px;
-                margin: 3px 15px;
-                border: 2px solid black;
-                border-radius: 3px;
-    
-                &.selected {
-                    border: 2px solid $yellow-highlight;
-                }
-            }
-        }
     }
-
 }
 
-.VideosApp .videogallery {
-    flex: 0 0 19%;
-    position: relative;
-    margin: auto;
-    margin-bottom: 2em;
-
-    &-inner {
-        cursor: pointer;
-    }
+.VideosApp .video-gallery {
+    @include gallery-tile;
 
     &-image {
-        background-color: black;
+        background-color: $black;
         border-top-left-radius: .3em;
         border-top-right-radius: .3em;
         width: 480px;
         overflow: hidden;
 
-        & img {
+        img {
             display: block;
             max-width: 480px;
             max-height: 270px;
@@ -131,179 +88,29 @@
     }
 
     &-container {
-        clear: both;
-        margin: 10px auto;
-        padding: 10px;
-        border-radius: 5px;
-        width: 90%;
-        background-color: $gray-2;
+        @include gallery-container;
 
         &-inner {
             display: flex;
             flex-wrap: wrap;
         }
-
-        .sort {
-            &-select {
-                display: flex;
-                justify-content: center;
-                font-size: large;
-                padding-bottom: 10px;
-            }
-
-            &-order {
-                cursor: pointer;
-                background-color: $gray-1;
-                padding: 5px 20px;
-                margin: 3px 15px;
-                border: 2px solid black;
-                border-radius: 3px;
-    
-                &.selected {
-                    border: 2px solid $yellow-highlight;
-                }
-            }
-
-            &-index {
-                display: flex;
-                flex-direction: row;
-                padding: 0 40px;
-                flex-wrap: wrap;
-                padding-bottom: 10px;
-                font-size: large;
-
-                &-item {
-                    cursor: pointer;
-                    background-color: $gray-1;
-                    padding: 3px 10px;
-                    margin: auto;
-                    border: 2px solid black;
-                    border-radius: 3px;
-        
-                    &.selected {
-                        border: 2px solid $yellow-highlight;
-                    }
-                }
-
-            }
-        }
-
-        .sort-select {
-            display: flex;
-            justify-content: center;
-            font-size: large;
-            padding-bottom: 10px;
-
-            .sort-order {
-                cursor: pointer;
-                background-color: $gray-1;
-                padding: 5px 20px;
-                margin: 3px 15px;
-                border: 2px solid black;
-                border-radius: 3px;
-    
-                &.selected {
-                    border: 2px solid $yellow-highlight;
-                }
-            }
-        }
     }
-
 }
 
-.VideosApp .actorgallery {
-    flex: 0 0 19%;
-    position: relative;
-    margin: auto;
-    margin-bottom: 2em;
-
-    &-inner {
-        cursor: pointer;
-    }
+.VideosApp .actor-gallery {
+    @include gallery-tile;
 
     &-image {
-        display: block;
-        border-top-left-radius: .3em;
-        border-top-right-radius: .3em;
+        @include tile-image;
         width: 480px;
     }
 
     &-container {
-        clear: both;
-        margin: 10px auto;
-        padding: 10px;
-        border-radius: 5px;
-        width: 90%;
-        background-color: $gray-2;
+        @include gallery-container;
 
         &-inner {
             display: flex;
             flex-wrap: wrap;
-        }
-
-        .sort {
-            &-select {
-                display: flex;
-                justify-content: center;
-                font-size: large;
-                padding-bottom: 10px;
-            }
-
-            &-order {
-                cursor: pointer;
-                background-color: $gray-1;
-                padding: 5px 20px;
-                margin: 3px 15px;
-                border: 2px solid black;
-                border-radius: 3px;
-    
-                &.selected {
-                    border: 2px solid $yellow-highlight;
-                }
-            }
-
-            &-index {
-                display: flex;
-                flex-direction: row;
-                padding: 0 40px;
-                flex-wrap: wrap;
-                padding-bottom: 10px;
-                font-size: large;
-
-                &-item {
-                    cursor: pointer;
-                    background-color: $gray-1;
-                    padding: 3px 10px;
-                    margin: auto;
-                    border: 2px solid black;
-                    border-radius: 3px;
-        
-                    &.selected {
-                        border: 2px solid $yellow-highlight;
-                    }
-                }
-
-            }
-        }
-
-        .sort-select {
-            display: flex;
-            justify-content: center;
-            font-size: large;
-            padding-bottom: 10px;
-
-            .sort-order {
-                cursor: pointer;
-                background-color: $gray-1;
-                padding: 5px 20px;
-                margin: 3px 15px;
-                border: 2px solid black;
-                border-radius: 3px;
-    
-                &.selected {
-                    border: 2px solid $yellow-highlight;
-                }
-            }
         }
     }
 
@@ -319,37 +126,22 @@
     }
 }
 
-.VideosApp .sourcegallery {
-    flex: 0 0 19%;
-    position: relative;
-    margin: auto;
-    margin-bottom: 2em;
-
-    &-inner {
-        cursor: pointer;
-    }
+.VideosApp .source-gallery {
+    @include gallery-tile;
 
     &-image {
-        display: block;
-        border-top-left-radius: .3em;
-        border-top-right-radius: .3em;
+        @include tile-image;
         width: 480px;
     }
 
     &-container {
-        clear: both;
-        margin: 10px auto;
-        padding: 10px;
-        border-radius: 5px;
-        width: 90%;
-        background-color: $gray-2;
+        @include gallery-container;
 
         &-inner {
             display: flex;
             flex-wrap: wrap;
         }
     }
-
 }
 
 .caption {
@@ -378,8 +170,6 @@
         }
     }
 
-    
-
     .subtitle {
         font-size: 13px;
         color: $pink-1;
@@ -391,15 +181,13 @@
     }
 }
 
-.videogallery .caption {
-    & .subtitle {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
+.video-gallery .caption .subtitle {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 
-        span {
-            flex: 1 0 30%;
-            white-space: pre;
-        }
+    span {
+        flex: 1 0 30%;
+        white-space: pre;
     }
 }

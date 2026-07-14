@@ -1,42 +1,8 @@
 @use 'vars' as *;
+@use 'mixins' as *;
 
-.sourcedetail {
-    display: flex;
-    flex-direction: column;
-    margin: 10px 20px;
-    padding: 15px 25px 25px 25px;
-    background-color: $gray-3;
-    border-radius: 0.3em;
-
-    &.favorite {
-        box-shadow: inset -22px 22px 28px -24px $yellow-favorite-glow;
-    }
-
-    &-header {
-        display: flex;
-        flex-direction: row;
-        margin: 0 30px;
-
-        & .favorite-icon {
-            cursor: pointer;
-            margin-left: auto;
-        }
-    }
-
-    &-inner {
-        display: flex;
-    }
-
-    &-image {
-        margin-right: 25px;
-        margin-left: 25px;
-
-        & img {
-            border: 5px solid $gray-2;
-            border-radius: 0.3em;
-            width: 500px;
-        }
-    }
+.source-detail {
+    @include detail-panel;
 
     &-info {
         margin-right: auto;
