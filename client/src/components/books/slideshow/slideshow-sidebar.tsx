@@ -173,8 +173,8 @@ const Sidebar = (props: SidebarProps) => {
                             <div className="slideshow-info">
                                 {
                                     props.slideshow.id !== 0 && props.slideshow.id ?
-                                        <button className="saveupdate-button" onClick={() => { toggleSaveModal() }}>Update Collection</button> :
-                                        <button className="saveupdate-button" onClick={() => { toggleSaveModal() }}>Create Collection</button>
+                                        <button className="save-update-button" onClick={() => { toggleSaveModal() }}>Update Collection</button> :
+                                        <button className="save-update-button" onClick={() => { toggleSaveModal() }}>Create Collection</button>
                                 }
                                 <Modal modalId={"saveUpdate-modal"} displayModal={showSaveModal} toggleModal={toggleSaveModal}>
                                     <SavePanel

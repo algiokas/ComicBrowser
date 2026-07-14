@@ -224,7 +224,7 @@ const Slideshow = (props: SlideshowProps) => {
         <div className={`slideshow-container ${showSidebar ? "show-sidebar" : ""}`}>
             {
                 gridView ?
-                    <div className="pagegrid" ref={gridRef}>
+                    <div className="page-grid" ref={gridRef}>
                         {
                             gridPages.map((page: IGridPage, i: number) =>
                                 <GridPage {...page}

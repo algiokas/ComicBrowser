@@ -118,10 +118,10 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
                                             return (
                                                 <div key={i} className="player-actor" onClick={() => searchActor(actor.name)}>
                                                     <div className="player-actor-image">
-                                                        <img className="actorgallery-image" src={actor.imageUrl} alt={`${actor.name}`}></img>
+                                                        <img className="actor-gallery-image" src={actor.imageUrl} alt={`${actor.name}`}></img>
                                                     </div>
                                                     <div className={`caption ${(actor.isFavorite ? 'favorite' : '')}`}>
-                                                        <div className="player-actorimagegen-icon" onClick={(e) => generateActorImage(e, actor)}>
+                                                        <div className="player-actor-image-gen-icon" onClick={(e) => generateActorImage(e, actor)}>
                                                             <img className="svg-icon-favorite" src={CameraIcon.toString()} alt={"Generate image for " + actor.name}></img>
                                                         </div>
                                                         <span>{actor.name}</span>
@@ -150,7 +150,7 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
                                         return (
                                             <div key={i} className="player-tag info-item clickable" onClick={() => searchTag(tag.name)}>
                                                 <span>{tag.name}</span>
-                                                <div className="imagegen" onClick={(e) => generateTagImage(e, tag, 'Video')}>
+                                                <div className="image-gen" onClick={(e) => generateTagImage(e, tag, 'Video')}>
                                                     <img className="svg-icon-favorite" src={CameraIcon.toString()} alt={"Generate image for " + tag.name}></img>
                                                 </div>
                                             </div>

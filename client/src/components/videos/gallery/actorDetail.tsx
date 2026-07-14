@@ -35,9 +35,9 @@ const ActorDetail = (props: ActorDetailProps) => {
     }
 
     return (
-        <div className={`actordetail ${props.actor.isFavorite ? "favorite" : ""}`}>
-            <div className="actordetail-header">
-                <h2 className="actordetail-name">{props.actor.name}</h2>
+        <div className={`actor-detail ${props.actor.isFavorite ? "favorite" : ""}`}>
+            <div className="actor-detail-header">
+                <h2 className="actor-detail-name">{props.actor.name}</h2>
                 <div className="favorite-icon" onClick={() => favoriteClick()}>
                     {
                         props.actor.isFavorite ?
@@ -47,18 +47,18 @@ const ActorDetail = (props: ActorDetailProps) => {
                     }
                 </div>
             </div>
-            <div className="actordetail-inner">
-                <div className="actordetail-image">
+            <div className="actor-detail-inner">
+                <div className="actor-detail-image">
                     <img src={props.actor.imageUrl}></img>
                 </div>
-                <div className="actordetail-info">
-                    <div className="actordetail-info-row">
-                        <span className="actordetail-info-label">Videos: </span>
-                        <span className="actordetail-info-value">{getActorVideoCount(props.actor, appContext.allVideos)}</span>
+                <div className="actor-detail-info">
+                    <div className="actor-detail-info-row">
+                        <span className="actor-detail-info-label">Videos: </span>
+                        <span className="actor-detail-info-value">{getActorVideoCount(props.actor, appContext.allVideos)}</span>
                     </div>
-                    <div className="actordetail-info-row">
-                        <span className="actordetail-info-label">Age: </span>
-                        <span className="actordetail-info-value">{getActorAge(props.actor)}</span>
+                    <div className="actor-detail-info-row">
+                        <span className="actor-detail-info-label">Age: </span>
+                        <span className="actor-detail-info-value">{getActorAge(props.actor)}</span>
                     </div>
                     <div className="tags-list">
                         {
@@ -66,7 +66,7 @@ const ActorDetail = (props: ActorDetailProps) => {
                                 return (
                                     <div key={i} className="player-tag info-item clickable" onClick={() => searchTag(tag.name)}>
                                         <span>{tag.name}</span>
-                                        <div className="imagegen" onClick={(e) => generateTagImage(e, tag, 'Video')}>
+                                        <div className="image-gen" onClick={(e) => generateTagImage(e, tag, 'Video')}>
                                             <img className="svg-icon-favorite" src={CameraIcon.toString()} alt={"Generate image for " + tag.name}></img>
                                         </div>
                                     </div>
@@ -75,7 +75,7 @@ const ActorDetail = (props: ActorDetailProps) => {
                         }
                     </div>
                 </div>
-                <div className="actordetail-edit">
+                <div className="actor-detail-edit">
                     <button type="button" onClick={() => { toggleEditModal() }}>
                         Edit Actor
                     </button>

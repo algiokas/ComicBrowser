@@ -145,8 +145,8 @@ const ActorGallery = (props: ActorGalleryProps) => {
     }
 
     return (
-        <div className="actorgallery-container dark-theme">
-            <div className="actorgallery-container-header">
+        <div className="actor-gallery-container dark-theme">
+            <div className="actor-gallery-container-header">
                 <PageSelect
                     setPage={setPage}
                     totalPages={totalPages}
@@ -157,7 +157,7 @@ const ActorGallery = (props: ActorGalleryProps) => {
                     sortVideos={sortActors}
                     setPage={setPage} />
             </div>
-            <div className="actorgallery-container-inner">
+            <div className="actor-gallery-container-inner">
                 {getCurrentgalleryPage().map((actor, i) => {
                     let infoDisplay = getInfoDisplay(actor)
                     return <ActorGalleryItem
@@ -173,7 +173,7 @@ const ActorGallery = (props: ActorGalleryProps) => {
 
                 }
             </div>
-            <div className="actorgallery-container-footer">
+            <div className="actor-gallery-container-footer">
                 <PageSelect setPage={setPage} totalPages={totalPages} currentPage={appContext.actorListingPage}></PageSelect>
             </div>
         </div>

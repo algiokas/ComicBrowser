@@ -26,18 +26,18 @@ const ActorGalleryItem = (props: ActorGalleryItemProps) => {
   }
 
   return (
-    <div className="actorgallery" key={props.actor.id}>
-      <div className="actorgallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
+    <div className="actor-gallery" key={props.actor.id}>
+      <div className="actor-gallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
         {
           props.infoLabel && props.infoValue ?
-            <div className="actorgallery-info-display">
+            <div className="actor-gallery-info-display">
               <span className="info-label">{props.infoLabel}</span>
               <span className="info-value">{props.infoValue}</span>
             </div>
             : null
         }
 
-        <img className="actorgallery-image" src={props.actor.imageUrl} alt={`${props.actor.name} thumbnail`}></img>
+        <img className="actor-gallery-image" src={props.actor.imageUrl} alt={`${props.actor.name} thumbnail`}></img>
         {
           props.children ? <div className="caption">{props.children}</div> :
             <div className={props.actor.isFavorite ? "caption favorite" : "caption"}>

@@ -44,17 +44,17 @@ const SavePanel = (props: SavePanelProps) => {
     }
 
     return (
-            <div className="savepanel">
+            <div className="save-panel">
                 <h3>{props.currentSlideshow.id === null ? "Create New Collection" : "Update Collection"}</h3>
-                <div className="savepanel-inner">
-                    <div className="savepanel-row">
+                <div className="save-panel-inner">
+                    <div className="save-panel-row">
                         <span>Collection Name: </span>
                         <input type="text"
                             value={collectionName}
                             onChange={handleTextInputChange}
                             onKeyDown={handleTextInputKey}></input>
                     </div>
-                    <div className="savepanel-covers">
+                    <div className="save-panel-covers">
                         {
                             props.currentSlideshow.books.map((book, index) => {
                                 return <GalleryItem
@@ -68,7 +68,7 @@ const SavePanel = (props: SavePanelProps) => {
                             })
                         }
                     </div>
-                    <div className="savepanel-controls">
+                    <div className="save-panel-controls">
                         {
                             props.currentSlideshow.id === null ? null :
                             <button type="button" className="delete-button" onClick={() => props.deleteCurrentCollection()}>DELETE</button>

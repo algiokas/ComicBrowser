@@ -57,9 +57,9 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
   }
 
   return (
-    <div className="videogallery" key={props.video.title}>
-      <div className="videogallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
-        <div className="videogallery-image">
+    <div className="video-gallery" key={props.video.title}>
+      <div className="video-gallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
+        <div className="video-gallery-image">
           {
             thumbnailImageUrl ?
               <img

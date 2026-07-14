@@ -26,9 +26,9 @@ const SourceGalleryItem = (props: SourceGalleryItemProps) => {
     }
 
     return (
-        <div className="sourcegallery" key={props.source.id}>
-            <div className="sourcegallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
-                <img className="sourcegallery-image" src={sourceImageUrl} alt={`${props.source.name} thumbnail`}></img>
+        <div className="source-gallery" key={props.source.id}>
+            <div className="source-gallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
+                <img className="source-gallery-image" src={sourceImageUrl} alt={`${props.source.name} thumbnail`}></img>
                 <div className="caption">
                     <div className="caption-text">
                         <span className="title">{props.source.name}</span>

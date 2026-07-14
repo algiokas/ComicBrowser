@@ -35,13 +35,13 @@ const TagsGallery = (props: TagsGalleryProps) => {
     }
 
     return (
-        <div className="tagsgallery dark-theme">
-            <div className="tagsgallery-container">
+        <div className="tags-gallery dark-theme">
+            <div className="tags-gallery-container">
                 <div>
-                    <h2 className="tagsgallery-header">
+                    <h2 className="tags-gallery-header">
                         Tags
                     </h2>
-                    <div className="tagsgallery-typeSelect">
+                    <div className="tags-gallery-type-select">
                         {
                             Object.keys(TagType).map((t, i) => {
                                 return <div key={i} onClick={() => setTagType(t as TagType)} className={(tagType === t) ? 'selected' : ''}>
@@ -52,7 +52,7 @@ const TagsGallery = (props: TagsGalleryProps) => {
                     </div>
                 </div>
 
-                <div className="tagsgallery-inner">
+                <div className="tags-gallery-inner">
                     {
                         getTagsByType(tagType).map((tag: VideosAppTag, i: number) => {
                             return <TagsGalleryItem

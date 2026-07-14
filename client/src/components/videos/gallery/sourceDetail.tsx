@@ -54,27 +54,27 @@ const SourceDetail = (props: SourceDetailProps) => {
     }
 
     return (
-        <div className="sourcedetail">
-            <div className="sourcedetail-header">
-                <h2 className="sourcedetail-name">{props.source.name}</h2>
+        <div className="source-detail">
+            <div className="source-detail-header">
+                <h2 className="source-detail-name">{props.source.name}</h2>
             </div>
-            <div className="sourcedetail-inner">
+            <div className="source-detail-inner">
                 {
                     props.source.imageFileLarge ?
-                        <div className="sourcedetail-image">
+                        <div className="source-detail-image">
                             <img src={primaryImageUrl}></img>
                         </div>
                         : null
                 }
-                <div className="sourcedetail-info">
-                    <div className="sourcedetail-info-row">
-                        <span className="sourcedetail-info-label">Number of Videos: </span>
-                        <span className="sourcedetail-info-value">{videoCount}</span>
+                <div className="source-detail-info">
+                    <div className="source-detail-info-row">
+                        <span className="source-detail-info-label">Number of Videos: </span>
+                        <span className="source-detail-info-value">{videoCount}</span>
                     </div>
                 </div>
-                <div className="sourcedetail-upload">
+                <div className="source-detail-upload">
                     <input type="file" id="source-image" name="source-image" accept="image/*" onChange={handleFileChange} />
-                    <div className="sourcedetail-upload-controls">
+                    <div className="source-detail-upload-controls">
                         <button type="button" onClick={() => upload('small')}>Upload Small</button>
                         <button type="button" onClick={() => upload('large')}>Upload Large</button>
                     </div>

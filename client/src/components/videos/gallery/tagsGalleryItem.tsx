@@ -83,9 +83,9 @@ const TagsGalleryItem = (props: TagsGalleryItemProps) => {
     }
 
     return (
-        <div className="tagsgallery-item" key={props.tag.name}>
-            <div className="tagsgallery-item-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
-                <div className="tagsgallery-item-image">
+        <div className="tags-gallery-item" key={props.tag.name}>
+            <div className="tags-gallery-item-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
+                <div className="tags-gallery-item-image">
                     {
                         thumbnailImageUrl ?
                             <img

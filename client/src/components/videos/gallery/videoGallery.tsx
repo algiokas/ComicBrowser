@@ -264,7 +264,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
     }
 
     return (
-        <div className="videogallery-container dark-theme">
+        <div className="video-gallery-container dark-theme">
             {
                 actorListingActor ?
                     <ActorDetail actor={actorListingActor} />
@@ -277,7 +277,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
                     />
                     : null
             }
-            <div className="videogallery-container-header">
+            <div className="video-gallery-container-header">
                 <PageSelect
                     setPage={setPage}
                     totalPages={totalPages}
@@ -292,7 +292,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
                             disabledSorts={disabledSortOrders} />
                 }
             </div>
-            <div className="videogallery-container-inner" style={{ 'visibility': (appContext.showLoadingModal ? 'hidden' : 'visible') }}>
+            <div className="video-gallery-container-inner" style={{ 'visibility': (appContext.showLoadingModal ? 'hidden' : 'visible') }}>
                 {
                     getCurrentGalleryPageItems(items).map((video, i) => {
                         return <VideoGalleryItem
@@ -307,7 +307,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
                     })
                 }
             </div>
-            <div className="videogallery-container-footer">
+            <div className="video-gallery-container-footer">
                 <PageSelect setPage={setPage} totalPages={totalPages} currentPage={getGalleryPage()}></PageSelect>
             </div>
         </div>

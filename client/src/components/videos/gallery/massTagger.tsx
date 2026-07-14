@@ -138,7 +138,7 @@ const MassTagger = (props: MassTaggerProps) => {
     }
 
     return (
-        <div className="videogallery-container dark-theme">
+        <div className="video-gallery-container dark-theme">
             <h3>Select a tag</h3>
             <div className="tag-select-container">
                 <div className="tag-select-inner">
@@ -153,14 +153,14 @@ const MassTagger = (props: MassTaggerProps) => {
                     </select>
                 </div>
             </div>
-            <div className="videogallery-container-header">
+            <div className="video-gallery-container-header">
                 <VideoSortControls sortOrder={appContext.massTaggerSortOrder}
                     videoList={appContext.allVideos}
                     pageSize={appContext.allVideos.length}
                     sortVideos={sortVideos}
                     setPage={() => window.scrollTo(0, 0)} />
             </div>
-            <div className="videogallery-container-inner"
+            <div className="video-gallery-container-inner"
                 style={{ 'visibility': (appContext.showLoadingModal ? 'hidden' : 'visible') }}>
                 {
                     sortedVideos.filter(v => !containsTag(v)).map((video, i) => (

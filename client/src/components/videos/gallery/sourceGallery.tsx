@@ -38,11 +38,11 @@ const SourceGallery = (props: SourceGalleryProps) => {
     }
 
     return (
-        <div className="sourcegallery-container dark-theme">
-            <div className="sourcegallery-container-header">
+        <div className="source-gallery-container dark-theme">
+            <div className="source-gallery-container-header">
                 <PageSelect setPage={(n: number) => { setGalleryPage(n) }} totalPages={getTotalPages(appContext.allSources)} currentPage={galleryPage} />
             </div>
-            <div className="sourcegallery-container-inner">
+            <div className="source-gallery-container-inner">
                 {
                     getCurrentGalleryPage().map((source, i) => {
                         return <SourceGalleryItem
