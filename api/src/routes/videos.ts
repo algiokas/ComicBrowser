@@ -4,6 +4,7 @@ import { createReadStream, statSync } from 'fs';
 import mime from 'mime';
 import * as videoRepository from "../videoRepository.ts";
 import { ImportVideosResult } from '../types/video.ts';
+import { sendImageFile } from './sendImage.ts';
 const router = Router();
 
 router.get('/', function (req, res, next) {
@@ -62,7 +63,7 @@ router.get('/sources/:sourceId/imagelarge', (req, res) => {
     }
 
     let fpath = videoRepository.getSourceImagePath(sourceId, false)
-    if (fpath) res.sendFile(fpath, {});
+    if (fpath) sendImageFile(res, fpath);
     else {
         res.sendStatus(404).end();
     }
@@ -76,7 +77,7 @@ router.get('/sources/:sourceId/imagesmall', (req, res) => {
     }
 
     let fpath = videoRepository.getSourceImagePath(sourceId, true)
-    if (fpath) res.sendFile(fpath, {});
+    if (fpath) sendImageFile(res, fpath);
     else {
         res.sendStatus(404).end();
     }
@@ -90,7 +91,7 @@ router.get('/thumbnail/:videoId', function (req, res) {
     }
 
     let fpath = videoRepository.getThumbnailFilePath(videoId)
-    if (fpath) res.sendFile(fpath, {});
+    if (fpath) sendImageFile(res, fpath);
     else {
         res.sendStatus(404).end();
     }
@@ -132,7 +133,7 @@ router.get('/tags/thumbnail/:tagId', function (req, res) {
     }
 
     let fpath = videoRepository.getTagImagePath(tagId, 'video')
-    if (fpath) res.sendFile(fpath, {});
+    if (fpath) sendImageFile(res, fpath);
     else {
         res.sendStatus(404).end();
     }

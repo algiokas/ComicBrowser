@@ -2,6 +2,7 @@ import { Router } from 'express';
 var router = Router();
 import * as videoRepository from '../videoRepository.ts';
 import * as ffmpeg from '../ffmpeg.ts';
+import { sendImageFile } from './sendImage.ts';
 
 router.get('/', function (req, res) {
     res.json(videoRepository.getActors())
@@ -27,7 +28,7 @@ router.get('/:actorId/image', function (req, res) {
         return
     }
     let fpath = videoRepository.getActorImagePath(actorId)
-    if (fpath) res.sendFile(fpath, {});
+    if (fpath) sendImageFile(res, fpath);
     else {
         res.sendStatus(404).end();
     }
