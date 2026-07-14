@@ -1,4 +1,5 @@
 @use 'vars' as *;
+@use 'mixins' as *;
 
 .tag-select {
     display: flex;
@@ -34,9 +35,20 @@
     }
 }
 
+// Mass Tagger renders its full, unpaginated video list in a scrolling
+// flex-wrap — deliberately not the video-gallery CSS Grid (that's sized
+// for exactly one page of 12 tiles filling the viewport with no scroll).
+.mass-tagger-container {
+    @include view-container;
+
+    &-inner {
+        display: flex;
+        flex-wrap: wrap;
+    }
+}
+
 .mass-tagger-item-wrapper {
-    flex: 0 0 19%;
-    position: relative;
-    margin: auto;
-    margin-bottom: 2em;
+    content-visibility: auto;
+    contain-intrinsic-size: 0 350px;
+    @include gallery-tile;
 }

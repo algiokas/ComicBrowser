@@ -32,17 +32,14 @@ const Player = (props: PlayerProps) => {
     }
 
     return (
-        <div className="player-container">
-            <div className={`player-inner ${(appContext.currentVideo?.isFavorite) ? 'favorite' : ''}`}>
-                <div className="player-video-container">
-                    <div className="player-video">
-                        <video muted preload="auto" ref={videoRef} controls={true} src={videoUrl()} width="100%" height="auto"></video>
-                    </div>
+        <div className={`player-container ${(appContext.currentVideo?.isFavorite) ? 'favorite' : ''}`}>
+            <div className="player-video-container">
+                <div className="player-video">
+                    <video muted preload="auto" ref={videoRef} controls={true} src={videoUrl()}></video>
                 </div>
-                <PlayerSidebar {...sidebarProps}/>
             </div>
+            <PlayerSidebar {...sidebarProps}/>
         </div>
-
     )
 }
 

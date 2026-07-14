@@ -71,11 +71,15 @@ const MassTagger = (props: MassTaggerProps) => {
         return sortedCopy;
     }, [appContext.allVideos, appContext.massTaggerSortOrder, shuffleVersion]);
 
+    // Nav is no longer part of the page scroll (see .view-content in base.scss) —
+    // that div is the actual scrolling ancestor now, not window.
+    const scrollContainer = () => document.querySelector('.view-content') as HTMLElement | null
+
     const handleScroll = () => {
         // Find the video card currently at the top of the viewport
         const items = document.querySelectorAll('.mass-tagger-item-wrapper');
         const headerHeight = 120; // Approx height of sticky filters
-        
+
         for (const item of items) {
             const rect = item.getBoundingClientRect();
             if (rect.top >= headerHeight) {
@@ -93,11 +97,12 @@ const MassTagger = (props: MassTaggerProps) => {
             if (element) {
                 element.scrollIntoView({ block: 'start' });
                 // Account for sticky header offset
-                window.scrollBy(0, -110);
+                scrollContainer()?.scrollBy(0, -110);
             }
         }
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        const container = scrollContainer()
+        container?.addEventListener('scroll', handleScroll);
+        return () => container?.removeEventListener('scroll', handleScroll);
     }, [sortedVideos]); // Re-run when list is rendered to handle lazy layout shifts
 
     const bodyClick = (video: Video) => {
@@ -138,7 +143,7 @@ const MassTagger = (props: MassTaggerProps) => {
     }
 
     return (
-        <div className="video-gallery-container dark-theme">
+        <div className="mass-tagger-container dark-theme">
             <h3>Select a tag</h3>
             <div className="tag-select-container">
                 <div className="tag-select-inner">
@@ -153,14 +158,14 @@ const MassTagger = (props: MassTaggerProps) => {
                     </select>
                 </div>
             </div>
-            <div className="video-gallery-container-header">
+            <div className="mass-tagger-container-header">
                 <VideoSortControls sortOrder={appContext.massTaggerSortOrder}
                     videoList={appContext.allVideos}
                     pageSize={appContext.allVideos.length}
                     sortVideos={sortVideos}
-                    setPage={() => window.scrollTo(0, 0)} />
+                    setPage={() => scrollContainer()?.scrollTo(0, 0)} />
             </div>
-            <div className="video-gallery-container-inner"
+            <div className="mass-tagger-container-inner"
                 style={{ 'visibility': (appContext.showLoadingModal ? 'hidden' : 'visible') }}>
                 {
                     sortedVideos.filter(v => !containsTag(v)).map((video, i) => (
@@ -172,7 +177,8 @@ const MassTagger = (props: MassTaggerProps) => {
                         >
                             <VideoGalleryItem
                                 index={i}
-                                video={video}
+                                data={video}
+                                className="flow-sized"
                                 bodyClickHandler={bodyClick}
                                 lazyload={true}
                                 secondaryClickHandler={secondaryClick}

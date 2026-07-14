@@ -67,51 +67,154 @@
     }
 }
 
+// Shared shell for the video/actor/source galleries: a card that fills the
+// view-content height, with a fixed-height header/footer and a CSS Grid of
+// tiles filling whatever height remains — no page scroll for these views.
+@mixin gallery-grid-container {
+    @include view-container;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    &-header,
+    &-footer {
+        flex: 0 0 auto;
+    }
+
+    // ActorDetail/SourceDetail render as siblings of -header/-inner/-footer
+    // when a video listing is filtered to a single actor/source. Sized to
+    // exactly one thumbnail row's height via the flex-grow ratio below —
+    // paired with -inner.detail-active, which drops to 2 grid rows (1 + 2 = 3
+    // row-equivalents, same total height budget as the ungapped 3-row grid).
+    > .actor-detail,
+    > .source-detail {
+        flex: 1 1 0;
+        min-height: 0;
+    }
+
+    &-inner {
+        @include gallery-grid;
+        flex: 1 1 auto;
+        min-height: 0;
+
+        &.detail-active {
+            grid-template-rows: repeat(2, 1fr);
+            flex: 2 1 0;
+        }
+    }
+}
+
+// Shared tile shell: the image and caption overlay each other, both sized
+// entirely by the CSS Grid cell (see gallery-grid-tile in mixins.scss).
+// Cropped to fill (object-fit: cover) rather than letterboxed — a grid
+// cell's shape depends on the viewport, so it rarely matches the source
+// 16:9 exactly, and letterboxing left visible black bars whose square
+// corners didn't line up with the tile's rounded corners.
+@mixin gallery-grid-tile-image($fit: cover) {
+    position: absolute;
+    inset: 0;
+
+    img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: $fit;
+    }
+}
+
+// Bottom-weighted glow with a slight glow all around, for favorited tiles.
+// A box-shadow on the tile itself would paint behind the thumbnail image
+// (position: absolute; inset: 0 covers the whole box), so this uses a
+// pseudo-element overlay instead — stacked above the image (z-index) but
+// below the caption/icons, and clipped to the tile's rounded corners.
+@mixin favorite-tile-glow {
+    &.favorite::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        pointer-events: none;
+        border-radius: inherit;
+        box-shadow:
+            inset 0 -3em 3.5em -1.5em rgba($yellow-favorite, 0.75),
+            inset 0 0 1.2em -0.6em rgba($yellow-favorite, 0.34);
+    }
+}
+
+// Tags/favorite indicator icons, pinned to the top corners of the thumbnail
+// instead of sitting inline in the caption. No background badge — just a
+// drop-shadow so they stay legible over bright thumbnails.
+@mixin gallery-tile-corner-icons {
+    .tags-icon,
+    .favorite-icon {
+        position: absolute;
+        z-index: 11;
+        margin: 0;
+        padding: 6px;
+    }
+
+    .favorite-icon {
+        top: 8px;
+        left: 8px;
+        filter: drop-shadow(0 1px 3px rgba($black, 0.9)) drop-shadow(0 0 8px rgba($black, 0.6));
+    }
+
+    .tags-icon {
+        top: 8px;
+        right: 8px;
+        opacity: 0.7;
+        filter: drop-shadow(0 1px 2px rgba($black, 0.8));
+    }
+}
+
 .VideosApp .video-gallery {
-    @include gallery-tile;
+    @include gallery-grid-tile;
+    @include favorite-tile-glow;
+    @include gallery-tile-corner-icons;
+
+    &-inner {
+        position: relative;
+        height: 100%;
+    }
 
     &-image {
-        background-color: $black;
-        border-top-left-radius: .3em;
-        border-top-right-radius: .3em;
-        width: 480px;
-        overflow: hidden;
-
-        img {
-            display: block;
-            max-width: 480px;
-            max-height: 270px;
-            width: auto;
-            height: auto;
-            margin: auto;
-        }
+        @include gallery-grid-tile-image;
     }
 
     &-container {
-        @include gallery-container;
+        @include gallery-grid-container;
+    }
 
-        &-inner {
-            display: flex;
-            flex-wrap: wrap;
+    // Used by MassTagger, which renders VideoGalleryItem inside its own
+    // flex-wrap tile (see mass-tagger.scss) instead of a grid cell — falls
+    // back to intrinsic 16:9 sizing instead of filling a grid cell's height.
+    &.flow-sized {
+        height: auto;
+
+        .video-gallery-image {
+            position: static;
+            width: 100%;
+            aspect-ratio: 16 / 9;
         }
     }
 }
 
 .VideosApp .actor-gallery {
-    @include gallery-tile;
+    @include gallery-grid-tile;
+    @include favorite-tile-glow;
+    @include gallery-tile-corner-icons;
+
+    &-inner {
+        position: relative;
+        height: 100%;
+    }
 
     &-image {
-        @include tile-image;
-        width: 480px;
+        @include gallery-grid-tile-image;
     }
 
     &-container {
-        @include gallery-container;
-
-        &-inner {
-            display: flex;
-            flex-wrap: wrap;
-        }
+        @include gallery-grid-container;
     }
 
     &-info-display {
@@ -120,40 +223,83 @@
         margin: 0;
         padding: 2px 5px;
         position: absolute;
-        top: 7px;
-        left: 7px;
+        top: 44px;
+        left: 8px;
         background-color: $gray-2;
     }
 }
 
 .VideosApp .source-gallery {
-    @include gallery-tile;
+    @include gallery-grid-tile;
+
+    &-inner {
+        position: relative;
+        height: 100%;
+    }
 
     &-image {
-        @include tile-image;
-        width: 480px;
+        @include gallery-grid-tile-image;
     }
 
     &-container {
-        @include gallery-container;
-
-        &-inner {
-            display: flex;
-            flex-wrap: wrap;
-        }
+        @include gallery-grid-container;
     }
 }
 
-.caption {
-    line-height: 15px;
+// Scoped to .VideosApp — .caption is also used by the Books app's cover
+// gallery, which keeps its original (non-overlay) caption styling.
+.VideosApp .caption {
+    position: absolute;
     left: 0;
     right: 0;
-    top: 100%;
+    bottom: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.5em 0.6em 0.4em 0.6em;
+    font-weight: 600;
+    font-size: clamp(0.85rem, 0.9vw, 1.05rem);
+    line-height: 1.3;
+    text-align: left;
+    text-decoration: none;
+    text-shadow: 0 1px 3px rgba($black, 0.9), 0 0 8px rgba($black, 0.6);
+    background: linear-gradient(to top, rgba($black, 0.95) 0%, rgba($black, 0.75) 45%, rgba($black, 0) 100%);
+
+    &-text {
+        margin: 0 auto 0 0;
+        overflow: hidden;
+
+        span {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    .title {
+        font-size: 1.15em;
+    }
+
+    .subtitle {
+        font-size: 0.85em;
+        color: $pink-1;
+        margin-bottom: 2px;
+    }
+}
+
+// Books app's original (pre-redesign) caption: a solid strip below the
+// cover, not an overlay — out of scope for this redesign.
+.BooksApp .caption {
+    left: 0;
+    right: 0;
     z-index: 10;
     overflow: hidden;
     padding: 8px 0 10px 0;
     font-weight: 600;
     font-size: 15px;
+    line-height: 15px;
     display: flex;
     flex-direction: row;
     text-align: center;
@@ -188,6 +334,8 @@
 
     span {
         flex: 1 0 30%;
+        overflow: visible;
+        text-overflow: clip;
         white-space: pre;
     }
 }

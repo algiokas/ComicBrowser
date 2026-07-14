@@ -20,6 +20,11 @@ interface VideoGalleryProps {
     query?: IVideoSearchQuery,
 }
 
+// When a video listing is filtered down to a single actor/source, ActorDetail
+// /SourceDetail take up the height of one thumbnail row (see .detail-active
+// in gallery.scss), so only 2 rows (8 items) fit instead of the usual 3.
+const DETAIL_LISTING_PAGE_SIZE = 8
+
 const VideoGallery = (props: VideoGalleryProps) => {
     const initialSortOrder = props.sortOrder ?? VideosSortOrder.Random
 
@@ -36,6 +41,9 @@ const VideoGallery = (props: VideoGalleryProps) => {
 
     const previousVideos = useRef([] as Video[])
     const previousQuery = useRef({} as IVideoSearchQuery | undefined)
+
+    const isDetailListing = actorListingActor !== null || sourceListingSource !== null
+    const effectivePageSize = isDetailListing ? DETAIL_LISTING_PAGE_SIZE : props.pageSize
 
 
     useEffect(() => {
@@ -65,10 +73,11 @@ const VideoGallery = (props: VideoGalleryProps) => {
                 if (isActorListing || isSourceListing)
                     setSortOrder("Favorite")
                 const sortedVideos = getSortedVideos(filteredVideos, isActorListing || isSourceListing ? "Favorite" : sortOrder)
+                const pageSize = (isActorListing || isSourceListing) ? DETAIL_LISTING_PAGE_SIZE : props.pageSize
                 setItems(sortedVideos)
-                setTotalPages(getTotalPages(sortedVideos))
+                setTotalPages(getTotalPages(sortedVideos, pageSize))
                 setGalleryPage(0)
-                setImageLoadState(new BitArray(Math.min(props.pageSize, filteredVideos.length)))
+                setImageLoadState(new BitArray(Math.min(pageSize, filteredVideos.length)))
             }
         } else {
             const newIds = videos.map(v => v.id)
@@ -77,7 +86,7 @@ const VideoGallery = (props: VideoGalleryProps) => {
                 updateActorListingActor()
                 updateSourceListingSource()
                 setItems(getSortedVideos(videos, initialSortOrder))
-                setTotalPages(getTotalPages(videos))
+                setTotalPages(getTotalPages(videos, props.pageSize))
                 setGalleryPage(0)
             }
         }
@@ -183,9 +192,9 @@ const VideoGallery = (props: VideoGalleryProps) => {
         }
     }
 
-    const getTotalPages = (Videos: Video[]): number => {
+    const getTotalPages = (Videos: Video[], pageSize: number): number => {
         if (Videos) {
-            return Math.max(1, Math.ceil(Videos.length / props.pageSize))
+            return Math.max(1, Math.ceil(Videos.length / pageSize))
         }
         return 1
     }
@@ -203,8 +212,8 @@ const VideoGallery = (props: VideoGalleryProps) => {
     }
 
     const getCurrentGalleryPageItems = (videos: Video[]): Video[] => {
-        let pageStart = getGalleryPage() * props.pageSize;
-        let pageEnd = (getGalleryPage() + 1) * props.pageSize;
+        let pageStart = getGalleryPage() * effectivePageSize;
+        let pageEnd = (getGalleryPage() + 1) * effectivePageSize;
 
         const galleryItems = videos.slice(pageStart, pageEnd)
         return galleryItems
@@ -286,19 +295,21 @@ const VideoGallery = (props: VideoGalleryProps) => {
                     props.sortOrder ? null :
                         <VideoSortControls sortOrder={sortOrder}
                             videoList={items}
-                            pageSize={props.pageSize}
+                            pageSize={effectivePageSize}
                             sortVideos={sortVideos}
                             setPage={setPage}
                             disabledSorts={disabledSortOrders} />
                 }
             </div>
-            <div className="video-gallery-container-inner" style={{ 'visibility': (appContext.showLoadingModal ? 'hidden' : 'visible') }}>
+            <div
+                className={isDetailListing ? "video-gallery-container-inner detail-active" : "video-gallery-container-inner"}
+                style={{ 'visibility': (appContext.showLoadingModal ? 'hidden' : 'visible') }}>
                 {
                     getCurrentGalleryPageItems(items).map((video, i) => {
                         return <VideoGalleryItem
                             key={i}
                             index={i}
-                            video={video}
+                            data={video}
                             bodyClickHandler={bodyClick}
                             subTitleItemClickHandler={subtitleClick}
                             favoriteClickHandler={favoriteClick}

@@ -3,6 +3,7 @@ import Modal from "../../shared/modal"
 import VideoEditPanel from "../editPanel/videoEditPanel"
 import CameraIcon from "../../../img/svg/camera.svg";
 import StarsIcon from "../../../img/svg/stars.svg";
+import ChevronRightIcon from "../../../img/svg/chevron-right.svg";
 import type { PlayerProps } from "./player"
 import { useContext } from "react";
 import { VideosAppContext } from "../videosAppContext";
@@ -92,8 +93,15 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
         searchTag: searchTag
     }
 
+    const toggleSidebar = () => {
+        appContext.setPlayerSidebarCollapsed(!appContext.playerSidebarCollapsed)
+    }
+
     return (
-        <div className="player-video-sidebar">
+        <div className={`player-video-sidebar ${appContext.playerSidebarCollapsed ? 'collapsed' : ''}`}>
+            <div className="player-video-sidebar-toggle" onClick={toggleSidebar}>
+                <img src={ChevronRightIcon.toString()} className={`svg-icon ${!appContext.playerSidebarCollapsed ? 'mirror' : ''}`} alt="toggle sidebar"></img>
+            </div>
             {
                 appContext.currentVideo ?
                     <div className="player-video-info">
@@ -116,9 +124,9 @@ const PlayerSidebar = (props: PlayerSidebarProps) => {
                                     {
                                         appContext.currentVideo.actors.map((actor, i) => {
                                             return (
-                                                <div key={i} className="player-actor" onClick={() => searchActor(actor.name)}>
+                                                <div key={i} className={`player-actor ${(actor.isFavorite ? 'favorite' : '')}`} onClick={() => searchActor(actor.name)}>
                                                     <div className="player-actor-image">
-                                                        <img className="actor-gallery-image" src={actor.imageUrl} alt={`${actor.name}`}></img>
+                                                        <img src={actor.imageUrl} alt={`${actor.name}`}></img>
                                                     </div>
                                                     <div className={`caption ${(actor.isFavorite ? 'favorite' : '')}`}>
                                                         <div className="player-actor-image-gen-icon" onClick={(e) => generateActorImage(e, actor)}>

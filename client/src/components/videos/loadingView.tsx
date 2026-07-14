@@ -1,9 +1,7 @@
 const LoadingView = () => {
     return (
-        <div className="container dark-theme">
-            <div className="loading-container">
-                {/* <Logo className="logo-pink loading-logo" /> */}
-            </div>           
+        <div className="loading-container dark-theme">
+            {/* <Logo className="logo-pink loading-logo" /> */}
         </div>
     )
 }

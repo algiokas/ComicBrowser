@@ -1,37 +1,39 @@
 import { useEffect, useState } from "react";
 import type { VideoSource } from "../../../types/videoSource";
 import { getSourceImageUrl } from "../../../util/helpers";
+import type { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
 
-interface SourceGalleryItemProps {
-    index: number,
-    source: VideoSource,
-    bodyClickHandler?: (data: VideoSource, index: number) => void,
-    favoriteClickHandler?: (data: VideoSource) => void,
+type SourceGalleryItemProps = Omit<BaseGalleryItemProps<VideoSource>, 'imageUrl'> & {
+    imageUrl?: string,
 }
 
 const SourceGalleryItem = (props: SourceGalleryItemProps) => {
-    const [sourceImageUrl, setSourceImageUrl] = useState<string>('')
+    const [sourceImageUrl, setSourceImageUrl] = useState<string>(props.imageUrl ?? '')
 
     useEffect(() => {
         const updateThumbnail = async () => {
-            const thumbnailUrl = await getSourceImageUrl(props.source)
+            const thumbnailUrl = await getSourceImageUrl(props.data)
             setSourceImageUrl(thumbnailUrl)
         }
-        updateThumbnail()
-    }, [props.source])
+        if (!props.imageUrl) {
+            updateThumbnail()
+        }
+    }, [props.data])
 
     const bodyClick = (e: React.MouseEvent) => {
         if (props.bodyClickHandler)
-            props.bodyClickHandler(props.source, props.index)
+            props.bodyClickHandler(props.data, props.index)
     }
 
     return (
-        <div className="source-gallery" key={props.source.id}>
+        <div className="source-gallery" key={props.data.id}>
             <div className="source-gallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
-                <img className="source-gallery-image" src={sourceImageUrl} alt={`${props.source.name} thumbnail`}></img>
+                <div className="source-gallery-image">
+                    <img src={sourceImageUrl} alt={`${props.data.name} thumbnail`}></img>
+                </div>
                 <div className="caption">
                     <div className="caption-text">
-                        <span className="title">{props.source.name}</span>
+                        <span className="title">{props.data.name}</span>
                     </div>
                 </div>
             </div>

@@ -1,10 +1,16 @@
 @use 'vars' as *;
+@use 'mixins' as *;
+
+html,
+body,
+#root {
+    height: 100%;
+}
 
 html,
 body {
     font-size: 14px;
     line-height: 1.4;
-    height: 100%;
     margin: 0;
     text-align: center;
     box-sizing: border-box;
@@ -64,7 +70,39 @@ h2 {
 }
 
 .App {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     text-align: center;
+}
+
+.VideosApp {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.view-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+
+    // Whatever MultiView renders should fill the available height
+    & > * {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+}
+
+// .loading-container is shared with the Books app, which has no
+// .view-content flex shell (its LoadingView relies on the standalone
+// .loading-container rule below instead) — scope the view-container
+// treatment to .VideosApp so Books is unaffected.
+.VideosApp .loading-container {
+    @include view-container;
+    height: 100%;
 }
 
 .mirror {

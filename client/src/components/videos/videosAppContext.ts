@@ -23,6 +23,7 @@ export type VideosAppState = {
     currentSearchQuery: IVideoSearchQuery,
     showLoadingModal: boolean,
     loadingModalText: string,
+    playerSidebarCollapsed: boolean,
 
     videoListingPage: number,
     actorListingPage: number,
@@ -41,6 +42,7 @@ export type VideosAppHandlers = {
     setVideoListingPage: (n: number) => void,
     setActorListingPage: (n: number) => void,
     setLoadingModal: (show: boolean, text?: string) => void
+    setPlayerSidebarCollapsed: (collapsed: boolean) => void
 
     updateVideo: (video: Video) => Promise<void>,
     deleteVideo: (videoId: number) => Promise<void>,
@@ -67,6 +69,7 @@ export const VideosAppContext = createContext<VideosAppState & VideosAppHandlers
     currentSearchQuery: {},
     showLoadingModal: false,
     loadingModalText: '',
+    playerSidebarCollapsed: false,
     videoListingPage: 0,
     actorListingPage: 0,
 
@@ -83,6 +86,7 @@ export const VideosAppContext = createContext<VideosAppState & VideosAppHandlers
     setVideoListingPage: () => { },
     setActorListingPage: () => { },
     setLoadingModal: () => { },
+    setPlayerSidebarCollapsed: () => { },
 
     //async
     updateVideo: async () => { },

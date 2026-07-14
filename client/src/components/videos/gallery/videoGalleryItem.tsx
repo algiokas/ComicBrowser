@@ -4,16 +4,14 @@ import TagsImage from "../../../img/svg/tags.svg";
 import type { Actor } from "../../../types/actor";
 import type { Video } from "../../../types/video";
 import { getVideoThumbnailUrl } from "../../../util/helpers";
+import type { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
 
-interface VideoGalleryItemProps {
-  index: number,
-  video: Video,
+type VideoGalleryItemProps = Omit<BaseGalleryItemProps<Video>, 'imageUrl'> & {
   imageUrl?: string,
+  className?: string,
   children?: React.ReactNode,
   lazyload?: boolean
   secondaryClickIconUrl?: string,
-  bodyClickHandler?: (data: Video, index: number) => void,
-  favoriteClickHandler?: (data: Video) => void,
   subTitleItemClickHandler?: (actor: Actor) => void,
   secondaryClickHandler?: (data: Video) => void,
   onImageLoad?: (idx: number) => void,
@@ -24,23 +22,23 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
 
   useEffect(() => {
     const updateThumbnail = async () => {
-      const thumbnailUrl = await getVideoThumbnailUrl(props.video)
+      const thumbnailUrl = await getVideoThumbnailUrl(props.data)
       setThumbnailImageUrl(thumbnailUrl)
     }
     if (!props.imageUrl) {
       updateThumbnail()
     }
-  }, [props.video])
+  }, [props.data])
 
   const bodyClick = (e: React.MouseEvent) => {
     if (props.bodyClickHandler)
-      props.bodyClickHandler(props.video, props.index)
+      props.bodyClickHandler(props.data, props.index)
   }
 
   const favoriteClick = (e: React.MouseEvent) => {
     if (props.favoriteClickHandler) {
       e.stopPropagation()
-      props.favoriteClickHandler(props.video)
+      props.favoriteClickHandler(props.data)
     }
   }
   const subtitleClick = (e: React.MouseEvent, actor: Actor) => {
@@ -56,60 +54,66 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
     }
   }
 
+  const tileClassName = [
+    "video-gallery",
+    props.data.isFavorite ? "favorite" : "",
+    props.className ?? ""
+  ].filter(Boolean).join(" ")
+
   return (
-    <div className="video-gallery" key={props.video.title}>
+    <div className={tileClassName} key={props.data.title}>
       <div className="video-gallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
         <div className="video-gallery-image">
           {
             thumbnailImageUrl ?
               <img
                 src={thumbnailImageUrl}
-                alt={`${props.video.title} thumbnail`}
+                alt={`${props.data.title} thumbnail`}
                 onLoad={() => { if (props.onImageLoad) props.onImageLoad(props.index) }}
                 loading={props.lazyload ? 'lazy' : 'eager'}>
               </img>
               : null
           }
         </div>
+        <div className="favorite-icon" onClick={props.favoriteClickHandler ? favoriteClick : undefined}>
+          {
+            props.data.isFavorite ?
+              <img className="svg-icon-favorite" src={StarsImage.toString()} alt="remove from favorites"></img>
+              :
+              <img className="svg-icon-disabled test" src={StarsImage.toString()} alt="add to favorites"></img>
+          }
+        </div>
+        <div className="tags-icon">
+          {
+            props.data.tags.length > 0 ?
+              <img className="svg-icon-red" src={TagsImage.toString()} alt="Video Tags"></img>
+              :
+              <img className="svg-icon-disabled" src={TagsImage.toString()} alt="Video Tags"></img>
+          }
+        </div>
         {
           props.children ? <div className="caption">{props.children}</div> :
-            <div className={props.video.isFavorite ? "caption favorite" : "caption"}>
-              <div className="tags-icon">
-                {
-                  props.video.tags.length > 0 ?
-                    <img className="svg-icon-red" src={TagsImage.toString()} alt="Video Tags"></img>
-                    :
-                    <img className="svg-icon-disabled" src={TagsImage.toString()} alt="Video Tags"></img>
-                }
-              </div>
+            <div className="caption">
               <div className="caption-text">
                 <span className="subtitle">
                   {
-                    props.video.actors.map((actor, i) => {
+                    props.data.actors.map((actor, i) => {
                       return (
                         <span key={i} onClick={(e) => subtitleClick(e, actor)}>{actor.name}</span>
                       )
                     })
                   }
                 </span>
-                <span className="title">{props.video.title}</span>
-              </div>
-              <div className="favorite-icon" onClick={props.favoriteClickHandler ? favoriteClick : undefined}>
-                {
-                  props.video.isFavorite ?
-                    <img className="svg-icon-favorite" src={StarsImage.toString()} alt="remove from favorites"></img>
-                    :
-                    <img className="svg-icon-disabled test" src={StarsImage.toString()} alt="add to favorites"></img>
-                }
+                <span className="title">{props.data.title}</span>
               </div>
             </div>
         }
         {
-          props.secondaryClickHandler ? 
-          <button className="add-button" onClick={(e) => secondaryClick(e, props.video)}>
+          props.secondaryClickHandler ?
+          <button className="add-button" onClick={(e) => secondaryClick(e, props.data)}>
             {
               props.secondaryClickIconUrl ? <img className="svg-icon" src={props.secondaryClickIconUrl}></img> : null
-            }   
+            }
           </button>
           : null
         }

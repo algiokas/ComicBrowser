@@ -10,6 +10,15 @@
     background-color: $gray-2;
 }
 
+// Standard shell for every videos-app view's root element (direct child of
+// .view-content) — same width/margin regardless of which view it is.
+@mixin view-container {
+    @include gallery-container;
+    width: auto;
+    margin: 10px;
+    box-sizing: border-box;
+}
+
 // A gallery tile (cover/thumbnail cell within a wrapping flex row)
 @mixin gallery-tile($tile-margin: auto) {
     flex: 0 0 19%;
@@ -27,6 +36,24 @@
     display: block;
     border-top-left-radius: .3em;
     border-top-right-radius: .3em;
+}
+
+// Fixed-shape grid of gallery tiles, sized to fill its container's height
+@mixin gallery-grid($columns: $gallery-columns, $rows: $gallery-rows) {
+    display: grid;
+    grid-template-columns: repeat($columns, 1fr);
+    grid-template-rows: repeat($rows, 1fr);
+    gap: $gallery-gap;
+    height: 100%;
+}
+
+// A gallery tile sized entirely by its CSS Grid cell (image + caption overlay it)
+@mixin gallery-grid-tile {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    border-radius: .5em;
+    cursor: pointer;
 }
 
 // Pink "media" action button (edit/save/update controls)
@@ -98,7 +125,10 @@
     }
 }
 
-// Shared shell for the actor/source detail panels
+// Shared shell for the actor/source detail panels. Sized to fit whatever
+// height its flex-grow share gives it (see gallery-grid-container in
+// gallery.scss, which sizes this to match a single thumbnail row) — the
+// image scales by height rather than a fixed width so it never overflows.
 @mixin detail-panel {
     display: flex;
     flex-direction: column;
@@ -106,12 +136,15 @@
     padding: 15px 25px 25px 25px;
     background-color: $gray-3;
     border-radius: 0.3em;
+    box-sizing: border-box;
+    overflow: hidden;
 
     &.favorite {
         box-shadow: inset -22px 22px 28px -24px $yellow-favorite-glow;
     }
 
     &-header {
+        flex: 0 0 auto;
         display: flex;
         flex-direction: row;
         margin: 0 30px;
@@ -124,16 +157,21 @@
 
     &-inner {
         display: flex;
+        flex: 1 1 auto;
+        min-height: 0;
     }
 
     &-image {
         margin-right: 25px;
         margin-left: 25px;
+        height: 100%;
 
         img {
+            display: block;
+            height: 100%;
+            width: auto;
             border: 5px solid $gray-2;
             border-radius: 0.3em;
-            width: 500px;
         }
     }
 }

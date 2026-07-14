@@ -8,6 +8,8 @@
         margin-right: auto;
         font-size: larger;
         font-weight: bold;
+        min-height: 0;
+        overflow-y: auto;
 
         &-row {
             display: flex;

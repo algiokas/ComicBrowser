@@ -3,11 +3,8 @@
 
 .player {
     &-container {
-        display: flex;
-    }
-
-    &-inner {
-        @include gallery-container;
+        @include view-container;
+        height: 100%;
         display: flex;
         flex-direction: row-reverse;
 
@@ -18,18 +15,62 @@
 
     &-video {
         margin: auto;
+        width: 100%;
+        height: 100%;
+
+        video {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
 
         &-container {
-            width: 1920px;
+            flex: 1 1 auto;
+            min-width: 0;
+            height: 100%;
+            box-sizing: border-box;
             display: flex;
             padding: 25px;
         }
 
         &-sidebar {
-            margin: 0 auto;
+            flex: 0 0 16.6667%;
+            height: 100%;
+            box-sizing: border-box;
             padding: 10px;
-            max-width: 310px;
-            max-height: 1130px;
+            overflow-y: auto;
+            position: relative; // anchors the toggle button
+
+            &.collapsed {
+                flex: 0 0 32px;
+                padding: 0;
+                overflow: hidden;
+
+                .player-video-info {
+                    display: none;
+                }
+            }
+
+            &-toggle {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                z-index: 6;
+                width: 24px;
+                height: 24px;
+                padding: 4px;
+                box-sizing: border-box;
+                background-color: $gray-2;
+                border-radius: 3px;
+                cursor: pointer;
+
+                img {
+                    display: block;
+                    width: 100%;
+                    height: 100%;
+                }
+            }
         }
 
         &-info {
@@ -68,11 +109,48 @@
                 overflow-y: auto;
 
                 &>.player-actor {
+                    width: 100%;
                     margin: 0.6em auto;
                     cursor: pointer;
+                    // Anchors the shared .caption overlay (position: absolute,
+                    // bottom: 0) — without this it escapes to the nearest
+                    // positioned ancestor instead of docking to this tile.
+                    position: relative;
 
-                    & .actor-gallery-image {
-                        width: 290px;
+                    // Same treatment as the Actor gallery tiles (cover-fill,
+                    // rounded corners, no letterboxing) but sized to fit the
+                    // sidebar instead of a CSS Grid cell.
+                    // Note: plain ".player-actor-image" here, not "&-image" —
+                    // & carries the ">" combinator from "&>.player-actor"
+                    // above, so "&-image" would compile to a direct-child
+                    // selector on .player-video-info-actors and never match
+                    // this (actual grandchild) element.
+                    .player-actor-image {
+                        position: relative;
+                        width: 100%;
+                        aspect-ratio: 16 / 9;
+                        overflow: hidden;
+                        border-radius: .5em;
+
+                        img {
+                            display: block;
+                            position: absolute;
+                            inset: 0;
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                        }
+                    }
+
+                    &.favorite .player-actor-image::after {
+                        content: "";
+                        position: absolute;
+                        inset: 0;
+                        pointer-events: none;
+                        border-radius: inherit;
+                        box-shadow:
+                            inset 0 -1.5em 2em -1em rgba($yellow-favorite, 0.75),
+                            inset 0 0 1em -0.4em rgba($yellow-favorite, 0.34);
                     }
 
                     & span {

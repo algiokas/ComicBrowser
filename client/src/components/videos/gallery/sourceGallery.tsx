@@ -48,7 +48,7 @@ const SourceGallery = (props: SourceGalleryProps) => {
                         return <SourceGalleryItem
                             key={i}
                             index={i}
-                            source={source}
+                            data={source}
                             bodyClickHandler={bodyClick} />
                     })
                 }

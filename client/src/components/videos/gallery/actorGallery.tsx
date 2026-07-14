@@ -163,7 +163,8 @@ const ActorGallery = (props: ActorGalleryProps) => {
                     return <ActorGalleryItem
                         key={i}
                         index={i}
-                        actor={actor}
+                        data={actor}
+                        imageUrl={actor.imageUrl}
                         bodyClickHandler={bodyClick}
                         favoriteClickHandler={favoriteClick}
                         infoLabel={infoDisplay?.at(0)}

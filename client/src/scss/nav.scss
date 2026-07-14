@@ -2,6 +2,7 @@
 
 nav {
     display: flex;
+    flex-shrink: 0;
     position: relative;
     height: 50px;
     background: $gray-2;

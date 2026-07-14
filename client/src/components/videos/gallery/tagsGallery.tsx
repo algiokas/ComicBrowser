@@ -35,34 +35,32 @@ const TagsGallery = (props: TagsGalleryProps) => {
     }
 
     return (
-        <div className="tags-gallery dark-theme">
-            <div className="tags-gallery-container">
-                <div>
-                    <h2 className="tags-gallery-header">
-                        Tags
-                    </h2>
-                    <div className="tags-gallery-type-select">
-                        {
-                            Object.keys(TagType).map((t, i) => {
-                                return <div key={i} onClick={() => setTagType(t as TagType)} className={(tagType === t) ? 'selected' : ''}>
-                                    {t}
-                                </div>
-                            })
-                        }
-                    </div>
-                </div>
-
-                <div className="tags-gallery-inner">
+        <div className="tags-gallery-container dark-theme">
+            <div>
+                <h2 className="tags-gallery-header">
+                    Tags
+                </h2>
+                <div className="tags-gallery-type-select">
                     {
-                        getTagsByType(tagType).map((tag: VideosAppTag, i: number) => {
-                            return <TagsGalleryItem
-                                index={i}
-                                tag={tag}
-                                bodyClickHandler={() => searchTag(tag.name)}>
-                            </TagsGalleryItem>
+                        Object.keys(TagType).map((t, i) => {
+                            return <div key={i} onClick={() => setTagType(t as TagType)} className={(tagType === t) ? 'selected' : ''}>
+                                {t}
+                            </div>
                         })
                     }
                 </div>
+            </div>
+
+            <div className="tags-gallery-inner">
+                {
+                    getTagsByType(tagType).map((tag: VideosAppTag, i: number) => {
+                        return <TagsGalleryItem
+                            index={i}
+                            tag={tag}
+                            bodyClickHandler={() => searchTag(tag.name)}>
+                        </TagsGalleryItem>
+                    })
+                }
             </div>
         </div>
     )

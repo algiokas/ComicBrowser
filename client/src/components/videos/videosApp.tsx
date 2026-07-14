@@ -34,7 +34,8 @@ const VideosApp = (props: VideosAppProps) => {
   const [currentSearchQuery, setCurrentSearchQuery] = useState<IVideoSearchQuery>(getEmptyQuery())
   const [showLoadingModal, setShowLoadingModal] = useState<boolean>(false)
   const [loadingModalText, setLoadingModalText] = useState<string>("")
-  const [galleryPageSize, setGalleryPageSize] = useState<number>(16)
+  const [galleryPageSize, setGalleryPageSize] = useState<number>(12)
+  const [playerSidebarCollapsed, setPlayerSidebarCollapsed] = useState<boolean>(false)
 
   const [videoListingPage, setVideoListingPage] = useState<number>(0)
   const [actorListingPage, setActorListingPage] = useState<number>(0)
@@ -409,6 +410,7 @@ const VideosApp = (props: VideosAppProps) => {
     setVideoListingPage: (n: number) => { setVideoListingPage(n) },
     setActorListingPage: (n: number) => { setActorListingPage(n) },
     setLoadingModal: setLoadingModal,
+    setPlayerSidebarCollapsed: setPlayerSidebarCollapsed,
 
     updateVideo: updateVideo,
     deleteVideo: deleteVideo,
@@ -435,6 +437,7 @@ const VideosApp = (props: VideosAppProps) => {
     currentSearchQuery: currentSearchQuery,
     showLoadingModal: showLoadingModal,
     loadingModalText: loadingModalText,
+    playerSidebarCollapsed: playerSidebarCollapsed,
     videoListingPage: videoListingPage,
     actorListingPage: actorListingPage
   }
@@ -453,10 +456,12 @@ const VideosApp = (props: VideosAppProps) => {
         </Modal>
         <Navigation {...navProps}>
         </Navigation>
-        <MultiView
-          viewMode={viewMode}
-          galleryPageSize={galleryPageSize}
-          currentSearchQuery={currentSearchQuery} />
+        <div className="view-content">
+          <MultiView
+            viewMode={viewMode}
+            galleryPageSize={galleryPageSize}
+            currentSearchQuery={currentSearchQuery} />
+        </div>
       </div>
     </VideosAppContext>
   )
