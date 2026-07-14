@@ -76,7 +76,7 @@ const ActorDetail = (props: ActorDetailProps) => {
                     </div>
                 </div>
                 <div className="actor-detail-edit">
-                    <button type="button" onClick={() => { toggleEditModal() }}>
+                    <button type="button" className="actor-detail-edit-button" onClick={() => { toggleEditModal() }}>
                         Edit Actor
                     </button>
                     <Modal modalId={"bookinfo-edit-modal"} displayModal={showActorEditModal} toggleModal={toggleEditModal}>

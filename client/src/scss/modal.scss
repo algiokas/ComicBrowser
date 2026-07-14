@@ -1,9 +1,12 @@
 @use 'vars' as *;
 
 .modal {
+    // Well above any in-page overlay (gallery favorite/tags icons and glow
+    // currently go up to z-index: 11) so a modal always renders on top
+    // regardless of what page content is open behind it.
     &-background {
         position: fixed;
-        z-index: 1;
+        z-index: 100;
         left: 0;
         top: 0;
         width: 100%;
@@ -14,7 +17,7 @@
     }
 
     &-dialog {
-        z-index: 2;
+        z-index: 101;
         position: absolute;
         margin: auto;
         padding: 20px;

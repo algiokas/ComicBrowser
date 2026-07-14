@@ -6,20 +6,16 @@
     display: flex;
     justify-content: center;
     font-size: large;
-    padding-bottom: 10px;
+    position: relative;
+
+    &::after {
+        @include fading-underline(15%);
+    }
 }
 
 .sort-order {
-    cursor: pointer;
-    background-color: $gray-1;
-    padding: 5px 20px;
-    margin: 3px 15px;
-    border: 2px solid $black;
-    border-radius: 3px;
-
-    &.selected {
-        border-color: $yellow-highlight;
-    }
+    @include text-underline-item;
+    margin: 3px 7px;
 }
 
 .sort-index {
@@ -67,14 +63,17 @@
     }
 }
 
-// Shared shell for the video/actor/source galleries: a card that fills the
-// view-content height, with a fixed-height header/footer and a CSS Grid of
-// tiles filling whatever height remains — no page scroll for these views.
+// Shared shell for the video/actor/source galleries. Page-select/sort
+// controls float outside the thumbnail card (no background of their own);
+// only -inner carries the card visual (background/padding/rounded corners),
+// since it's the element that should contain just the thumbnails. An even
+// gap separates header / (optional detail panel) / card / footer.
 @mixin gallery-grid-container {
-    @include view-container;
+    @include view-shell;
     height: 100%;
     display: flex;
     flex-direction: column;
+    gap: 15px;
 
     &-header,
     &-footer {
@@ -94,6 +93,10 @@
 
     &-inner {
         @include gallery-grid;
+        padding: 14px;
+        border-radius: 5px;
+        background-color: $gray-2;
+        box-sizing: border-box;
         flex: 1 1 auto;
         min-height: 0;
 

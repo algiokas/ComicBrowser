@@ -19,6 +19,52 @@
     box-sizing: border-box;
 }
 
+// Same width/margin as view-container, but no card visual (background/
+// padding/border-radius) — for views where page-select/sort controls live
+// outside the thumbnail card instead of inside a single bordered panel.
+@mixin view-shell {
+    width: auto;
+    margin: 10px;
+    box-sizing: border-box;
+}
+
+// Borderless "text over a fading line" control (sort order selector, and
+// anything styled to match it) — a rectangular clickbox with no visible
+// button chrome; selection/hover is indicated by a glow on the text itself.
+@mixin text-underline-item {
+    cursor: pointer;
+    position: relative;
+    background: none;
+    border: none;
+    padding: 5px 20px;
+    font-family: $font-family;
+    color: $text-color;
+
+    &.selected,
+    &:hover {
+        text-shadow: 0 0 6px $yellow-highlight, 0 0 12px $yellow-highlight;
+    }
+}
+
+// The light-gray line that fades out toward the edges, sitting behind a
+// text-underline-item (or a row of them). $fade is how far in from each
+// edge the line reaches full opacity.
+@mixin fading-underline($fade: 20%) {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(
+        to right,
+        rgba($gray-0, 0),
+        rgba($gray-0, 0.5) #{$fade},
+        rgba($gray-0, 0.5) calc(100% - #{$fade}),
+        rgba($gray-0, 0)
+    );
+}
+
 // A gallery tile (cover/thumbnail cell within a wrapping flex row)
 @mixin gallery-tile($tile-margin: auto) {
     flex: 0 0 19%;

@@ -40,4 +40,13 @@
     & .svg-icon-disabled {
         filter: brightness(0);
     }
+
+    &-edit-button {
+        @include text-underline-item;
+        font-size: large;
+
+        &::after {
+            @include fading-underline(10%);
+        }
+    }
 }
