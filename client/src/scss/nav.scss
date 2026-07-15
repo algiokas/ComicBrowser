@@ -39,7 +39,7 @@ nav {
     
                 &.selected {
                     background-color: $gray-1;
-                    border-radius: 3px;
+                    border-radius: radius(3px);
                 }
             }
 
@@ -56,13 +56,13 @@ nav {
                 input {
                     color: white;
                     background-color: $gray-1;
-                    border-radius: 3px 0 0 3px;
+                    border-radius: radius(3px) 0 0 radius(3px);
                     border: 0;
                 }
 
                 button {
                     background-color: $gray-1;
-                    border-radius: 0 3px 3px 0;
+                    border-radius: 0 radius(3px) radius(3px) 0;
                     border: 0;
                     border-left: 2px solid $gray-3;
                 }

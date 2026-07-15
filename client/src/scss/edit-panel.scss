@@ -1,7 +1,10 @@
 @use 'vars' as *;
 @use 'mixins' as *;
 
-.edit-panel {
+// Scoped to .VideosApp — .edit-panel is also the Books app's edit panel
+// class (client/src/components/books/editPanel/editPanel.tsx), which keeps
+// its original (unmodified) look.
+.VideosApp .edit-panel {
     margin: 0 20px;
     font-size: 18px;
 
@@ -87,16 +90,37 @@
             &-add {
                 display: flex;
                 flex-direction: row;
+                align-items: center;
                 justify-content: flex-end;
                 margin-top: 6px;
+                gap: 8px;
 
+                // <input> can't reliably host its own ::after either, hence
+                // the wrapper — see underline-wrapper in mixins.scss.
+                &-input {
+                    @include underline-wrapper($text-color);
+                    display: flex;
+                    flex: 1 1 auto;
+
+                    input {
+                        width: 100%;
+                        margin: 0;
+                        padding: 3px 10px;
+                        background: none;
+                        border: none;
+                        color: $text-color;
+                        box-sizing: border-box;
+                    }
+                }
 
                 button {
                     padding: 6px 8px;
-                    margin: -1px 0;
-                    border-left: 0;
-                    border-top-left-radius: 0;
-                    border-bottom-left-radius: 0;
+                    margin: 0;
+                    background: none;
+                    border: none;
+                    color: $text-color;
+                    cursor: pointer;
+                    @include icon-glow-on-hover;
                 }
             }
 
@@ -188,6 +212,15 @@
                 cursor: pointer;
                 color: $pink-1;
                 @include icon-glow-on-hover;
+
+                // .svg-icon-pink's own filter (shared with the Books app)
+                // bakes in a permanent drop-shadow(0 0 20px) — halve just
+                // the shadow here without touching the shared color filter,
+                // by reproducing its color-conversion portion alongside a
+                // smaller shadow (filter isn't additive across separate rules).
+                img.svg-icon-pink {
+                    filter: invert(36%) sepia(82%) saturate(5169%) hue-rotate(291deg) brightness(88%) contrast(113%) drop-shadow(0 0 10px $pink-1);
+                }
             }
         }
 
@@ -250,6 +283,7 @@
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
+            justify-content: end;
         }
 
         &-item {

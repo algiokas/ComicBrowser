@@ -115,11 +115,13 @@ function EditPanelRowMulti<T>(props: EditPanelRowProps<T>) {
                             {
                                 props.getValueFromTextInput ?
                                     <div className="edit-panel-row-value-add">
-                                        <input type="text" id={`${props.editField.toString().toLowerCase()}-text-input`} 
-                                            value={props.getDisplayString(fieldValue)}
-                                            onChange={handleTextInputChange}
-                                            onKeyDown={handleTextInputKey}>
-                                        </input>
+                                        <div className="edit-panel-row-value-add-input">
+                                            <input type="text" id={`${props.editField.toString().toLowerCase()}-text-input`}
+                                                value={props.getDisplayString(fieldValue)}
+                                                onChange={handleTextInputChange}
+                                                onKeyDown={handleTextInputKey}>
+                                            </input>
+                                        </div>
                                         <button type="button" onClick={addFieldValueToCollection}>
                                             <img className="svg-icon text-icon" src={PlusImg.toString()} alt="remove collection item"></img>
                                         </button>

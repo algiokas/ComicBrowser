@@ -62,7 +62,7 @@
                 padding: 4px;
                 box-sizing: border-box;
                 background-color: $gray-2;
-                border-radius: 3px;
+                border-radius: radius(3px);
                 cursor: pointer;
 
                 img {
@@ -138,7 +138,7 @@
                         width: 100%;
                         aspect-ratio: 16 / 9;
                         overflow: hidden;
-                        border-radius: .5em;
+                        border-radius: radius(.5em);
 
                         img {
                             display: block;

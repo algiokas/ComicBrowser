@@ -97,7 +97,7 @@
     &-inner {
         @include gallery-grid;
         padding: 14px;
-        border-radius: 5px;
+        border-radius: radius(5px);
         background-color: $gray-2;
         box-sizing: border-box;
         flex: 1 1 auto;
@@ -260,7 +260,7 @@
 
     &-info-display {
         z-index: 3;
-        border-radius: 3px;
+        border-radius: radius(3px);
         margin: 0;
         padding: 2px 5px;
         position: absolute;
@@ -345,8 +345,8 @@
     flex-direction: row;
     text-align: center;
     text-decoration: none;
-    border-bottom-left-radius: .3em;
-    border-bottom-right-radius: .3em;
+    border-bottom-left-radius: radius(.3em);
+    border-bottom-right-radius: radius(.3em);
     background-color: $gray-1;
 
     &-text {

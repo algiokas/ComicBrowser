@@ -5,7 +5,7 @@
     clear: both;
     margin: 10px auto;
     padding: 10px;
-    border-radius: 5px;
+    border-radius: radius(5px);
     width: 90%;
     background-color: $gray-2;
 }
@@ -49,7 +49,7 @@
         flex-wrap: wrap;
         align-content: flex-start;
         padding: 10px;
-        border-radius: 5px;
+        border-radius: radius(5px);
         background-color: $gray-2;
         box-sizing: border-box;
         flex: 1 1 auto;
@@ -137,18 +137,23 @@
     }
 }
 
-// Wrap a dropdown-select <select> in an element with this to get the fading
-// underline (which the select itself can't render as its own ::after). The
-// wrapper needs its own `color` (matching dropdown-select's) since currentColor
-// resolves from its own inheritance chain, not its child select's color.
-@mixin dropdown-select-wrapper {
+// For any form control that can't host its own ::after (native <select>,
+// and empirically some <input> types too) — wrap it in an element with this
+// to get the fading underline instead. Needs its own `color` (rather than
+// inheriting it from the control inside it) since currentColor resolves
+// from this element's own inheritance chain, not its child's color.
+@mixin underline-wrapper($color: $text-color) {
     position: relative;
-    display: inline-flex;
-    color: $pink-1;
+    color: $color;
 
     &::after {
         @include fading-underline(10%);
     }
+}
+
+@mixin dropdown-select-wrapper {
+    @include underline-wrapper($pink-1);
+    display: inline-flex;
 }
 
 // A gallery tile (cover/thumbnail cell within a wrapping flex row)
@@ -166,8 +171,8 @@
 // Top-rounded tile image
 @mixin tile-image {
     display: block;
-    border-top-left-radius: .3em;
-    border-top-right-radius: .3em;
+    border-top-left-radius: radius(.3em);
+    border-top-right-radius: radius(.3em);
 }
 
 // Fixed-shape grid of gallery tiles, sized to fill its container's height
@@ -184,7 +189,7 @@
     position: relative;
     height: 100%;
     overflow: hidden;
-    border-radius: .5em;
+    border-radius: radius(.5em);
     cursor: pointer;
 }
 
@@ -193,7 +198,7 @@
     display: block;
     justify-content: center;
     align-items: center;
-    border-radius: 3px;
+    border-radius: radius(3px);
     background-color: $gray-1;
     font-family: $font-family;
     color: $pink-1;
@@ -205,7 +210,7 @@
     display: flex;
     flex-direction: row;
     background-color: $gray-3;
-    border-radius: 10px;
+    border-radius: radius(10px);
     font-size: 1.2em;
     font-weight: 600;
     margin-right: 8px;
@@ -214,8 +219,8 @@
 @mixin pill-label {
     background-color: $gray-1;
     padding: 8px 8px 8px 16px;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
+    border-top-left-radius: radius(10px);
+    border-bottom-left-radius: radius(10px);
     color: $pink-1;
 }
 
@@ -236,7 +241,7 @@
 @mixin info-item-clickable {
     background-color: $gray-1;
     color: $pink-1;
-    border-radius: 4px;
+    border-radius: radius(4px);
 }
 
 // Wrapping tag list with image-gen affordance, shared by player + detail
@@ -282,13 +287,15 @@
 // height its flex-grow share gives it (see gallery-grid-container in
 // gallery.scss, which sizes this to match a single thumbnail row) — the
 // image scales by height rather than a fixed width so it never overflows.
+// No card background — matches the rest of the gallery view's header/detail
+// area, where only the thumbnail grid itself gets a card treatment — and
+// the same margin as the gallery card below it (view-shell), so their edges
+// line up.
 @mixin detail-panel {
     display: flex;
     flex-direction: column;
-    margin: 10px 20px;
+    margin: 10px;
     padding: 15px 25px 25px 25px;
-    background-color: $gray-3;
-    border-radius: 0.3em;
     box-sizing: border-box;
     overflow: hidden;
 
@@ -323,8 +330,7 @@
             display: block;
             height: 100%;
             width: auto;
-            border: 5px solid $gray-2;
-            border-radius: 0.3em;
+            border-radius: radius(0.3em);
         }
     }
 }

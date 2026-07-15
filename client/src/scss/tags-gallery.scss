@@ -55,8 +55,8 @@
 
         &-image {
             background-color: $black;
-            border-top-left-radius: .3em;
-            border-top-right-radius: .3em;
+            border-top-left-radius: radius(.3em);
+            border-top-right-radius: radius(.3em);
             width: 100%;
             aspect-ratio: 16 / 9;
             overflow: hidden;
@@ -72,7 +72,7 @@
         & .caption {
             &-count {
                 background-color: $gray-2;
-                border-radius: 5px;
+                border-radius: radius(5px);
                 padding: 3px 8px;
                 margin-left: 5px;
             }

@@ -1,6 +1,14 @@
 @use 'vars' as *;
 @use 'mixins' as *;
 
+:root {
+    // 1 = normal rounded corners (current design). Set to 0 to compare the
+    // whole app with every corner-rounding border-radius squared off —
+    // see the radius() function in vars.scss that every rounded corner is
+    // wrapped in. Purely a design-comparison toggle, not user-facing.
+    --radius-scale: 0;
+}
+
 html,
 body,
 #root {
@@ -34,7 +42,7 @@ button {
     font-family: $font-family;
     color: $text-color;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: radius(5px);
     border: solid 2px $gray-3;
 }
 
@@ -51,7 +59,7 @@ input {
     color: $text-color;
     font-family: $font-family;
     border: 1px solid $input-border;
-    border-radius: 3px;
+    border-radius: radius(3px);
     font-size: 17px;
 }
 
@@ -120,7 +128,7 @@ h2 {
 .add-button {
     z-index: 3;
     border: 2px solid $gray-2;
-    border-radius: 3px;
+    border-radius: radius(3px);
     margin: 0;
     padding: 2px;
     width: 30px;
@@ -155,12 +163,12 @@ h2 {
     height: 10px;
     width: 10px;
     background: $gray-4;
-    -webkit-border-radius: 5px;
+    -webkit-border-radius: radius(5px);
 }
 
 ::-webkit-scrollbar-thumb {
     background: $gray-1;
-    -webkit-border-radius: 5px;
+    -webkit-border-radius: radius(5px);
 }
 
 ::-webkit-scrollbar-corner {

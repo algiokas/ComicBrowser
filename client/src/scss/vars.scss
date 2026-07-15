@@ -25,3 +25,13 @@ $black-to-red-filter: brightness(0) saturate(100%) invert(11%) sepia(55%) satura
 $gallery-gap: clamp(1rem, 1.25vw, 2rem);
 $gallery-columns: 4; // 4 x 3 = 12, landscape 16:9 cells
 $gallery-rows: 3;
+
+// Wrap any corner-rounding border-radius value in this so it scales with
+// the global --radius-scale custom property (set in base.scss). Flip that
+// to 0 (e.g. temporarily in devtools, or by editing base.scss) to compare
+// the whole app with every rounded corner squared off, with no other
+// changes needed. Not meant for shape-defining radii like 50% circles —
+// those should stay literal.
+@function radius($value) {
+    @return calc(#{$value} * var(--radius-scale));
+}
