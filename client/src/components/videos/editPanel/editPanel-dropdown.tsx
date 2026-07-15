@@ -9,14 +9,16 @@ interface EditPanelDropdownProps<T> {
 }
 
 function EditPanelDropdown<T>(props: EditPanelDropdownProps<T>): React.ReactNode {
-    return <select className="edit-panel-row-dropdown" onChange={props.handleDropdownChange} id={`${props.editField.toString().toLowerCase()}-dropdown`}>
-        <option value=''>{`-- Select ${props.editField} --`}</option>
-        {props.valueRange.map((v, i) => {
-            if (!props.collection.some(item => props.getDisplayString(item) === props.getDisplayString(v))) {
-                return (<option key={i} value={props.getDisplayString(v)}>{props.getDisplayString(v)}</option>);
-            }
-        })}
-    </select>;
+    return <div className="edit-panel-row-dropdown-wrapper">
+        <select className="edit-panel-row-dropdown" onChange={props.handleDropdownChange} id={`${props.editField.toString().toLowerCase()}-dropdown`}>
+            <option value=''>{`-- Select ${props.editField} --`}</option>
+            {props.valueRange.map((v, i) => {
+                if (!props.collection.some(item => props.getDisplayString(item) === props.getDisplayString(v))) {
+                    return (<option key={i} value={props.getDisplayString(v)}>{props.getDisplayString(v)}</option>);
+                }
+            })}
+        </select>
+    </div>;
 }
 
 export default EditPanelDropdown

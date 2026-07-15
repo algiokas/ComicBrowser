@@ -71,14 +71,16 @@ const SourceDetail = (props: SourceDetailProps) => {
                         <span className="source-detail-info-label">Number of Videos: </span>
                         <span className="source-detail-info-value">{videoCount}</span>
                     </div>
-                </div>
-                <div className="source-detail-upload">
-                    <input type="file" id="source-image" name="source-image" accept="image/*" onChange={handleFileChange} />
-                    <div className="source-detail-upload-controls">
-                        <button type="button" onClick={() => upload('small')}>Upload Small</button>
-                        <button type="button" onClick={() => upload('large')}>Upload Large</button>
+                    <div className="source-detail-upload">
+                        <input type="file" id="source-image" 
+                            name="source-image" accept="image/*" onChange={handleFileChange} />
+                        <div className="source-detail-upload-controls">
+                            <button type="button" onClick={() => upload('small')}>Upload Small</button>
+                            <button type="button" onClick={() => upload('large')}>Upload Large</button>
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
     )

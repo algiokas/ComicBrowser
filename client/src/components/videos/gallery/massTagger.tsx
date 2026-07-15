@@ -148,14 +148,16 @@ const MassTagger = (props: MassTaggerProps) => {
             <div className="mass-tagger-container-header">
                 <div className="tag-select-row">
                     <h3>Select a tag</h3>
-                    <select className="tag-select"
-                        id="tag-select-dropdown"
-                        onChange={(e) => setTagToApply(e.target.value)}
-                        value={appContext.currentMassTaggerTag?.id ?? 0}>
-                        {appContext.allVideoTags.toSorted(alphaSort).map((t, i) => (
-                            <option value={t.id} key={i}>{t.name}</option>
-                        ))}
-                    </select>
+                    <div className="tag-select-wrapper">
+                        <select className="tag-select"
+                            id="tag-select-dropdown"
+                            onChange={(e) => setTagToApply(e.target.value)}
+                            value={appContext.currentMassTaggerTag?.id ?? 0}>
+                            {appContext.allVideoTags.toSorted(alphaSort).map((t, i) => (
+                                <option value={t.id} key={i}>{t.name}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
                 <VideoSortControls sortOrder={appContext.massTaggerSortOrder}
                     videoList={appContext.allVideos}

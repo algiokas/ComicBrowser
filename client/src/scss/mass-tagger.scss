@@ -13,17 +13,16 @@
     }
 }
 
+// <select> can't host its own ::after (no browser renders generated content
+// on it), so the fading underline lives on this wrapper instead.
+.tag-select-wrapper {
+    @include dropdown-select-wrapper;
+}
+
 .tag-select {
     @include dropdown-select;
     display: flex;
     margin: 0;
-
-    // Pink instead of the shared mixin's default gray, to match the rest of
-    // the mass tagger's pink accents (e.g. the sort order glow already used
-    // here comes from currentColor, but this dropdown wants it unconditionally).
-    &::after {
-        @include fading-underline(10%, $pink-1);
-    }
 }
 
 // Mass Tagger renders its full, unpaginated video list in a scrolling

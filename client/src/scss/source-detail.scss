@@ -5,6 +5,8 @@
     @include detail-panel;
 
     &-info {
+        display: flex;
+        flex-direction: column;
         margin-right: auto;
         font-size: larger;
         font-weight: bold;
@@ -13,6 +15,10 @@
 
         &-value {
             color: $pink-1
+        }
+
+        &-row {
+            margin-right: auto;
         }
     }
 
@@ -27,6 +33,10 @@
         input[type="file"] {
             position: relative;
             padding-bottom: 8px;
+            background-color: transparent;
+            border: none;
+            padding-left: 10px;
+
 
             &::after {
                 @include fading-underline(5%);

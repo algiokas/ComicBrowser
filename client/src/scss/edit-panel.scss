@@ -191,6 +191,12 @@
             }
         }
 
+        // <select> can't host its own ::after, so the fading underline
+        // lives on this wrapper instead — see dropdown-select-wrapper.
+        &-dropdown-wrapper {
+            @include dropdown-select-wrapper;
+        }
+
         &-dropdown {
             @include dropdown-select;
             display: flex;

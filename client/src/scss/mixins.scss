@@ -91,11 +91,14 @@
     }
 }
 
-// The light-gray line that fades out toward the edges, sitting behind a
+// The line that fades out toward the edges, sitting behind a
 // text-underline-item (or a row of them). $fade is how far in from each
-// edge the line reaches full opacity; $color defaults to light gray but can
-// be overridden (e.g. pink, to match a specific element's accent color).
-@mixin fading-underline($fade: 20%, $color: $gray-0) {
+// edge the line reaches full opacity. $color defaults to currentColor (same
+// logic as text-underline-item's glow — it tracks whatever `color` the
+// element has rather than a fixed value) — color-mix() is used instead of
+// Sass's rgba() because rgba() needs a real Sass color to decompose into
+// channels at compile time, which currentColor (a runtime CSS keyword) isn't.
+@mixin fading-underline($fade: 20%, $color: currentColor) {
     content: "";
     position: absolute;
     left: 0;
@@ -104,33 +107,47 @@
     height: 1px;
     background: linear-gradient(
         to right,
-        rgba($color, 0),
-        rgba($color, 0.5) #{$fade},
-        rgba($color, 0.5) calc(100% - #{$fade}),
-        rgba($color, 0)
+        transparent,
+        color-mix(in srgb, #{$color} 50%, transparent) #{$fade},
+        color-mix(in srgb, #{$color} 50%, transparent) calc(100% - #{$fade}),
+        transparent
     );
 }
 
 // Native <select> dropdown, same button family as text-underline-item —
-// borderless with a fading underline and pink text. Shared by the mass
-// tagger's tag picker and the edit panel's add-value dropdown, which were
-// previously two near-identical, independently hand-copied rules.
+// borderless with pink text, right-aligned to match the app's other
+// right-hand controls. <select> doesn't support ::before/::after in any
+// major browser, so the fading underline can't live on the select itself —
+// see dropdown-select-wrapper below, which the select must be wrapped in.
 @mixin dropdown-select {
     @include text-underline-item;
     color: $pink-1;
     font-size: 18px;
     padding: 6px 20px 10px 20px;
+    text-align: right;
+
+    // background-color/color are the only things browsers reliably respect
+    // on <option> in the open popup — gradients, custom scrollbars, and
+    // per-option hover glow are all ignored there in every major engine, so
+    // this is genuinely the ceiling for native <select> styling.
+    option {
+        background-color: $gray-4;
+        color: $text-color;
+        text-align: right;
+    }
+}
+
+// Wrap a dropdown-select <select> in an element with this to get the fading
+// underline (which the select itself can't render as its own ::after). The
+// wrapper needs its own `color` (matching dropdown-select's) since currentColor
+// resolves from its own inheritance chain, not its child select's color.
+@mixin dropdown-select-wrapper {
+    position: relative;
+    display: inline-flex;
+    color: $pink-1;
 
     &::after {
         @include fading-underline(10%);
-    }
-
-    // Most browsers respect color/background on <option> even though they
-    // ignore border/padding on the native popup — keep it readable in a
-    // dark theme rather than falling back to browser-chrome white-on-black.
-    option {
-        background-color: $gray-2;
-        color: $text-color;
     }
 }
 
