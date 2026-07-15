@@ -196,11 +196,17 @@
             }
 
             & button {
-                @include media-button;
+                @include text-underline-item;
                 width: 100%;
                 padding: 5px 15px;
                 margin: 0 auto;
                 font-size: 16px;
+                font-weight: 600;
+                color: $pink-1;
+
+                &::after {
+                    @include fading-underline(10%);
+                }
             }
         }
 

@@ -2,37 +2,47 @@
 
 .page-select {
     display: flex;
+    align-items: center;
     justify-content: center;
     font-size: large;
 }
 
 .stepper-arrow {
-    margin: 0 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 4px;
+    cursor: pointer;
+
+    img {
+        height: 18px;
+    }
 }
 
 .page-number {
-    margin: 0 8px;
+    display: flex;
+    align-items: center;
+    margin: 0 6px;
 
     div {
-        padding-top: 2px;
         display: inline;
     }
 }
 
 .page-select-number {
-    width: 40px;
-    background-color: $gray-1;
-    font-size: 18px;
+    width: 32px;
+    background-color: transparent;
+    font-size: 16px;
     color: $text-color;
     display: inline-block;
     border: 0;
-    border-radius: 3px;
+    border-bottom: 1px solid $gray-1;
     text-align: center;
     padding: 2px 0;
 
     &:disabled {
         width: 1rem;
-        background-color: $gray-2;
+        border-bottom-color: transparent;
     }
 
     &::-webkit-inner-spin-button,
@@ -41,14 +51,5 @@
         -moz-appearance: none;
         appearance: none;
         margin: 0;
-    }
-}
-
-.stepper-arrow {
-    cursor: pointer;
-    height: 100%;
-
-    img {
-        height: 25px;
     }
 }
