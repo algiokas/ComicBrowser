@@ -28,9 +28,54 @@
     box-sizing: border-box;
 }
 
+// Shell for non-paginated, arbitrary-length list views (tags gallery, mass
+// tagger): same header/card split as gallery-grid-container, but -inner is
+// a flex-wrap flow (not a CSS Grid) that scrolls internally via its own
+// overflow-y — the header stays outside it, so it never scrolls away.
+@mixin list-view-container {
+    @include view-shell;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    &-header,
+    &-footer {
+        flex: 0 0 auto;
+    }
+
+    &-inner {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: $gray-2;
+        box-sizing: border-box;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+    }
+}
+
+// Icon-only equivalent of text-underline-item's hover glow — text-shadow
+// doesn't render on an <img>, so this uses drop-shadow instead, applied to
+// the icon's wrapping element (never the <img> itself, which usually already
+// has its own color-conversion filter — a second filter would replace it
+// rather than combine, since filter isn't additive across rules).
+@mixin icon-glow-on-hover {
+    &:hover {
+        filter: drop-shadow(0 0 6px currentColor) drop-shadow(0 0 12px currentColor);
+    }
+}
+
 // Borderless "text over a fading line" control (sort order selector, and
 // anything styled to match it) — a rectangular clickbox with no visible
 // button chrome; selection/hover is indicated by a glow on the text itself.
+// The glow uses currentColor rather than a fixed color, so it automatically
+// matches whatever `color` the element (or an override further down the
+// cascade, e.g. a "delete" variant) has — no separate glow color to keep
+// in sync by hand.
 @mixin text-underline-item {
     cursor: pointer;
     position: relative;
@@ -42,14 +87,15 @@
 
     &.selected,
     &:hover {
-        text-shadow: 0 0 6px $yellow-highlight, 0 0 12px $yellow-highlight;
+        text-shadow: 0 0 6px currentColor, 0 0 12px currentColor;
     }
 }
 
 // The light-gray line that fades out toward the edges, sitting behind a
 // text-underline-item (or a row of them). $fade is how far in from each
-// edge the line reaches full opacity.
-@mixin fading-underline($fade: 20%) {
+// edge the line reaches full opacity; $color defaults to light gray but can
+// be overridden (e.g. pink, to match a specific element's accent color).
+@mixin fading-underline($fade: 20%, $color: $gray-0) {
     content: "";
     position: absolute;
     left: 0;
@@ -58,11 +104,34 @@
     height: 1px;
     background: linear-gradient(
         to right,
-        rgba($gray-0, 0),
-        rgba($gray-0, 0.5) #{$fade},
-        rgba($gray-0, 0.5) calc(100% - #{$fade}),
-        rgba($gray-0, 0)
+        rgba($color, 0),
+        rgba($color, 0.5) #{$fade},
+        rgba($color, 0.5) calc(100% - #{$fade}),
+        rgba($color, 0)
     );
+}
+
+// Native <select> dropdown, same button family as text-underline-item —
+// borderless with a fading underline and pink text. Shared by the mass
+// tagger's tag picker and the edit panel's add-value dropdown, which were
+// previously two near-identical, independently hand-copied rules.
+@mixin dropdown-select {
+    @include text-underline-item;
+    color: $pink-1;
+    font-size: 18px;
+    padding: 6px 20px 10px 20px;
+
+    &::after {
+        @include fading-underline(10%);
+    }
+
+    // Most browsers respect color/background on <option> even though they
+    // ignore border/padding on the native popup — keep it readable in a
+    // dark theme rather than falling back to browser-chrome white-on-black.
+    option {
+        background-color: $gray-2;
+        color: $text-color;
+    }
 }
 
 // A gallery tile (cover/thumbnail cell within a wrapping flex row)
@@ -153,7 +222,12 @@
     border-radius: 4px;
 }
 
-// Wrapping tag list with image-gen affordance, shared by player + detail views
+// Wrapping tag list with image-gen affordance, shared by player + detail
+// views. .player-tag also carries .info-item/.clickable (mixins shared with
+// the Books app's book-info chips — left untouched) — the compound
+// ".player-tag.clickable" selector below is two classes, so it reliably
+// overrides those regardless of declaration order, without editing the
+// shared mixins themselves.
 @mixin tags-list {
     display: flex;
     flex-direction: row;
@@ -162,11 +236,27 @@
     .player-tag {
         display: flex;
         flex-direction: row;
+        align-items: center;
+
+        // Same button family as the rest of the redesign, but visually
+        // distinct: tighter padding and pink text mark it as a tag, not
+        // an action button, though it shares the fading-line/glow language.
+        &.clickable {
+            @include text-underline-item;
+            color: $pink-1;
+            padding: 4px 10px;
+
+            &::after {
+                @include fading-underline(10%);
+            }
+        }
 
         .image-gen {
-            margin-top: auto;
-            margin-bottom: auto;
             margin-left: 5px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            @include icon-glow-on-hover;
         }
     }
 }

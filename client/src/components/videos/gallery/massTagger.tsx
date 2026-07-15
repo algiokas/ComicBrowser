@@ -71,18 +71,19 @@ const MassTagger = (props: MassTaggerProps) => {
         return sortedCopy;
     }, [appContext.allVideos, appContext.massTaggerSortOrder, shuffleVersion]);
 
-    // Nav is no longer part of the page scroll (see .view-content in base.scss) —
-    // that div is the actual scrolling ancestor now, not window.
-    const scrollContainer = () => document.querySelector('.view-content') as HTMLElement | null
+    // .mass-tagger-container-inner is its own scroll region now (the header
+    // sits outside it, not overlaid on top of it — see list-view-container
+    // in mixins.scss), so this no longer needs to fall back to .view-content.
+    const scrollContainer = () => document.querySelector('.mass-tagger-container-inner') as HTMLElement | null
 
     const handleScroll = () => {
-        // Find the video card currently at the top of the viewport
+        // Find the video card currently at the top of the visible scrolled area
         const items = document.querySelectorAll('.mass-tagger-item-wrapper');
-        const headerHeight = 120; // Approx height of sticky filters
+        const containerTop = scrollContainer()?.getBoundingClientRect().top ?? 0;
 
         for (const item of items) {
             const rect = item.getBoundingClientRect();
-            if (rect.top >= headerHeight) {
+            if (rect.top >= containerTop) {
                 const id = item.getAttribute('data-video-id');
                 if (id) appContext.setMassTaggerAnchorVideoId(parseInt(id));
                 break;
@@ -95,9 +96,9 @@ const MassTagger = (props: MassTaggerProps) => {
         if (appContext.massTaggerAnchorVideoId) {
             const element = document.getElementById(`video-${appContext.massTaggerAnchorVideoId}`);
             if (element) {
+                // The header is a separate, non-overlapping sibling now (not an
+                // overlay on top of the scroll area), so no extra offset is needed.
                 element.scrollIntoView({ block: 'start' });
-                // Account for sticky header offset
-                scrollContainer()?.scrollBy(0, -110);
             }
         }
         const container = scrollContainer()
@@ -144,10 +145,9 @@ const MassTagger = (props: MassTaggerProps) => {
 
     return (
         <div className="mass-tagger-container dark-theme">
-            <h3>Select a tag</h3>
-            <div className="tag-select-container">
-                <div className="tag-select-inner">
-
+            <div className="mass-tagger-container-header">
+                <div className="tag-select-row">
+                    <h3>Select a tag</h3>
                     <select className="tag-select"
                         id="tag-select-dropdown"
                         onChange={(e) => setTagToApply(e.target.value)}
@@ -157,8 +157,6 @@ const MassTagger = (props: MassTaggerProps) => {
                         ))}
                     </select>
                 </div>
-            </div>
-            <div className="mass-tagger-container-header">
                 <VideoSortControls sortOrder={appContext.massTaggerSortOrder}
                     videoList={appContext.allVideos}
                     pageSize={appContext.allVideos.length}

@@ -1,49 +1,46 @@
 @use 'vars' as *;
 @use 'mixins' as *;
 
-.tag-select {
+// "Select a tag" label sits next to the dropdown instead of stacked above it.
+.tag-select-row {
     display: flex;
-    padding: 6px;
-    font-size: 18px;
-    background-color: $gray-1;
-    color: $pink-1;
-    border-radius: 0.3em;
-    border: 1px solid $gray-3;
-    margin: 10px auto;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
 
-    &-container {
-        position: sticky;
-        top: 0;
-        z-index: 5;
-        width: 20%;
-        margin: 0 auto 7px auto;
+    h3 {
+        margin: 0;
     }
+}
 
-    &-inner {
-        padding: 5px;
-        background-color: $gray-3;
-    }
+.tag-select {
+    @include dropdown-select;
+    display: flex;
+    margin: 0;
 
-    option {
-        display: flex;
-        justify-content: flex-start;
-        gap: 20px;
-
-        border: 2px solid $gray-4;
-        padding: 10px;
-        transition: 0.4s;
+    // Pink instead of the shared mixin's default gray, to match the rest of
+    // the mass tagger's pink accents (e.g. the sort order glow already used
+    // here comes from currentColor, but this dropdown wants it unconditionally).
+    &::after {
+        @include fading-underline(10%, $pink-1);
     }
 }
 
 // Mass Tagger renders its full, unpaginated video list in a scrolling
 // flex-wrap — deliberately not the video-gallery CSS Grid (that's sized
 // for exactly one page of 12 tiles filling the viewport with no scroll).
+// -inner scrolls internally; -header (dropdown + sort select) stays outside
+// it and never scrolls away — see list-view-container in mixins.scss.
 .mass-tagger-container {
-    @include view-container;
+    @include list-view-container;
 
-    &-inner {
+    &-header {
+        position: sticky;
+        top: 0;
+        z-index: 5;
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 10px;
     }
 }
 

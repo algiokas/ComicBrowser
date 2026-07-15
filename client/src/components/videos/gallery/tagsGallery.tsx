@@ -36,10 +36,7 @@ const TagsGallery = (props: TagsGalleryProps) => {
 
     return (
         <div className="tags-gallery-container dark-theme">
-            <div>
-                <h2 className="tags-gallery-header">
-                    Tags
-                </h2>
+            <div className="tags-gallery-container-header">
                 <div className="tags-gallery-type-select">
                     {
                         Object.keys(TagType).map((t, i) => {
@@ -51,7 +48,7 @@ const TagsGallery = (props: TagsGalleryProps) => {
                 </div>
             </div>
 
-            <div className="tags-gallery-inner">
+            <div className="tags-gallery-container-inner">
                 {
                     getTagsByType(tagType).map((tag: VideosAppTag, i: number) => {
                         return <TagsGalleryItem

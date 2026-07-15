@@ -21,33 +21,34 @@
         display: flex;
         flex-direction: column;
 
+        // Same borderless "text over a fading line" language as the rest of
+        // the redesigned buttons — the fading line lives on the input itself
+        // since ::file-selector-button can't host its own ::after.
         input[type="file"] {
-            box-shadow:inset 0px 0px 0px 3px $gray-3;
-            border-radius: 0.3em;
+            position: relative;
+            padding-bottom: 8px;
+
+            &::after {
+                @include fading-underline(5%);
+            }
         }
-        
+
         /* file upload button */
         input[type="file"]::file-selector-button {
-            border-radius: 0.3em 0 0 0.3em;
-            padding: 5px 10px;
             cursor: pointer;
-            background-color: $gray-1;
+            background: none;
+            border: none;
             color: $pink-1;
             font-weight: bold;
-            border: 1px solid $gray-2;
-            box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
+            font-family: $font-family;
+            padding: 5px 10px 5px 0;
             margin-right: 16px;
-            transition: background-color 200ms;
+            transition: text-shadow 200ms;
         }
 
         /* file upload button hover state */
         input[type="file"]::file-selector-button:hover {
-            background-color: $gray-0;
-        }
-
-        /* file upload button active state */
-        input[type="file"]::file-selector-button:active {
-            background-color: #e5e7eb;
+            text-shadow: 0 0 6px currentColor, 0 0 12px currentColor;
         }
 
         &-controls {
@@ -55,9 +56,14 @@
             flex-direction: row;
 
             button {
+                @include text-underline-item;
                 padding: 5px;
                 margin: 4px;
                 font-size: medium;
+
+                &::after {
+                    @include fading-underline(10%);
+                }
             }
         }
     }

@@ -1,4 +1,5 @@
 @use 'vars' as *;
+@use 'mixins' as *;
 
 .edit-panel {
     margin: 0 20px;
@@ -60,12 +61,16 @@
             }
 
             .click-item {
+                @include text-underline-item;
                 margin: 0 4px 7px 4px;
                 padding: 4px 10px;
                 overflow-wrap: break-word;
                 min-width: 0px;
-                background-color: $gray-1;
-                border-radius: 4px;
+                color: $pink-1;
+
+                &::after {
+                    @include fading-underline(10%);
+                }
             }
 
             input {
@@ -111,25 +116,36 @@
             &-item {
                 margin: 0 3px 8px 3px;
                 display: flex;
+                align-items: center;
                 flex-shrink: 0;
                 flex-wrap: wrap;
 
+                // Floating text + fading underline, like a tag — but it's
+                // not clickable, so no cursor/hover-glow affordance.
                 .item-value {
-                    background-color: $gray-3;
-                    padding: 6px 8px 6px 16px;
-                    border-top-left-radius: 10px;
-                    border-bottom-left-radius: 10px;
+                    @include text-underline-item;
+                    cursor: default;
+                    padding: 4px 10px;
                     color: $pink-1;
+
+                    &::after {
+                        @include fading-underline(10%);
+                    }
+
+                    &:hover {
+                        text-shadow: none;
+                    }
                 }
 
+                // Icon stays white — its glow is its own, independent of the
+                // item-value's pink glow.
                 .remove-button {
                     display: flex;
-                    background-color: $gray-1;
-                    padding: 2px 4px 0 2px;
-                    border-top-right-radius: 10px;
-                    border-bottom-right-radius: 10px;
+                    align-items: center;
+                    padding: 2px 4px;
                     color: $text-color;
                     cursor: pointer;
+                    @include icon-glow-on-hover;
 
                     img {
                         width: 32px;
@@ -160,32 +176,24 @@
                 }
             }
 
+            // Icon-only buttons (confirm/cancel/edit-mode toggle) — borderless
+            // icon with a hover glow, no fading underline (there's no text).
             button {
                 width: 35px;
                 height: 35px;
                 outline: none;
                 margin-left: 5px;
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: $pink-1;
+                @include icon-glow-on-hover;
             }
         }
 
         &-dropdown {
+            @include dropdown-select;
             display: flex;
-            padding: 6px;
-            font-size: 18px;
-            background-color: $gray-1;
-            color: $pink-1;
-            border-radius: 0.3em;
-            border: 1px solid $gray-3;
-
-            option {
-                display: flex;
-                justify-content: flex-start;
-                gap: 20px;
-
-                border: 2px solid $gray-4;
-                padding: 10px;
-                transition: 0.4s;
-            }
         }
     }
 
@@ -195,18 +203,36 @@
         justify-content: flex-end;
         margin: 20px 10px 0 10px;
 
-        .delete-button {
-            margin-right: auto;
-        }
-
         button {
+            @include text-underline-item;
             padding: 8px 10px;
             margin: 5px;
             font-size: large;
+
+            &::after {
+                @include fading-underline(10%);
+            }
+
+            // The glow above uses currentColor, so disabling the hover glow
+            // and dimming both the text and the line is enough to read as
+            // inactive — no separate disabled color to keep in sync by hand.
+            &:disabled {
+                color: $gray-1;
+                cursor: default;
+
+                &::after {
+                    opacity: 0.4;
+                }
+
+                &:hover {
+                    text-shadow: none;
+                }
+            }
         }
 
-        button:enabled {
-            border-color: $pink-1;
+        .delete-button {
+            margin-right: auto;
+            color: $red;
         }
     }
 
@@ -221,9 +247,8 @@
         }
 
         &-item {
-            &.selected {
-                box-shadow: inset -1px 0px 3px 3px $pink-1;
-            }
+            // .selected already glows via .click-item's text-underline-item
+            // (currentColor text-shadow) — no separate indicator needed.
         }
     }
 }

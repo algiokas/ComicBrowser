@@ -6,6 +6,7 @@
     display: flex;
     justify-content: center;
     font-size: large;
+    padding-bottom: 14px;
     position: relative;
 
     &::after {
@@ -18,24 +19,26 @@
     margin: 3px 7px;
 }
 
+// Same design language as .sort-select — its own fading underline and
+// matching bottom spacing, but only a small gap above it since it's the
+// alphabet jump-index directly tied to the sort order selector above it.
 .sort-index {
     display: flex;
-    flex-direction: row;
     flex-wrap: wrap;
-    padding: 0 40px 10px 40px;
+    justify-content: center;
     font-size: large;
+    padding-top: 2px;
+    padding-bottom: 14px;
+    position: relative;
+
+    &::after {
+        @include fading-underline(15%);
+    }
 
     &-item {
-        cursor: pointer;
-        background-color: $gray-1;
+        @include text-underline-item;
+        margin: 2px 4px;
         padding: 3px 10px;
-        margin: auto;
-        border: 2px solid $black;
-        border-radius: 3px;
-
-        &.selected {
-            border-color: $yellow-highlight;
-        }
     }
 }
 
@@ -175,6 +178,14 @@
     @include favorite-tile-glow;
     @include gallery-tile-corner-icons;
 
+    // Video thumbnails specifically put the tags icon at the bottom instead
+    // of the top (actor/source galleries keep the shared top-right default).
+    .tags-icon {
+        top: auto;
+        bottom: 8px;
+        right: 8px;
+    }
+
     &-inner {
         position: relative;
         height: 100%;
@@ -199,6 +210,33 @@
             width: 100%;
             aspect-ratio: 16 / 9;
         }
+    }
+}
+
+// Videos-app equivalent of the Books app's .add-button (base.scss) — same
+// corner-icon position/size, but borderless with a permanent black glow
+// (matching .favorite-icon's glow) instead of a solid gray box, since this
+// is generic "secondary action" affordance here, not specifically "add".
+.secondary-button {
+    z-index: 3;
+    margin: 0;
+    padding: 2px;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    img {
+        width: 20px;
+        height: 20px;
+        // .secondary-button img is more specific than .svg-icon, so its filter
+        // would otherwise replace (not add to) the icon's own black-to-white
+        // color filter — combine both into one filter chain here instead.
+        filter: $black-to-text-filter drop-shadow(0 1px 3px rgba($black, 0.9)) drop-shadow(0 0 8px rgba($black, 0.6));
     }
 }
 

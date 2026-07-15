@@ -110,7 +110,7 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
         }
         {
           props.secondaryClickHandler ?
-          <button className="add-button" onClick={(e) => secondaryClick(e, props.data)}>
+          <button className="secondary-button" onClick={(e) => secondaryClick(e, props.data)}>
             {
               props.secondaryClickIconUrl ? <img className="svg-icon" src={props.secondaryClickIconUrl}></img> : null
             }

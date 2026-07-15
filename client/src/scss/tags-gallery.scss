@@ -2,14 +2,16 @@
 @use 'mixins' as *;
 
 .tags-gallery {
+    // -inner (the tile grid) scrolls internally; -header stays outside it
+    // and never scrolls away — see list-view-container in mixins.scss.
     &-container {
-        @include view-container;
-    }
+        @include list-view-container;
 
-    &-inner {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
+        &-header {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
     }
 
     &-tag {
@@ -24,37 +26,22 @@
         }
     }
 
+    // Same look as the sort order selector (.sort-select/.sort-order).
     &-type-select {
         display: flex;
-        flex-direction: row;
-        margin-bottom: 1em;
+        justify-content: center;
+        font-size: large;
+        padding-bottom: 14px;
+        position: relative;
 
-        & div {
-            background-color: $gray-1;
-            padding: .5em 1.5em;
-            margin: 2px;
-            border: 2px solid $gray-3;
-            font-weight: 550;
-            font-size: 16px;
-
-            &:last-child {
-                margin-right: auto;
-                border-radius: 0 10px 10px 0;
-            }
-
-            &:first-child {
-                margin-left: auto;
-                border-radius: 10px 0 0 10px;
-            }
-
-            &.selected {
-                border: 2px solid $yellow-highlight;
-                box-sizing: border-box;
-            }
+        &::after {
+            @include fading-underline(15%);
         }
 
-
-
+        & div {
+            @include text-underline-item;
+            margin: 3px 7px;
+        }
     }
 
     &-item {
