@@ -289,6 +289,13 @@
         &-item {
             // .selected already glows via .click-item's text-underline-item
             // (currentColor text-shadow) — no separate indicator needed.
+
+            // The fading underline (.click-item::after) is the visibility
+            // cue here: only selected items show it, everything else about
+            // an unselected item (padding, color, hover glow) is unchanged.
+            &:not(.selected)::after {
+                content: none;
+            }
         }
     }
 }
