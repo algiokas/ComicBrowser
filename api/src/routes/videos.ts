@@ -4,6 +4,8 @@ import { createReadStream, statSync } from 'fs';
 import mime from 'mime';
 import * as videoRepository from "../videoRepository.ts";
 import { ImportVideosResult } from '../types/video.ts';
+import { sendImageFile } from './sendImage.ts';
+import { getResizedImagePath, sanitizeWidth } from './imageResize.ts';
 const router = Router();
 
 router.get('/', function (req, res, next) {
@@ -62,7 +64,7 @@ router.get('/sources/:sourceId/imagelarge', (req, res) => {
     }
 
     let fpath = videoRepository.getSourceImagePath(sourceId, false)
-    if (fpath) res.sendFile(fpath, {});
+    if (fpath) sendImageFile(res, fpath);
     else {
         res.sendStatus(404).end();
     }
@@ -76,13 +78,13 @@ router.get('/sources/:sourceId/imagesmall', (req, res) => {
     }
 
     let fpath = videoRepository.getSourceImagePath(sourceId, true)
-    if (fpath) res.sendFile(fpath, {});
+    if (fpath) sendImageFile(res, fpath);
     else {
         res.sendStatus(404).end();
     }
 })
 
-router.get('/thumbnail/:videoId', function (req, res) {
+router.get('/thumbnail/:videoId', async function (req, res) {
     const videoId = Number(req.params.videoId)
     if (isNaN(videoId)) {
         res.status(500).send(`Internal Server Error: parameter videoId must be a number - provided value: ${req.params.videoId}`)
@@ -90,10 +92,23 @@ router.get('/thumbnail/:videoId', function (req, res) {
     }
 
     let fpath = videoRepository.getThumbnailFilePath(videoId)
-    if (fpath) res.sendFile(fpath, {});
-    else {
+    if (!fpath) {
         res.sendStatus(404).end();
+        return
     }
+
+    // Optionally serve a smaller, WebP-encoded copy sized for how the client
+    // actually renders it (?w=<width>). Falls back to the full-res original if
+    // resizing fails for any reason.
+    const width = sanitizeWidth(req.query.w)
+    if (width) {
+        try {
+            fpath = await getResizedImagePath(fpath, width)
+        } catch (err) {
+            console.error(`thumbnail resize failed for video ${videoId}:`, err)
+        }
+    }
+    sendImageFile(res, fpath);
 })
 
 router.post('/thumbnail/:videoId/generate/:timeMs', function (req, res) {
@@ -132,7 +147,7 @@ router.get('/tags/thumbnail/:tagId', function (req, res) {
     }
 
     let fpath = videoRepository.getTagImagePath(tagId, 'video')
-    if (fpath) res.sendFile(fpath, {});
+    if (fpath) sendImageFile(res, fpath);
     else {
         res.sendStatus(404).end();
     }

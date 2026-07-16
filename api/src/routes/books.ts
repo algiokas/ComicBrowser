@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as bookRepository from '../bookRepository.ts';
+import { sendImageFile } from './sendImage.ts';
 var router = Router();
 
 router.get('/', function (req, res, next) {
@@ -28,7 +29,7 @@ router.get('/:bookId/page/:pageNum', function (req, res, next) {
     }
 
     let fpath = bookRepository.getBookPage(bookId, pageNum);
-    if (fpath) res.sendFile(fpath, { root: process.env.BOOKS_IMAGE_DIR });
+    if (fpath) sendImageFile(res, fpath, { root: process.env.BOOKS_IMAGE_DIR });
     else {
         res.sendStatus(404).end();
     }
