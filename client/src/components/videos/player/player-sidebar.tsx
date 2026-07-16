@@ -6,7 +6,7 @@ import StarsIcon from "../../../img/svg/stars.svg";
 import ChevronRightIcon from "../../../img/svg/chevron-right.svg";
 import type { PlayerProps } from "./player"
 import { useContext } from "react";
-import { VideosAppContext } from "../videosAppContext";
+import { VideosAppContext } from "../../../context/videosAppContext";
 import type { Video } from "../../../types/video";
 import type { VideosAppTag } from "../../../types/tags";
 import type { TagType } from "../../../util/enums";

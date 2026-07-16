@@ -1,15 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import type { VideoSource } from "../../../types/videoSource";
-import { getSourceImageUrl } from "../../../util/helpers";
-import { VideosAppContext } from "../videosAppContext";
+import type { FileWithData } from "../../../types/fileWithData";
+import { getSourceImageUrl } from "../../../api/urls";
+import { VideosAppContext } from "../../../context/videosAppContext";
 
 interface SourceDetailProps {
     source: VideoSource,
-}
-
-export interface FileWithData {
-    file: File,
-    data: ArrayBuffer
 }
 
 const SourceDetail = (props: SourceDetailProps) => {

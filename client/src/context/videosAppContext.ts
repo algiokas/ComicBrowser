@@ -1,11 +1,11 @@
 import { createContext } from "react";
-import type { Actor } from "../../types/actor";
-import type { IVideoSearchQuery } from "../../types/searchQuery";
-import type { Video } from "../../types/video";
-import type { VideoSource } from "../../types/videoSource";
-import { TagType, VideosSortOrder, VideosViewMode } from "../../util/enums";
-import type { FileWithData } from "./gallery/sourceDetail";
-import type { VideoTag, ActorTag, VideosAppTag } from "../../types/tags";
+import type { Actor } from "../types/actor";
+import type { IVideoSearchQuery } from "../types/searchQuery";
+import type { Video } from "../types/video";
+import type { VideoSource } from "../types/videoSource";
+import { TagType, VideosSortOrder, VideosViewMode } from "../util/enums";
+import type { FileWithData } from "../types/fileWithData";
+import type { VideoTag, ActorTag, VideosAppTag } from "../types/tags";
 
 export type VideosAppState = {
     galleryPageSize: number,

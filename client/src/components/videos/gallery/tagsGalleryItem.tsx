@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
-import { getActorImageUrl, getTagImageUrl, getVideoThumbnailUrl } from "../../../util/helpers";
+import { getActorImageUrl, getTagImageUrl, getVideoThumbnailUrl } from "../../../api/urls";
 import type { ActorTag, VideosAppTag, VideoTag } from "../../../types/tags";
-import { VideosAppContext } from "../videosAppContext";
+import { VideosAppContext } from "../../../context/videosAppContext";
 import type { Actor } from "../../../types/actor";
 import type { Video } from "../../../types/video";
 import CameraIcon from "../../../img/svg/camera.svg";

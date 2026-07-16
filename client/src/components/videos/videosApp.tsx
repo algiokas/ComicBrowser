@@ -7,14 +7,14 @@ import { type VideosAppTag, type ActorTag, type VideoTag } from "../../types/tag
 import type { Video } from "../../types/video";
 import type { VideoSource } from "../../types/videoSource";
 import { TagType, VideosSortOrder, VideosViewMode } from "../../util/enums";
-import { actorFromJson, actorsFromJson, getActorImageUrlWithFallback, getEmptyQuery, videoFromJson, videosFromJson } from "../../util/videoUtils";
+import { getEmptyQuery } from "../../util/videoUtils";
+import { getActorImageUrlWithFallback } from "../../mappers/videoMappers";
+import * as videosApi from "../../api/videosApi";
 import Modal from "../shared/modal";
 import Navigation from "../shared/navigation";
-import type { FileWithData } from "./gallery/sourceDetail";
+import type { FileWithData } from "../../types/fileWithData";
 import MultiView from "./multiView";
-import { type VideosAppHandlers, type VideosAppState, VideosAppContext } from "./videosAppContext";
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
+import { type VideosAppHandlers, type VideosAppState, VideosAppContext } from "../../context/videosAppContext";
 
 interface VideosAppProps extends SubAppProps { }
 
@@ -50,36 +50,26 @@ const VideosApp = (props: VideosAppProps) => {
   }, [])
 
   const fillData = async () => {
-    const res = await fetch(`${apiBaseUrl}/videos`)
-    const data = await res.json()
-    const videos = videosFromJson(data)
+    const videos = await videosApi.fetchVideos()
     setAllVideos(videos)
 
-    await fillVideoTags()
-    await fillActorTags()
+    await refreshVideoTags()
+    await refreshActorTags()
 
     await fillActors(videos)
-    await fillSources()
+    setAllSources(await videosApi.fetchSources())
   }
 
-  const fillVideoTags = async () => {
-    const videoTagsRes = await fetch(`${apiBaseUrl}/videos/tags`)
-    const videoTagsData = await videoTagsRes.json()
-    const videoTags = videoTagsData.map((t: Omit<VideoTag, 'tagType'>) => { return { ...t, tagType: 'video' } as VideoTag })
-    setAllVideoTags(videoTags as VideoTag[])
+  const refreshVideoTags = async () => {
+    setAllVideoTags(await videosApi.fetchVideoTags())
   }
 
-  const fillActorTags = async () => {
-    const actorTagsRes = await fetch(`${apiBaseUrl}/actors/tags`)
-    const actorTagsData = await actorTagsRes.json()
-    const actorTags = actorTagsData.map((t: Omit<ActorTag, 'tagType'>) => { return { ...t, tagType: 'actor' } as ActorTag })
-    setAllActorTags(actorTags as ActorTag[])
+  const refreshActorTags = async () => {
+    setAllActorTags(await videosApi.fetchActorTags())
   }
 
   const fillActors = async (videos: Video[]) => {
-    const res = await fetch(`${apiBaseUrl}/actors`)
-    const data = await res.json()
-    const actors = await actorsFromJson(data, videos)
+    const actors = await videosApi.fetchActors(videos)
     setAllActors(actors)
     updateAllVideoActors(videos, actors)
   }
@@ -96,65 +86,36 @@ const VideosApp = (props: VideosAppProps) => {
     }
   }
 
-  const fillSources = async () => {
-    const res = await fetch(`${apiBaseUrl}/videos/sources`)
-    const data = await res.json()
-    const sources = data.map((s: any) => s as VideoSource)
-    setAllSources(sources)
-  }
+
   //#endregion
 
   //#region API
   const updateVideo = async (video: Video) => {
-    const res = await fetch(`${apiBaseUrl}/videos/${video.id}/update`, {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(video)
-    })
-    const data = await res.json()
-    if (data.success) {
-      console.log("Video " + video.id + " Updated")
-      const vData = videoFromJson(data.video)
-      updateVideoActors(vData, allActors)
-      const newVideos = allVideos.map(v => { return v.id === data.video.id ? vData : v })
-      setAllVideos(newVideos)
-      if (currentVideo?.id === data.video.id) {
-        setCurrentVideo(vData)
-      }
-      await fillVideoTags()
+    const updated = await videosApi.updateVideo(video)
+    if (!updated) return
+    console.log("Video " + video.id + " Updated")
+    updateVideoActors(updated, allActors)
+    const newVideos = allVideos.map(v => v.id === updated.id ? updated : v)
+    setAllVideos(newVideos)
+    if (currentVideo?.id === updated.id) {
+      setCurrentVideo(updated)
     }
+    await refreshVideoTags()
   }
 
   const updateActor = async (actor: Actor) => {
-    const res = await fetch(`${apiBaseUrl}/actors/${actor.id}/update`, {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(actor)
-    })
-    const data = await res.json()
-    if (data.success) {
-      console.log("Actor " + actor.id + " Updated")
-      const newActors: Actor[] = []
-      for (const a of allActors) {
-        if (a.id === data.actor.id) {
-          const newActor = await actorFromJson(data.actor, allVideos)
-          newActors.push(newActor)
-        } else {
-          newActors.push(a)
-        }
-      }
-      setAllActors(newActors)
-      await fillActorTags()
-    }
+    const updated = await videosApi.updateActor(actor, allVideos)
+    if (!updated) return
+    console.log("Actor " + actor.id + " Updated")
+    const newActors = allActors.map(a => a.id === updated.id ? updated : a)
+    setAllActors(newActors)
+    await refreshActorTags()
   }
 
   const deleteVideo = async (videoId: number) => {
     console.log('delete video with id: ' + videoId)
-    const res = await fetch(`${apiBaseUrl}/videos/${videoId}`, {
-      method: 'delete'
-    })
-    const data = await res.json()
-    if (data.changes > 0) {
+    const removed = await videosApi.deleteVideo(videoId)
+    if (removed) {
       console.log('removed video ID: ' + videoId)
       setAllVideos(allVideos.filter((b) => b.id !== videoId))
       setCurrentVideo(null)
@@ -165,13 +126,9 @@ const VideosApp = (props: VideosAppProps) => {
   const importVideos = async () => {
     console.log("Importing Videos")
     setViewMode(VideosViewMode.Loading)
-    const res = await fetch(`${apiBaseUrl}/videos/import`, {
-      method: 'get',
-      headers: { 'Content-Type': 'application/json' }
-    })
-    const data = await res.json()
-    if (data) {
-      setAllVideos(videosFromJson(data.videos))
+    const videos = await videosApi.importVideos()
+    if (videos) {
+      setAllVideos(videos)
       setCurrentVideo(null)
       setViewMode(VideosViewMode.Listing)
     }
@@ -180,16 +137,13 @@ const VideosApp = (props: VideosAppProps) => {
   const setThumbnailToTime = async (videoId: number, timeMs: number) => {
     console.log('set thumbnail for video:' + videoId + ' to ' + timeMs + 'ms')
     setLoadingModal(true, "Generating thumbnail for video " + videoId)
-    const res = await fetch(`${apiBaseUrl}/videos/thumbnail/${videoId}/generate/${timeMs}`, {
-      method: 'post'
-    })
-    const data = await res.json()
-    if (data.success) {
-      console.log('successfully updated thumbnail for: ' + videoId + " new thumb: " + data.video.thumbnailId)
+    const result = await videosApi.generateVideoThumbnail(videoId, timeMs)
+    if (result) {
+      console.log('successfully updated thumbnail for: ' + videoId + " new thumb: " + result.thumbnailId)
       for (let i = 0; i < allVideos.length; i++) {
-        if (allVideos[i] && allVideos[i].id === data.video.id) {
+        if (allVideos[i] && allVideos[i].id === result.id) {
           let videos = allVideos
-          videos[i].thumbnailId = data.video.thumbnailId
+          videos[i].thumbnailId = result.thumbnailId
           videos[i].tags = videos[i].tags.filter(t => t.name !== 'Default Thumbnail')
           setAllVideos(videos)
           setShowLoadingModal(false)
@@ -201,24 +155,13 @@ const VideosApp = (props: VideosAppProps) => {
   const generateImageForActor = async (videoId: number, actorId: number, timeMs: number) => {
     console.log('Generating image for actor: ' + actorId + " from video " + videoId + " @" + timeMs + 'ms')
     setLoadingModal(true, "Generating image for actor " + actorId)
-    const res = await fetch(`${apiBaseUrl}/actors/${actorId}/imagefromvideo`, {
-      method: 'post',
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        videoId: videoId,
-        timeMs: timeMs
-      })
-    })
-    const data = await res.json()
-    if (data.success) {
-      console.log('successfully generated  image for: ' + actorId + " new image: " + data.actor.imageFile)
+    const result = await videosApi.generateActorImage(videoId, actorId, timeMs)
+    if (result) {
+      console.log('successfully generated  image for: ' + actorId + " new image: " + result.imageFile)
       for (let i = 0; i < allActors.length; i++) {
-        if (allActors[i] && allActors[i].id === data.actor.id) {
+        if (allActors[i] && allActors[i].id === result.id) {
           let actors = allActors
-          actors[i].imageFile = data.actor.imageFile
+          actors[i].imageFile = result.imageFile
           actors[i].imageUrl = await getActorImageUrlWithFallback(actors[i], allVideos)
           setAllActors(actors)
           setShowLoadingModal(false)
@@ -252,18 +195,13 @@ const VideosApp = (props: VideosAppProps) => {
   const generateImageForTag = async (tagId: number, tagType: TagType, videoId: number, timeMs: number) => {
     console.log(`Generating image for ${tagType} tag: ${tagId} from video ${videoId} @${timeMs}ms`)
     setLoadingModal(true, `Generating image for ${tagType} tag ${tagId}`)
-    const tagTypeSegment = `${tagType.toLowerCase()}s`
-    const res = await fetch(`${apiBaseUrl}/${tagTypeSegment}/tags/thumbnail/${tagId}/generate/${videoId}/${timeMs}`, {
-      method: 'post'
-    })
-    const data = await res.json()
-    if (data.success) {
+    const imageFile = await videosApi.generateTagImage(tagId, tagType, videoId, timeMs)
+    if (imageFile != null) {
+      console.log(`Successfully generated and updated tag image for tag ${tagId} - new image: ${imageFile}`)
       if (tagType === 'Video') {
-        console.log(`Successfully generated and updated tag image for tag ${tagId} - new image: ${data.videoTag.imageFile}`)
-        updateVideoTagImage(tagId, data.videoTag.imageFile)
+        updateVideoTagImage(tagId, imageFile)
       } else {
-        console.log(`Successfully generated and updated tag image for tag ${tagId} - new image: ${data.actorTag.imageFile}`)
-        updateActorTagImage(tagId, data.actorTag.imageFile)
+        updateActorTagImage(tagId, imageFile)
       }
       setShowLoadingModal(false)
     }
@@ -271,19 +209,12 @@ const VideosApp = (props: VideosAppProps) => {
 
   const uploadSourceImage = async (sourceId: number, imageSize: 'small' | 'large', fileData: FileWithData) => {
     setLoadingModal(true, `Uploading image for source: ${sourceId}`)
-    const res = await fetch(`${apiBaseUrl}/videos/upload/sourceimage/${sourceId}/${imageSize}`, {
-      method: 'post',
-      headers: {
-        "Content-Type": fileData.file.type
-      },
-      body: fileData.data
-    })
-    const data = await res.json()
-    if (data.success) {
+    const source = await videosApi.uploadSourceImage(sourceId, imageSize, fileData)
+    if (source) {
       for (let i = 0; i < allSources.length; i++) {
-        if (allSources[i] && allSources[i].id === data.source.id) {
+        if (allSources[i] && allSources[i].id === source.id) {
           let sources = allSources
-          sources[i] = data.source as VideoSource
+          sources[i] = source
           setAllSources(sources)
           setShowLoadingModal(false)
         }

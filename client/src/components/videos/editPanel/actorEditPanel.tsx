@@ -1,7 +1,7 @@
 import { useContext, useState } from "react"
 import EditPanelRow from "./editPanel-row"
 import EditPanelRowMulti from "./editPanel-row-multi"
-import { VideosAppContext } from "../videosAppContext"
+import { VideosAppContext } from "../../../context/videosAppContext"
 import { ActorsEditField } from "../../../util/enums"
 import type { Actor } from "../../../types/actor"
 import type { ActorTag } from "../../../types/tags"

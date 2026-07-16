@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import type { Actor } from "../../../types/actor";
 import type { Video } from "../../../types/video";
 import PlayerSidebar, { type PlayerSidebarProps } from "./player-sidebar";
-import { VideosAppContext } from "../videosAppContext";
+import { VideosAppContext } from "../../../context/videosAppContext";
 
 export interface PlayerProps {
     videoFavoriteClick?: (video: Video) => void,

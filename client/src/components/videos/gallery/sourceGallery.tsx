@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import type { VideoSource } from "../../../types/videoSource";
 import PageSelect from "../../shared/pageSelect";
 import SourceGalleryItem from "./sourceGalleryItem";
-import { VideosAppContext } from "../videosAppContext";
+import { VideosAppContext } from "../../../context/videosAppContext";
 
 interface SourceGalleryProps { }
 

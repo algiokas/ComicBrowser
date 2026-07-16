@@ -5,7 +5,7 @@ import { VideosEditField } from "../../../util/enums";
 import EditPanelRow from "./editPanel-row";
 import EditPanelRowMulti from "./editPanel-row-multi";
 import EditPanelRowStatic from "./editPanel-row-static";
-import { VideosAppContext } from "../videosAppContext";
+import { VideosAppContext } from "../../../context/videosAppContext";
 import type { Actor } from "../../../types/actor";
 import type { VideoTag } from "../../../types/tags";
 

@@ -9,7 +9,7 @@ import ActorDetail from "./actorDetail"
 import { useContext, useEffect, useRef, useState } from "react"
 import type { VideoSource } from "../../../types/videoSource"
 import SourceDetail from "./sourceDetail"
-import { VideosAppContext } from "../videosAppContext"
+import { VideosAppContext } from "../../../context/videosAppContext"
 import { scalarArrayCompare } from "../../../util/helpers"
 import { BitArray } from "../../../util/bitArray"
 

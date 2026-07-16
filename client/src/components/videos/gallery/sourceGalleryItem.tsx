@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { VideoSource } from "../../../types/videoSource";
-import { getSourceImageUrl } from "../../../util/helpers";
+import { getSourceImageUrl } from "../../../api/urls";
 import type { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
 
 type SourceGalleryItemProps = Omit<BaseGalleryItemProps<VideoSource>, 'imageUrl'> & {

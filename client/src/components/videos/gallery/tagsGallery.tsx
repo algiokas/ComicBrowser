@@ -1,5 +1,5 @@
 import { useContext, useState } from "react"
-import { VideosAppContext } from "../videosAppContext"
+import { VideosAppContext } from "../../../context/videosAppContext"
 import { TagType } from "../../../util/enums"
 import type { VideosAppTag, VideoTag } from "../../../types/tags"
 import TagsGalleryItem from "./tagsGalleryItem"

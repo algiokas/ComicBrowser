@@ -3,7 +3,7 @@ import StarsImage from "../../../img/svg/stars.svg";
 import TagsImage from "../../../img/svg/tags.svg";
 import type { Actor } from "../../../types/actor";
 import type { Video } from "../../../types/video";
-import { getVideoThumbnailUrl } from "../../../util/helpers";
+import { getVideoThumbnailUrl } from "../../../api/urls";
 import type { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
 
 type VideoGalleryItemProps = Omit<BaseGalleryItemProps<Video>, 'imageUrl'> & {

@@ -1,9 +1,5 @@
-import type { Actor } from "../types/actor";
 import type { Book } from "../types/book"
 import type { Slideshow } from "../types/slideshow";
-import type { VideosAppTag } from "../types/tags";
-import type { Video } from "../types/video";
-import type { VideoSource } from "../types/videoSource";
 
 export function GetCoverPath(book: Book): string {
     const basePath = import.meta.env.VITE_API_BASE_URL
@@ -21,45 +17,6 @@ export function GetPagePathByID(bookId: number, pageNum: number): string {
     }
     console.error(`Books base path env var not set`)
     return ''
-}
-
-async function shortNumericHash(input: string, digits = 8): Promise<number> {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(input);
-    const buffer = await crypto.subtle.digest('SHA-256', data);
-    const bytes = new Uint8Array(buffer);
-
-    let num = 0;
-    for (let i = 0; i < 6; i++) {
-        num = (num << 8) | bytes[i];
-    }
-    return num % (10 ** digits);
-}
-
-export async function getVideoThumbnailUrl(video: Video): Promise<string> {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-    const versionHash = await shortNumericHash(video.thumbnailId)
-    return `${apiBaseUrl}/videos/thumbnail/${video.id}?v=${versionHash}`
-}
-
-export async function getActorImageUrl(actor: Actor): Promise<string> {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-    const versionHash = await shortNumericHash(actor.imageFile)
-    return `${apiBaseUrl}/actors/${actor.id}/image?v=${versionHash}`
-}
-
-export async function getSourceImageUrl(source: VideoSource, small?: boolean): Promise<string> {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-    const versionHash = await shortNumericHash(small ? source.imageFileSmall : source.imageFileLarge)
-    return `${apiBaseUrl}/videos/sources/${source.id}/image${small ? 'small' : 'large'}?v=${versionHash}`
-}
-
-export async function getTagImageUrl(tag: VideosAppTag): Promise<string> {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-    if (!tag.imageFile) return ''
-    const versionHash = await shortNumericHash(tag.imageFile)
-    const tagTypeSegment = tag.tagType + "s"
-    return `${apiBaseUrl}/${tagTypeSegment}/tags/thumbnail/${tag.id}?v=${versionHash}`
 }
 
 export function GetPagePath(book: Book, pageNum: number): string {

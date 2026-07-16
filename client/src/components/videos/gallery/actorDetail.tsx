@@ -5,7 +5,7 @@ import type { Actor } from "../../../types/actor";
 import { getActorAge, getActorVideoCount } from "../../../util/videoUtils";
 import Modal from "../../shared/modal";
 import ActorEditPanel from "../editPanel/actorEditPanel";
-import { VideosAppContext } from "../videosAppContext";
+import { VideosAppContext } from "../../../context/videosAppContext";
 import type { TagType } from "../../../util/enums";
 import type { VideosAppTag } from "../../../types/tags";
 

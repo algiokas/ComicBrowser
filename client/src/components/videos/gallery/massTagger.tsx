@@ -1,7 +1,7 @@
 import { useContext, useEffect, useMemo, useState, useRef } from "react";
 import type { VideosAppTag } from "../../../types/tags";
 import type { Video } from "../../../types/video";
-import { VideosAppContext } from "../videosAppContext";
+import { VideosAppContext } from "../../../context/videosAppContext";
 import VideoSortControls from "./videoSortControls";
 import { VideosSortOrder } from "../../../util/enums";
 import VideoGalleryItem from "./videoGalleryItem";
