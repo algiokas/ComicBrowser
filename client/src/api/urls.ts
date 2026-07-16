@@ -17,9 +17,11 @@ async function shortNumericHash(input: string, digits = 8): Promise<number> {
     return num % (10 ** digits);
 }
 
+const THUMBNAIL_WIDTH = 960
+
 export async function getVideoThumbnailUrl(video: Video): Promise<string> {
     const versionHash = await shortNumericHash(video.thumbnailId)
-    return `${apiBaseUrl}/videos/thumbnail/${video.id}?v=${versionHash}`
+    return `${apiBaseUrl}/videos/thumbnail/${video.id}?v=${versionHash}&w=${THUMBNAIL_WIDTH}`
 }
 
 export async function getActorImageUrl(actor: Actor): Promise<string> {
