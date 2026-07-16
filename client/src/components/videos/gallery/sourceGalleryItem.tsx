@@ -20,7 +20,7 @@ const SourceGalleryItem = (props: SourceGalleryItemProps) => {
         }
     }, [props.data])
 
-    const bodyClick = (e: React.MouseEvent) => {
+    const bodyClick = (_e: React.MouseEvent) => {
         if (props.bodyClickHandler)
             props.bodyClickHandler(props.data, props.index)
     }

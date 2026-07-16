@@ -31,7 +31,7 @@ const ActorDetail = (props: ActorDetailProps) => {
         console.log(tagName)
     }
 
-    const generateTagImage = (e: React.MouseEvent, tag: VideosAppTag, tagType: TagType): void => {
+    const generateTagImage = (_e: React.MouseEvent, _tag: VideosAppTag, _tagType: TagType): void => {
     }
 
     return (

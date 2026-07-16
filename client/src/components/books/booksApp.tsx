@@ -57,7 +57,7 @@ function BooksApp(props: BooksAppProps) {
   const [currentSlideshow, setCurrentSlideshow] = useState<Slideshow>(getEmptySlideshow())
   const [currentSearchQuery, setCurrentSearchQuery] = useState<IBookSearchQuery>(getEmptyQuery())
   const [slideshowInterval, setSlideshowInterval] = useState<number>(5)
-  const [galleryPageSize, setGalleryPageSize] = useState<number>(12)
+  const [galleryPageSize] = useState<number>(12)
 
   useEffect(() => {
     const init = async () => {

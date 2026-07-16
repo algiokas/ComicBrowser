@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import type { Video } from "../../../types/video";
 import type { VideoSource } from "../../../types/videoSource";
 import { VideosEditField } from "../../../util/enums";

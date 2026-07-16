@@ -76,12 +76,12 @@ const ActorGallery = (props: ActorGalleryProps) => {
                 })
                 break
             case ActorsSortOrder.Random:
-                sortedCopy.sort((a, b) => {
+                sortedCopy.sort(() => {
                     return 0.5 - Math.random()
                 })
                 break
             case ActorsSortOrder.Favorite:
-                sortedCopy.sort((a, b) => {
+                sortedCopy.sort(() => {
                     return 0.5 - Math.random()
                 })
                 let favorites = sortedCopy.filter(b => b.isFavorite)

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import type { Book } from "../../../types/book";
 import type { IBookSearchQuery } from "../../../types/searchQuery";
 import { GetCoverPath } from "../../../util/helpers";
@@ -15,14 +15,7 @@ interface BookInfoProps {
     viewSearchResults(query?: IBookSearchQuery): void
 }
 
-interface BookInfoState {
-    inputRef: React.RefObject<HTMLInputElement>,
-    showEditModal: boolean,
-    tagToAdd: string
-}
-
 const BookInfo = (props: BookInfoProps) => {
-    const [tagToAdd, setTagToAdd] = useState<string>('')
     const [showEditModal, setShowEditModal] = useState<boolean>(false)
 
     const searchGroup = (g: string): void => {

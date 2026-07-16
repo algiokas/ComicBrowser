@@ -19,7 +19,7 @@ interface GalleryItemProps {
 }
 
 const GalleryItem = (props: GalleryItemProps) => {
-  const bodyClick = (e: React.MouseEvent) => {
+  const bodyClick = (_e: React.MouseEvent) => {
     if (props.bodyClickHandler)
       props.bodyClickHandler(props.book, props.index)
   }

@@ -35,7 +35,7 @@ const ActorSortControls = (props: ActorSortControlsProps) => {
     const firstGalleryMatchForIndex = (indexKey: string): number => {
         let firstMatch = 0
         let hasFindFunction = false
-        let findFunction = (a: Actor) => { }
+        let findFunction = (_a: Actor) => { }
         switch (props.sortOrder) {
             case ActorsSortOrder.Name:
                 findFunction = (a: Actor) => {

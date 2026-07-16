@@ -1,12 +1,10 @@
 import { useContext, useState } from "react"
 import { VideosAppContext } from "../../../context/videosAppContext"
 import { TagType } from "../../../util/enums"
-import type { VideosAppTag, VideoTag } from "../../../types/tags"
+import type { VideosAppTag } from "../../../types/tags"
 import TagsGalleryItem from "./tagsGalleryItem"
 
-interface TagsGalleryProps { }
-
-const TagsGallery = (props: TagsGalleryProps) => {
+const TagsGallery = () => {
     const [tagType, setTagType] = useState<TagType>("Video")
 
     const appContext = useContext(VideosAppContext)
@@ -21,7 +19,6 @@ const TagsGallery = (props: TagsGalleryProps) => {
         if (a.name === "Default Thumbnail") return -1
         return a.name.localeCompare(b.name)
     }
-    const idSort = (a: VideosAppTag, b: VideosAppTag): number => b.id - a.id
 
     const getTagsByType = (t: TagType): (VideosAppTag)[] => {
         switch (t) {

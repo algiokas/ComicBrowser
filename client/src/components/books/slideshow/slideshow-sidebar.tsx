@@ -42,13 +42,6 @@ interface SidebarProps {
     deleteCollection(collectionId: number): void
 }
 
-interface SidebarState {
-    sidebarRef: React.RefObject<HTMLDivElement>,
-    coversRef: React.RefObject<HTMLDivElement>,
-    listingHeight: number,
-    showSaveModal: boolean
-}
-
 const Sidebar = (props: SidebarProps) => {
     const [showSaveModal, setShowSaveModal] = useState<boolean>(false)
 
@@ -102,25 +95,8 @@ const Sidebar = (props: SidebarProps) => {
         }
     }
 
-    const addTagToBook = (tag: string) => {
-        console.log(`add tag "${tag}" to book`)
-        if (props.updateBook) {
-            let req = props.slideshow.books[0]
-            if (req.tags) {
-                req.tags.push(tag)
-            } else {
-                req.tags = [tag]
-            }
-            props.updateBook(req)
-        }
-    }
-
     const toggleSaveModal = (): void => {
         setShowSaveModal(!showSaveModal)
-    }
-
-    const resetSlideshow = () => {
-        props.setPage(0)
     }
 
     const deleteCurrentCollection = () => {

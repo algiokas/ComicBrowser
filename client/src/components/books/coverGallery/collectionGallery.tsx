@@ -11,7 +11,7 @@ interface CollectionGalleryProps extends BaseGalleryProps<Collection> {
 }
 
 const CollectionGallery = (props: CollectionGalleryProps) => {
-    const [items, setItems] = useState<Collection[]>(props.allItems)
+    const [items] = useState<Collection[]>(props.allItems)
     const [galleryPage, setGalleryPage] = useState<number>(0)
     const [totalPages, setTotalPages] = useState<number>(0)
 
@@ -25,14 +25,6 @@ const CollectionGallery = (props: CollectionGalleryProps) => {
             return Math.max(1, Math.ceil(items.length / props.pageSize))
         }
         return 1
-    }
-
-    const getPageSize = (pageNum: number): number => {
-        if (pageNum < totalPages - 1) {
-            return props.pageSize
-        } else {
-            return items.length % props.pageSize
-        }
     }
 
     const setPage = (pageNum: number) => {

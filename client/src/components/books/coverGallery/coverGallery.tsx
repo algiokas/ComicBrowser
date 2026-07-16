@@ -26,7 +26,6 @@ const CoverGallery = (props: CoverGalleryProps) => {
     const initialSortOrder = props.sortOrder ?? BooksSortOrder.Favorite
 
     const [ galleryPage, setGalleryPage ] = useState<number>(0)
-    const [ currentPageSize, setCurrentPageSize ] = useState<number>(props.allBooks.length < props.pageSize ? props.allBooks.length : props.pageSize)
     const [ bookList, setBookList ] = useState<Book[]>([])
     const [ totalPages, setTotalPages ] = useState<number>(0)
     const [ sortOrder, setSortOrder ] = useState<BooksSortOrder>(initialSortOrder)
@@ -84,12 +83,12 @@ const CoverGallery = (props: CoverGalleryProps) => {
                 })
                 break
             case BooksSortOrder.Random:
-                sortedCopy.sort((a, b) => {
+                sortedCopy.sort(() => {
                     return 0.5 - Math.random()
                 })
                 break
             case BooksSortOrder.Favorite:
-                sortedCopy.sort((a, b) => {
+                sortedCopy.sort(() => {
                     return 0.5 - Math.random()
                 })
                 let favorites = sortedCopy.filter(b => b.isFavorite)
@@ -172,19 +171,11 @@ const CoverGallery = (props: CoverGalleryProps) => {
         return bookList.slice(pageStart, pageEnd)
     }
 
-    const getPageSize = (pageNum: number): number => {
-        if (pageNum < totalPages-1) {
-            return props.pageSize
-        } else {
-            return bookList.length % props.pageSize
-        }
-    }
-
     const setPage = (pageNum: number) => {
         setGalleryPage(pageNum)
     }
 
-    const bodyClick = (book: Book, bookIndex: number) => {
+    const bodyClick = (book: Book) => {
         props.viewBook(book)
     }
 

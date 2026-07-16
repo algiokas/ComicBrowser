@@ -3,7 +3,7 @@ import type { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
 import type { Collection } from "../../../types/slideshow";
 
 const CollectionGalleryItem = (props: BaseGalleryItemProps<Collection>) => {
-  const bodyClick = (e: React.MouseEvent) => {
+  const bodyClick = (_e: React.MouseEvent) => {
     if (props.bodyClickHandler)
       props.bodyClickHandler(props.data, props.index)
   }

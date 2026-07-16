@@ -35,7 +35,7 @@ const SortControls = (props: SortControlsProps) => {
     const firstGalleryMatchForIndex = (indexKey: string): number => {
         let firstMatch = 0
         let hasFindFunction = false
-        let findFunction = (b: Book) => {}
+        let findFunction = (_b: Book) => {}
         switch (props.sortOrder) {
             case BooksSortOrder.Author:
                 findFunction = (b: Book) => { 

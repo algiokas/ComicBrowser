@@ -110,7 +110,7 @@ const ActorEditPanel = (props: ActorEditPanelProps) => {
                     valueRange={appContext.allActorTags.sort((a, b) => a.name.localeCompare(b.name))}
                     getDisplayString={(t) => t?.name ?? ''}
                     getValueFromDisplayString={(str) => { return appContext.allActorTags.find((t) => t.name == str) ?? null }}
-                    getValueFromTextInput={(str) => { return { id: -1, name: str, tagType: 'actor' } }}
+                    getValueFromTextInput={(str) => { return { id: -1, name: str, tagType: 'actor', imageFile: '' } }}
                 />
             </div>
             <div className="edit-panel-controls">

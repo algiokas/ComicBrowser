@@ -7,13 +7,8 @@ import { VideosSortOrder } from "../../../util/enums";
 import VideoGalleryItem from "./videoGalleryItem";
 import EyeImage from "../../../img/svg/eye-fill.svg"
 
-interface MassTaggerProps {
-    sortOrder?: VideosSortOrder;
-}
-
-const MassTagger = (props: MassTaggerProps) => {
+const MassTagger = () => {
     const appContext = useContext(VideosAppContext)
-    const initialSortOrder = props.sortOrder ?? VideosSortOrder.ID
     const [shuffleVersion, setShuffleVersion] = useState(0);
 
     const randomWeights = useRef<Map<number, number>>(new Map());

@@ -4,9 +4,7 @@ import PageSelect from "../../shared/pageSelect";
 import SourceGalleryItem from "./sourceGalleryItem";
 import { VideosAppContext } from "../../../context/videosAppContext";
 
-interface SourceGalleryProps { }
-
-const SourceGallery = (props: SourceGalleryProps) => {
+const SourceGallery = () => {
     const [galleryPage, setGalleryPage] = useState<number>(0)
 
     const appContext = useContext(VideosAppContext)

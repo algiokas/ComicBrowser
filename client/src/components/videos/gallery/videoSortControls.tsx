@@ -36,7 +36,7 @@ const VideoSortControls = (props: VideoSortControlsProps) => {
     const firstGalleryMatchForIndex = (indexKey: string): number => {
         let firstMatch = 0
         let hasFindFunction = false
-        let findFunction = (b: Video) => { }
+        let findFunction = (_b: Video) => { }
         switch (props.sortOrder) {
             case VideosSortOrder.Actor:
                 findFunction = (b: Video) => {

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import type { Book } from "../../../types/book";
 import type { IBookSearchQuery } from "../../../types/searchQuery";
-import type { Slideshow } from "../../../types/slideshow";
+import type { Slideshow as SlideshowModel } from "../../../types/slideshow";
 import { BooksViewMode } from "../../../util/enums";
 import { GetPagePathMulti, getSlideshowBookByPage } from "../../../util/helpers";
 import GridPage from "./gridPage";
 import Sidebar from "./slideshow-sidebar";
 
 interface SlideshowProps {
-    slideshow: Slideshow,
+    slideshow: SlideshowModel,
     currentPage: number,
     viewMode: BooksViewMode,
 
@@ -140,7 +140,7 @@ const Slideshow = (props: SlideshowProps) => {
         }
     }
 
-    const firstPageOfBook = (book: Book, bookIndex: number) => {
+    const firstPageOfBook = (_book: Book, bookIndex: number) => {
         let pageIndex = 0;
         for (let i = 0; i < bookIndex; i++) {
             pageIndex += props.slideshow.books[i].pageCount

@@ -34,7 +34,7 @@ const VideosApp = (props: VideosAppProps) => {
   const [currentSearchQuery, setCurrentSearchQuery] = useState<IVideoSearchQuery>(getEmptyQuery())
   const [showLoadingModal, setShowLoadingModal] = useState<boolean>(false)
   const [loadingModalText, setLoadingModalText] = useState<string>("")
-  const [galleryPageSize, setGalleryPageSize] = useState<number>(12)
+  const [galleryPageSize] = useState<number>(12)
   const [playerSidebarCollapsed, setPlayerSidebarCollapsed] = useState<boolean>(false)
 
   const [videoListingPage, setVideoListingPage] = useState<number>(0)
