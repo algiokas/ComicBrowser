@@ -1,5 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
-import { getActorImageUrl, getTagImageUrl, getVideoThumbnailUrl } from "../../../api/urls";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { getActorImageUrl, getTagImageUrl, getVideoThumbnailUrl, withThumbnailWidth } from "../../../api/urls";
+import { useThumbnailWidth } from "../../../util/useThumbnailWidth";
 import type { ActorTag, VideosAppTag, VideoTag } from "../../../types/tags";
 import { VideosAppContext } from "../../../context/videosAppContext";
 import type { Actor } from "../../../types/actor";
@@ -15,8 +16,13 @@ interface TagsGalleryItemProps {
 
 const TagsGalleryItem = (props: TagsGalleryItemProps) => {
     const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string>('')
+    const imageContainerRef = useRef<HTMLDivElement>(null)
 
     const appContext = useContext(VideosAppContext)
+
+    // Request the tag thumbnail at its rendered size (x device pixel ratio).
+    const thumbnailWidth = useThumbnailWidth(imageContainerRef)
+    const sizedThumbnailUrl = withThumbnailWidth(thumbnailImageUrl, thumbnailWidth)
 
     const getTagImage = async (): Promise<string> => {
         if (props.tag.imageFile) {
@@ -85,11 +91,11 @@ const TagsGalleryItem = (props: TagsGalleryItemProps) => {
     return (
         <div className="tags-gallery-item" key={props.tag.name}>
             <div className="tags-gallery-item-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
-                <div className="tags-gallery-item-image">
+                <div className="tags-gallery-item-image" ref={imageContainerRef}>
                     {
-                        thumbnailImageUrl ?
+                        sizedThumbnailUrl ?
                             <img
-                                src={thumbnailImageUrl}
+                                src={sizedThumbnailUrl}
                                 alt={`${props.tag.name} thumbnail`}
                                 onLoad={() => { if (props.onImageLoad) props.onImageLoad(props.index) }}>
                             </img>

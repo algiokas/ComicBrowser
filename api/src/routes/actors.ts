@@ -2,7 +2,7 @@ import { Router } from 'express';
 var router = Router();
 import * as videoRepository from '../videoRepository.ts';
 import * as ffmpeg from '../ffmpeg.ts';
-import { sendImageFile } from './sendImage.ts';
+import { sendImage } from './sendImage.ts';
 
 router.get('/', function (req, res) {
     res.json(videoRepository.getActors())
@@ -21,14 +21,14 @@ router.get('/:actorId', function (req, res) {
     res.json(videoRepository.getActor(actorId))
 })
 
-router.get('/:actorId/image', function (req, res) {
+router.get('/:actorId/image', async function (req, res) {
     const actorId = Number(req.params.actorId)
     if (isNaN(actorId)) {
         res.status(500).send(`Internal Server Error: parameter actorId must be a number - provided value: ${req.params.actorId}`)
         return
     }
     let fpath = videoRepository.getActorImagePath(actorId)
-    if (fpath) sendImageFile(res, fpath);
+    if (fpath) await sendImage(req, res, fpath);
     else {
         res.sendStatus(404).end();
     }

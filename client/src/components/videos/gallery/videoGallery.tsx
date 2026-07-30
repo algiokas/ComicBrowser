@@ -54,6 +54,18 @@ const VideoGallery = (props: VideoGalleryProps) => {
     useEffect(() => {
         const pageItemCount = getCurrentGalleryPageItems(items).length
         setImageLoadState(new BitArray(pageItemCount))
+
+        // Nothing to load (empty gallery, or items not yet populated during the
+        // initial mount pass): hide the modal and bail. Critically we must NOT
+        // fall through to showing it, because the allTrue effect below treats an
+        // empty tracker as "all loaded" and would immediately hide it again -
+        // that race is what previously kept the modal from ever showing on the
+        // very first gallery load.
+        if (pageItemCount === 0) {
+            appContext.setLoadingModal(false)
+            return
+        }
+
         appContext.setLoadingModal(true, "Loading Images")
 
         const timeout = setTimeout(() => {
@@ -64,7 +76,11 @@ const VideoGallery = (props: VideoGalleryProps) => {
 
     useEffect(() => {
         //console.log(`update image load state: [${imageLoadState.getBits().map(b => b ? 1 : 0).join(',')}]`)
-        if (imageLoadState.allTrue()) {
+        // Only hide once a *non-empty* tracker is fully resolved. allTrue() is
+        // vacuously true for an empty BitArray, so without the length guard the
+        // transient empty state produced while items populate would hide the
+        // modal before any image has actually loaded.
+        if (imageLoadState.getBits().length > 0 && imageLoadState.allTrue()) {
             appContext.setLoadingModal(false)
         }
     }, [imageLoadState])

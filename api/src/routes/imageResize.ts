@@ -8,7 +8,13 @@ const CACHE_DIR = process.env.IMAGE_CACHE_DIR
         ? path.join(process.env.VIDEOS_DATA_DIR, 'images', 'resized')
         : path.join(process.cwd(), '.image-cache'));
 
-const ALLOWED_WIDTHS = [240, 480, 720, 960, 1440, 1920];
+// Buckets chosen to cover the galleries' rendered sizes across device pixel
+// ratios: tag/mass-tagger tiles (~477 CSS px) and video/actor/source tiles
+// (~607 CSS px), each times a 1x-2x DPR. Snapping requests to this small set
+// keeps the derived-image cache from exploding across arbitrary widths.
+//   477 -> 480 (1x) / 720 (1.5x) / 960 (2x)
+//   607 -> 720 (1x) / 960 (1.5x) / 1280 (2x)
+const ALLOWED_WIDTHS = [480, 720, 960, 1280, 1920];
 
 const inFlight = new Map<string, Promise<string>>();
 

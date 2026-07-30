@@ -3,7 +3,8 @@ import StarsImage from "../../../img/svg/stars.svg";
 import TagsImage from "../../../img/svg/tags.svg";
 import type { Actor } from "../../../types/actor";
 import type { Video } from "../../../types/video";
-import { getVideoThumbnailUrl } from "../../../api/urls";
+import { getVideoThumbnailUrl, withThumbnailWidth } from "../../../api/urls";
+import { useThumbnailWidth } from "../../../util/useThumbnailWidth";
 import type { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
 
 type VideoGalleryItemProps = Omit<BaseGalleryItemProps<Video>, 'imageUrl'> & {
@@ -21,6 +22,13 @@ type VideoGalleryItemProps = Omit<BaseGalleryItemProps<Video>, 'imageUrl'> & {
 const VideoGalleryItem = (props: VideoGalleryItemProps) => {
   const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string>(props.imageUrl ?? '')
   const imgRef = useRef<HTMLImageElement>(null)
+  const imageContainerRef = useRef<HTMLDivElement>(null)
+
+  // Request the thumbnail at the size it actually renders (x device pixel
+  // ratio). Measured before paint, so the first <img> already asks for the
+  // right size rather than fetching the full-res source first.
+  const thumbnailWidth = useThumbnailWidth(imageContainerRef)
+  const sizedThumbnailUrl = withThumbnailWidth(thumbnailImageUrl, thumbnailWidth)
 
   useEffect(() => {
     const updateThumbnail = async () => {
@@ -33,10 +41,10 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
   }, [props.data])
 
   useEffect(() => {
-    if (thumbnailImageUrl && imgRef.current?.complete && props.onImageLoad) {
+    if (sizedThumbnailUrl && imgRef.current?.complete && props.onImageLoad) {
       props.onImageLoad(props.index)
     }
-  }, [thumbnailImageUrl])
+  }, [sizedThumbnailUrl])
 
   const bodyClick = (e: React.MouseEvent) => {
     if (props.bodyClickHandler)
@@ -71,12 +79,12 @@ const VideoGalleryItem = (props: VideoGalleryItemProps) => {
   return (
     <div className={tileClassName} key={props.data.title}>
       <div className="video-gallery-inner" onClick={props.bodyClickHandler ? bodyClick : undefined}>
-        <div className="video-gallery-image">
+        <div className="video-gallery-image" ref={imageContainerRef}>
           {
-            thumbnailImageUrl ?
+            sizedThumbnailUrl ?
               <img
                 ref={imgRef}
-                src={thumbnailImageUrl}
+                src={sizedThumbnailUrl}
                 alt={`${props.data.title} thumbnail`}
                 onLoad={() => { if (props.onImageLoad) props.onImageLoad(props.index) }}
                 onError={() => { if (props.onImageError) props.onImageError(props.index) }}

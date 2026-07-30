@@ -1,7 +1,10 @@
+import { useRef } from "react";
 import type { Actor } from "../../../types/actor";
 import StarsImage from "../../../img/svg/stars.svg"
 import TagsImage from "../../../img/svg/tags.svg";
 import type { BaseGalleryItemProps } from "../../shared/baseGalleryItem";
+import { withThumbnailWidth } from "../../../api/urls";
+import { useThumbnailWidth } from "../../../util/useThumbnailWidth";
 
 interface ActorGalleryItemProps extends BaseGalleryItemProps<Actor> {
   children?: React.ReactNode,
@@ -10,6 +13,10 @@ interface ActorGalleryItemProps extends BaseGalleryItemProps<Actor> {
 }
 
 const ActorGalleryItem = (props: ActorGalleryItemProps) => {
+  const imageContainerRef = useRef<HTMLDivElement>(null)
+  const thumbnailWidth = useThumbnailWidth(imageContainerRef)
+  const sizedImageUrl = withThumbnailWidth(props.imageUrl, thumbnailWidth)
+
   const bodyClick = (_e: React.MouseEvent) => {
     if (props.bodyClickHandler)
       props.bodyClickHandler(props.data, props.index)
@@ -36,8 +43,8 @@ const ActorGalleryItem = (props: ActorGalleryItemProps) => {
             : null
         }
 
-        <div className="actor-gallery-image">
-          <img src={props.imageUrl} alt={`${props.data.name} thumbnail`}></img>
+        <div className="actor-gallery-image" ref={imageContainerRef}>
+          <img src={sizedImageUrl} alt={`${props.data.name} thumbnail`}></img>
         </div>
         <div className="favorite-icon" onClick={props.favoriteClickHandler ? favoriteClick : undefined}>
           {
