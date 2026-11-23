@@ -12,6 +12,7 @@ import SourceDetail from "./sourceDetail"
 import { VideosAppContext } from "../../../context/videosAppContext"
 import { scalarArrayCompare } from "../../../util/helpers"
 import { BitArray } from "../../../util/bitArray"
+import { useGalleryNavigation } from "../../../hooks/useGalleryNavigation"
 
 interface VideoGalleryProps {
     pageSize: number,
@@ -84,6 +85,8 @@ const VideoGallery = (props: VideoGalleryProps) => {
             appContext.setLoadingModal(false)
         }
     }, [imageLoadState])
+
+
 
     const updateItems = (videos: Video[], query?: IVideoSearchQuery) => {
         if (query) {
@@ -293,6 +296,13 @@ const VideoGallery = (props: VideoGalleryProps) => {
         setDisabledSortOrder(prev => [...prev, "AlphaSource"])
         return true
     }
+
+        useGalleryNavigation({
+        currentPage: getGalleryPage(),
+        totalPages: totalPages,
+        setPage: setPage,
+        isEnabled: true
+    })
 
     return (
         <div className="video-gallery-container dark-theme">
